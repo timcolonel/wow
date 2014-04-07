@@ -1,4 +1,4 @@
-from lib.build.builder import Builder
+from src.build.builder import Builder
 
 class Wow:
     options = {}

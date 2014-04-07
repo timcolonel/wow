@@ -18,9 +18,9 @@ Options:
 
 """
 
-from lib.wow import Wow
+from src.wow import Wow
 from docopt import docopt
-from lib.exception import WowException
+from src.exception import WowException
 import logging
 
 logging.basicConfig(format='%(message)s', level=logging.DEBUG)

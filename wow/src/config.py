@@ -1,7 +1,7 @@
 import yaml
 import glob
 import os.path
-from lib.exception import WowException
+from src.exception import WowException
 
 
 class Config:
