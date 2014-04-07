@@ -5,7 +5,8 @@ Usage:
     wow
     wow install <application>...
     wow uninstall <application>...
-    wow build
+    wow unpack <file>...
+    wow build [<config_file>]
     wow push
     wow compile
     wow (-h | --help)
@@ -19,9 +20,15 @@ Options:
 
 from lib.wow import Wow
 from docopt import docopt
+from lib.exception import WowException
+import logging
 
+logging.basicConfig(format='%(message)s', level=logging.DEBUG)
 
 if __name__ == '__main__':
     arguments = docopt(__doc__, version='1.0.0')
     engine = Wow()
-    engine.run(arguments)
+    try:
+        engine.run(arguments)
+    except WowException as e:
+        logging.error(str(e))
