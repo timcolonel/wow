@@ -1,6 +1,6 @@
 from setuptools import setup
 
-dependencies = ['docopt', 'pyyaml']
+dependencies = ['docopt', 'pyyaml', 'inflection']
 
 setup(
 

@@ -2,11 +2,17 @@ import yaml
 import glob
 import os.path
 from src.exception import WowException
+from src.config_format import ConfigFormat
 
 
 class Config:
     config = {}
     config_file = 'wow.yml'
+
+    config_format = ConfigFormat()
+    config_format.validate_presence_of(['name', 'version', 'files'])
+    config_format.validate_with('name', '^[a-z0-9_-]+$', 'Error in config file. Name should'
+                                                         ' only contain lowercase, numbers and _-')
 
     def load(self):
         """
@@ -14,10 +20,17 @@ class Config:
         """
 
         if not os.path.isfile(self.config_file):
-            raise WowException("Config file does '%s' not exist" % self.config_file)
+            raise WowException("Config file does `%s` not exist" % self.config_file)
 
         stream = open(self.config_file, 'r')
         self.config = yaml.load(stream)
+        self.validate()
+
+    def validate(self):
+        """
+            Check the required values where specified
+        """
+        self.config_format.validate(self.config)
 
     def all_files(self):
         """
