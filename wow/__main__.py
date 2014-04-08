@@ -7,7 +7,7 @@ Usage:
     wow uninstall <application>...
     wow unpack <file>...
     wow build [<config_file>]
-    wow push
+    wow push <file>
     wow compile
     wow (-h | --help)
     wow --version

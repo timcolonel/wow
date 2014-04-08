@@ -5,13 +5,14 @@ from bs4 import BeautifulSoup
 class Uploader:
     root_url = 'http://localhost:3000/'
 
-    def upload(self):
+    def upload(self, filename):
         print('pusshing')
         self.client = requests.session()
+        print(filename)
         self.login()
         upload_url = self.url('/package/version/upload')
         token = self.get_authenticity_token(upload_url)
-        files = {'file': open('wow.yml', 'rb')}
+        files = {'file': open(filename, 'rb')}
         self.client.post(upload_url, files=files, headers={'X-CSRF-Token': token})
 
     def login(self):

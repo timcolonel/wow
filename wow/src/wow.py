@@ -31,4 +31,4 @@ class Wow:
 
     def push(self):
         uploader = Uploader()
-        uploader.upload()
+        uploader.upload(self.options['<file>'][0])
