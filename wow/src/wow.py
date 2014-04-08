@@ -1,4 +1,6 @@
 from src.build.builder import Builder
+from src.push.uploader import Uploader
+
 
 class Wow:
     options = {}
@@ -11,6 +13,8 @@ class Wow:
             self.uninstall()
         elif options['build']:
             self.build()
+        elif options['push']:
+            self.push()
 
     def install(self):
         print('install')
@@ -25,3 +29,6 @@ class Wow:
             builder.config_file = self.options['<config_file>']
         builder.build()
 
+    def push(self):
+        uploader = Uploader()
+        uploader.upload()
