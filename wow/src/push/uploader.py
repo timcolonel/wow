@@ -1,4 +1,5 @@
 import requests
+from getpass import getpass
 from bs4 import BeautifulSoup
 
 
@@ -13,14 +14,20 @@ class Uploader:
         upload_url = self.url('/package/version/upload')
         token = self.get_authenticity_token(upload_url)
         files = {'file': open(filename, 'rb')}
-        self.client.post(upload_url, files=files, headers={'X-CSRF-Token': token})
+        r = self.client.post(upload_url, files=files, headers={'X-CSRF-Token': token})
+        json = r.json()
+        if json['success']:
+            print('Uploaded with success!')
+        else:
+            print('Error while uploading:')
+            print(json['message'])
 
     def login(self):
         login_url = self.url('/users/sign_in')
         token = self.get_authenticity_token(login_url)
         while True:
             email = input('Email:')
-            password = input('Password:')
+            password = getpass('Password:')
             r = self.client.post(login_url,
                                  data={'user[email]': email, 'user[password]': password, 'return_json': True},
                                  headers={'X-CSRF-Token': token})
