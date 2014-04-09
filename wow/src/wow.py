@@ -25,8 +25,8 @@ class Wow:
     def build(self):
         print('Building')
         builder = Builder()
-        if self.options['<config_file>'] is not None:
-            builder.config_file = self.options['<config_file>']
+        if self.options['<platform>'] is not None:
+            builder.platform = self.options['<platform>']
         builder.build()
 
     def push(self):

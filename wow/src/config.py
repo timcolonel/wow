@@ -8,6 +8,7 @@ from src.config_format import ConfigFormat
 class Config:
     config = {}
     config_file = 'wow.yml'
+    platform = ''
 
     config_format = ConfigFormat()
     config_format.validate_presence_of(['name', 'version', 'files'])
