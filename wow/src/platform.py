@@ -18,16 +18,18 @@ class Platform:
         """
             This will check if the platform given is a subplatform of the parent one
         """
+        if platform == parent:
+            return True
         parent_element = Platform.get_element(Platform.platforms['platforms'], parent)
         if parent_element is None:
-            logging.log('The given platform is unknown: `%s`', parent_element)
-            return
+            logging.error('The given platform is unknown: `%s`', parent_element)
+            return False
         else:
             return not Platform.get_element(parent_element, platform) is None
 
     @staticmethod
     def get_element(hash, element):
-        if hash is dict:
+        if type(hash) is dict:
             for key in hash:
                 if key == element:
                     return hash[key]
@@ -35,7 +37,7 @@ class Platform:
                     result = Platform.get_element(hash[key], element)
                     if not result is None:
                         return result
-        elif hash is list:
+        elif type(hash) is list:
             for e in hash:
                 if e == element:
                     return e

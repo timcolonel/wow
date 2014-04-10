@@ -3,6 +3,7 @@ import glob
 import os.path
 from src.exception import WowException
 from src.config_format import ConfigFormat
+from src.platform import Platform
 
 
 class Config:
@@ -26,6 +27,13 @@ class Config:
         stream = open(self.config_file, 'r')
         self.config = yaml.load(stream)
         self.validate()
+
+        if not self.config['platforms'] is None:
+            for config_platform in self.config['platforms']:
+                if Platform.is_in_platform(config_platform, self.platform):
+                    print('In %s' % config_platform)
+                else:
+                    print('Not %s' % config_platform)
 
     def validate(self):
         """
