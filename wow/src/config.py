@@ -7,6 +7,9 @@ from src.platform import Platform
 
 
 class Config:
+    """
+        wow.yml config file container
+    """
     config = {}
     config_file = 'wow.yml'
     platform = ''
