@@ -1,6 +1,6 @@
 from src.action.build.builder import Builder
 from src.action.push.uploader import Uploader
-from src.action.extract.extracter import Extracter
+from src.action.extract.extractor import Extractor
 
 
 class Wow:
@@ -8,7 +8,9 @@ class Wow:
 
     def run(self, options):
         self.options = options
-        if options['install']:
+        if options['extract']:
+            self.extract()
+        elif options['install']:
             self.install()
         elif options['uninstall']:
             self.uninstall()
@@ -19,8 +21,8 @@ class Wow:
 
     #Extract a wow file
     def extract(self):
-        extracter = Extracter()
-        extracter.extract(self.options['<filename>'])
+        extractor = Extractor()
+        extractor.extract(self.options['<filename>'])
 
     #Download a
     def install(self):

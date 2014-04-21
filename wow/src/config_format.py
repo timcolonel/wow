@@ -28,6 +28,5 @@ class ConfigFormat:
         for hash in self.config_attributes_regex:
             name = hash['name']
             regex = hash['regex']
-            print('Bullshit: ' + config[name])
             if not re.match(regex, config[name]):
                 raise WowException(hash['message'])
