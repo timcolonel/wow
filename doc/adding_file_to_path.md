@@ -12,5 +12,5 @@
 
 
 #Options:
-* Make a shortcut for executable files
+* Make a shortcut for executable files `os.symlink`
 * Create bash script for scripts
