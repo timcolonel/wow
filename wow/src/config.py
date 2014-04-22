@@ -18,6 +18,8 @@ class Config:
     config_format.validate_presence_of(['name', 'version', 'files'])
     config_format.validate_with('name', '^[a-z0-9_-]+$', 'Error in config file. Name should'
                                                          ' only contain lowercase, numbers and _-')
+    def __init__(self, config_file='wow.yml'):
+        self.config_file = config_file
 
     def load(self):
         """
@@ -53,4 +55,14 @@ class Config:
         for pattern in self.config['files']:
             filenames += glob.glob(pattern)
         filenames.append(self.config_file)
+        return filenames
+
+    def all_executables(self):
+        """
+            return all the files matching the patterns provided in the config
+        """
+        filenames = []
+
+        for pattern in self.config['executables']:
+            filenames += glob.glob(pattern)
         return filenames

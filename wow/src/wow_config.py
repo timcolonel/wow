@@ -4,3 +4,5 @@ class WowConfig:
     """
 
     install_folder = 'install'
+
+    link_folder = 'bin'

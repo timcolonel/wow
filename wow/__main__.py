@@ -33,3 +33,4 @@ if __name__ == '__main__':
         engine.run(arguments)
     except WowException as e:
         logging.error(str(e))
+
