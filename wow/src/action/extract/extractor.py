@@ -1,6 +1,6 @@
 from src.archive import Archive
 from src.wow_config import WowConfig
-from src.config import Config
+from src.package import Package
 import os
 
 
@@ -15,7 +15,7 @@ class Extractor:
         Archive.extract(filename, self.destination())
 
         config_file = os.path.join(self.destination(), 'wow.yml')
-        config = Config(config_file)
+        config = Package(config_file)
         config.load()
 
         for filepath in config.all_executables():

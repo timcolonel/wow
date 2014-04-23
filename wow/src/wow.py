@@ -1,6 +1,7 @@
 from src.action.build.builder import Builder
 from src.action.push.uploader import Uploader
 from src.action.extract.extractor import Extractor
+from src.action.uninstall.uninstaller import Uninstaller
 
 
 class Wow:
@@ -29,7 +30,9 @@ class Wow:
         print('install')
 
     def uninstall(self):
-        print('uninstalling')
+        uninstaller = Uninstaller()
+        for package in self.options['<package>']:
+            uninstaller.uninstall(package)
 
     def build(self):
         print('Building')

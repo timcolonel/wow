@@ -6,7 +6,7 @@ from src.config_format import ConfigFormat
 from src.platform import Platform
 
 
-class Config:
+class Package:
     """
         wow.yml config file container
     """
@@ -18,6 +18,7 @@ class Config:
     config_format.validate_presence_of(['name', 'version', 'files'])
     config_format.validate_with('name', '^[a-z0-9_-]+$', 'Error in config file. Name should'
                                                          ' only contain lowercase, numbers and _-')
+
     def __init__(self, config_file='wow.yml'):
         self.config_file = config_file
 
@@ -66,3 +67,9 @@ class Config:
         for pattern in self.config['executables']:
             filenames += glob.glob(pattern)
         return filenames
+
+    def name(self):
+        return self.config['name']
+
+    def version(self):
+        return self.config['version']
