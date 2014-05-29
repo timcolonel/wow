@@ -19,7 +19,6 @@ class Extractor:
         config.load()
 
         for filepath in config.all_executables():
-            print('filepaht: ' + filepath)
             filename = os.path.basename(filepath)
             Extractor.symlink(os.path.join(self.destination(), filepath), os.path.join(WowConfig.link_folder, filename))
 
