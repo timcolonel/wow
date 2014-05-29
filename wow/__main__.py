@@ -12,6 +12,7 @@ Usage:
     wow compile
     wow (-h | --help)
     wow --version
+    wow use <package> <version>
 Action
 Options:
   -h --help     Show this screen.

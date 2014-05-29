@@ -19,6 +19,8 @@ class Wow:
             self.build()
         elif options['push']:
             self.push()
+        elif options['use']:
+        	self.use()
 
     #Extract a wow file
     def extract(self):
@@ -44,3 +46,6 @@ class Wow:
     def push(self):
         uploader = Uploader()
         uploader.upload(self.options['<file>'][0])
+
+    def use(self):
+    	print('Using version x of package y')
