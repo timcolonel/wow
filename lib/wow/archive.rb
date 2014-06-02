@@ -2,18 +2,18 @@ require 'rubygems/package'
 
 module Wow
   class Archive
-    attr_accessor :tar
+    attr_accessor :tar_reader
     attr_accessor :archive_filename
 
     #Open archive file to read
     # @param filename Archive filename
     # @param block Optional block the archive is given as param
-    def self.read(filename, &block)
+    def self.open(filename, &block)
       archive = Archive.new
-      archive.tar = Gem::Package::TarReader.new(Zlib::GzipReader.open(filename))
+      archive.tar_reader = Gem::Package::TarReader.new(Zlib::GzipReader.open(filename))
       if block_given?
         block.call(archive)
-        archive.tar.close
+        archive.tar_reader.close
       end
       archive
     end
@@ -22,24 +22,30 @@ module Wow
       tar.each(&block)
     end
 
+    #Close the file
+    def close()
+    	tar_reader.close if tar_reader
+    end
+
     def extract_all(destination)
-      tar.each do |tar_entity|
-        destination_file = File.join destination, tar_entity.full_name
-        if tar_entity.directory?
-          FileUtils.mkdir_p destination_file
-        else
-          destination_directory = File.dirname(destination_file)
-          FileUtils.mkdir_p destination_directory unless File.directory?(destination_directory)
-          File.open destination_file, 'wb' do |f|
-            f.print tar_entity.open
-          end
-        end
-      end
+    	return false if tar_reader.nil?
+		tar_reader.each do |tar_entity|
+			destination_file = File.join destination, tar_entity.full_name
+			if tar_entity.directory?
+			  FileUtils.mkdir_p destination_file
+			else
+			  destination_directory = File.dirname(destination_file)
+			  FileUtils.mkdir_p destination_directory unless File.directory?(destination_directory)
+			  File.open destination_file, 'wb' do |f|
+			    f.print tar_entity.open
+			  end
+			end
+		end
     end
 
     def self.extract(filename, destination)
-      Archive.read(filename) do |tar|
-        tar.extract_all(destination)
+      Archive.open(filename) do |archive|
+        archive.extract_all(destination)
       end
     end
 
