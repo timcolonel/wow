@@ -2,6 +2,9 @@ require 'rubygems/package'
 
 module Wow
   class Archive
+    attr_accessor :gz
+    attr_accessor :io
+    attr_accessor :tar_writer
     attr_accessor :tar_reader
     attr_accessor :archive_filename
 
@@ -18,13 +21,37 @@ module Wow
       archive
     end
 
+    def self.write(filename, &block)
+      archive = Archive.new
+      io = StringIO.new('')
+      tar = Gem::Package::TarWriter.new(io)
+      [*filenames].each do |filename|
+        mode = File.stat(filename).mode
+        tar.add_file filename, mode do |tf|
+          File.open(filename, 'rb') { |f| tf.write f.open }
+        end
+      end
+    end
+
     def each (&block)
       tar.each(&block)
     end
 
     #Close the file
-    def close()
+    def close
+      gz.write io.string if gz
+      gz.close
     	tar_reader.close if tar_reader
+    end
+
+    def add_file(file)
+
+    end
+
+    def add_files(files)
+      files.each do |file|
+        add_file file
+      end
     end
 
     def extract_all(destination)
