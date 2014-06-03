@@ -3,6 +3,8 @@ wow
 
 Wow packer. Cross platform package manager
 
+#Requirements
+* `> Ruby 2.0.0`
 
 #Planned features
 * Distribute files(Copying file on user computer) 
