@@ -51,3 +51,5 @@ coverage.xml
 docs/_build/
 
 .idea/
+test/tmp
+coverage/
