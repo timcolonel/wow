@@ -1,4 +1,5 @@
 require 'rubygems/package'
+require 'pathname'
 
 module Wow
   class Archive
@@ -46,18 +47,30 @@ module Wow
       tar_reader.close if tar_reader
     end
 
-    def add_file(filename)
+    def add_file(filename, path_in_archive = '')
       mode = File.stat(filename).mode
-      tar_writer.add_file filename, mode do |tf|
+      filename_in_archive = if Pathname.new(filename).absolute?
+                              File.basename(filename)
+                            else
+                              filename
+                            end
+      archive_file_path = if path_in_archive.nil? or path_in_archive.empty?
+                            filename_in_archive
+                          else
+                            Join(path_in_archive, filename_in_archive)
+                          end
+      tar_writer.add_file archive_file_path, mode do |tf|
         File.open(filename, 'rb') { |f|
           tf.write f.read
         }
       end
     end
 
-    def add_files(filenames)
+    # Add the given list of files to the archive into the given folder
+
+    def add_files(filenames, path_in_archive = '')
       [*filenames].each do |filename|
-        add_file filename
+        add_file filename, path_in_archive
       end
     end
 
