@@ -23,14 +23,14 @@ module Wow
 
     def self.write(filename, &block)
       archive = Archive.new
-      io = StringIO.new('')
-      tar = Gem::Package::TarWriter.new(io)
-      [*filenames].each do |filename|
-        mode = File.stat(filename).mode
-        tar.add_file filename, mode do |tf|
-          File.open(filename, 'rb') { |f| tf.write f.open }
-        end
+      archive.io = StringIO.new('')
+      archive.gz = Zlib::GzipWriter.open(output)
+      archive.tar_writer = Gem::Package::TarWriter.new(io)
+      if block_given?
+        block.call(archive)
+        archive.tar_reader.close
       end
+      archive
     end
 
     def each (&block)
@@ -39,18 +39,23 @@ module Wow
 
     #Close the file
     def close
-      gz.write io.string if gz
-      gz.close
-    	tar_reader.close if tar_reader
+      unless gz.nil?
+        gz.write io.string 
+        gz.close
+      end
+      tar_reader.close if tar_reader
     end
 
-    def add_file(file)
-
+    def add_file(filename)
+      mode = File.stat(filename).mode
+      tar_writer.add_file filename, mode do |tf|
+      	File.open(filename, 'rb') { |f| tf.write f.open }
+      end
     end
 
-    def add_files(files)
-      files.each do |file|
-        add_file file
+    def add_files(filenames)
+      filenames.each do |filename|
+        add_file filename
       end
     end
 
@@ -77,17 +82,8 @@ module Wow
     end
 
     def self.create(filenames, output)
-      Zlib::GzipWriter.open(output) do |gz|
-        io = StringIO.new('')
-        tar = Gem::Package::TarWriter.new(io)
-        [*filenames].each do |filename|
-          mode = File.stat(filename).mode
-          tar.add_file filename, mode do |tf|
-            File.open(filename, 'rb') { |f| tf.write f.open }
-          end
-        end
-        gz.write io.string
-        tar.close
+      Archive.write(filename) do |archive|
+        archive.add_files filenames
       end
     end
   end
