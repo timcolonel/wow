@@ -24,11 +24,11 @@ module Wow
     def self.write(filename, &block)
       archive = Archive.new
       archive.io = StringIO.new('')
-      archive.gz = Zlib::GzipWriter.open(output)
-      archive.tar_writer = Gem::Package::TarWriter.new(io)
+      archive.gz = Zlib::GzipWriter.open(filename)
+      archive.tar_writer = Gem::Package::TarWriter.new(archive.io)
       if block_given?
         block.call(archive)
-        archive.tar_reader.close
+        archive.close
       end
       archive
     end
@@ -40,7 +40,7 @@ module Wow
     #Close the file
     def close
       unless gz.nil?
-        gz.write io.string 
+        gz.write io.string
         gz.close
       end
       tar_reader.close if tar_reader
@@ -49,30 +49,32 @@ module Wow
     def add_file(filename)
       mode = File.stat(filename).mode
       tar_writer.add_file filename, mode do |tf|
-      	File.open(filename, 'rb') { |f| tf.write f.open }
+        File.open(filename, 'rb') { |f|
+          tf.write f.read
+        }
       end
     end
 
     def add_files(filenames)
-      filenames.each do |filename|
+      [*filenames].each do |filename|
         add_file filename
       end
     end
 
     def extract_all(destination)
-    	return false if tar_reader.nil?
-		tar_reader.each do |tar_entity|
-			destination_file = File.join destination, tar_entity.full_name
-			if tar_entity.directory?
-			  FileUtils.mkdir_p destination_file
-			else
-			  destination_directory = File.dirname(destination_file)
-			  FileUtils.mkdir_p destination_directory unless File.directory?(destination_directory)
-			  File.open destination_file, 'wb' do |f|
-			    f.print tar_entity.open
-			  end
-			end
-		end
+      return false if tar_reader.nil?
+      tar_reader.each do |tar_entity|
+        destination_file = File.join destination, tar_entity.full_name
+        if tar_entity.directory?
+          FileUtils.mkdir_p destination_file
+        else
+          destination_directory = File.dirname(destination_file)
+          FileUtils.mkdir_p destination_directory unless File.directory?(destination_directory)
+          File.open destination_file, 'wb' do |f|
+            f.print tar_entity.open
+          end
+        end
+      end
     end
 
     def self.extract(filename, destination)
@@ -82,7 +84,7 @@ module Wow
     end
 
     def self.create(filenames, output)
-      Archive.write(filename) do |archive|
+      Archive.write(output) do |archive|
         archive.add_files filenames
       end
     end
