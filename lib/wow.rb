@@ -4,7 +4,7 @@ module Wow
     def run(options)
       puts options
       if options['build']
-        build
+        build options['<platform>']
       end
     end
 
@@ -14,7 +14,7 @@ module Wow
       extractor.extract
     end
 
-    def build
+    def build(platform = :any)
       Wow::Archive.create('test/test.txt', 'output.tar.gz')
     end
 
