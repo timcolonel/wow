@@ -46,10 +46,12 @@ module Wow
         end
 
         def based_on?(parent, child)
-          parent_hash = Wow::Package::Platform.platforms.deep_find(parent.key)
+          parent_key = parent.is_a?(Wow::Package::Platform) ? parent.key : parent
+          child_key = parent.is_a?(Wow::Package::Platform) ? child.key : child
+          parent_hash = Wow::Package::Platform.platforms.deep_find(parent_key)
           return false if parent_hash.nil?
           if parent_hash.is_a? Hash
-            child_hash = parent_hash.deep_find(child.key)
+            child_hash = parent_hash.deep_find(child_key)
             !child_hash.nil?
           else
             child.key == parent_hash

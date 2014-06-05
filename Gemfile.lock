@@ -54,3 +54,4 @@ DEPENDENCIES
   minitest
   minitest-reporters
   rake
+  win32console
