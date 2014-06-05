@@ -4,7 +4,7 @@ gem 'rake'
 gem 'activesupport'
 gem 'minitest'
 gem 'minitest-reporters'
-gem'coveralls'
+gem 'coveralls', require: false
 
 gem 'docopt'
 
