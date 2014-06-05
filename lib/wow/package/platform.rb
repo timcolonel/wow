@@ -1,3 +1,5 @@
+require 'yaml'
+
 module Wow
   module Package
     class Platform
@@ -28,6 +30,14 @@ module Wow
       def include?(platform)
         fail ArgumentError unless platform.is_a? Wow::Package::Platform
       end
+
+      def self.platforms
+        if @@platforms = nil?
+          @@platforms = self.YAML.load_file(Wow::Config.asset_path('platform.yml')).deep_symbolize_keys
+        end
+        @@platforms
+      end
     end
   end
 end
+
