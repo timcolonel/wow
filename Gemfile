@@ -7,3 +7,4 @@ gem 'minitest-reporters'
 gem'coveralls'
 
 gem 'docopt'
+

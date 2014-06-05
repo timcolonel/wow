@@ -5,7 +5,7 @@ module Wow
     class Platform
       attr_accessor :name
 
-      # plaform.is?(other) => Boolean
+      # platform.is?(other) => Boolean
       # Return true is the given platform is a parent or equals to this 
       # i.e Self is a subset of the given platform.
       # @param platform [Wow::Package::Platform] Other platform object to test
@@ -18,7 +18,7 @@ module Wow
         fail ArgumentError unless platform.is_a? Wow::Package::Platform
       end
 
-      # This this the opposite of is?. Return true if the given platorm is a child or equals to this.
+      # This this the opposite of is?. Return true if the given platform is a child or equals to this.
       # i.e The given platform is a subset of self
       # @param platform Other platform object to test
       #
@@ -31,11 +31,13 @@ module Wow
         fail ArgumentError unless platform.is_a? Wow::Package::Platform
       end
 
-      def self.platforms
-        if @@platforms = nil?
-          @@platforms = self.YAML.load_file(Wow::Config.asset_path('platform.yml')).deep_symbolize_keys
+      class << self
+        def platforms
+          if @platforms.nil?
+            @platforms = YAML.load_file(Wow::Config.asset_path('platforms.yml')).deep_symbolize_keys
+          end
+          @platforms
         end
-        @@platforms
       end
     end
   end
