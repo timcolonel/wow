@@ -1,0 +1,39 @@
+#!/usr/bin/env ruby
+require 'rubygems'
+require 'rubygems/gem_runner'
+require 'rubygems/exceptions'
+require 'bundler'
+Bundler.setup
+
+required_version = Gem::Requirement.new '>= 2.0.0'
+
+
+require 'docopt'
+
+doc = <<DOCOPT
+Wow
+
+Usage:
+    #{__FILE__}
+#{__FILE__} extract <filename>
+    #{__FILE__} install <package>...
+    #{__FILE__} uninstall <package>...
+    #{__FILE__} unpack <file>...
+    #{__FILE__} build [<platform>]
+    #{__FILE__} push <file>
+    #{__FILE__} compile
+    #{__FILE__} (-h | --help)
+    #{__FILE__} --version
+    #{__FILE__} use <package> <version>
+Action
+Options:
+  -h --help     Show this screen.
+  --version     Show version.
+DOCOPT
+
+begin
+  require_relative '../lib/wow'
+  Wow.run Docopt::docopt(doc)
+rescue Docopt::Exit => e
+  puts e.message
+end
