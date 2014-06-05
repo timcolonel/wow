@@ -18,16 +18,20 @@ module Wow
         assert_kind_of Hash, Wow::Package::Platform.platforms
       end
 
-      test '#is? function' do
-        Wow::Package::Platform.platforms
+      test 'Based on function' do
         setup_platforms
-        assert Wow::Package::Platform.new(:child1).is?(Wow::Package::Platform.new(:root))
-        assert Wow::Package::Platform.new(:subchild21).is? (Wow::Package::Platform.new(:root))
-        assert Wow::Package::Platform.new(:subchild21).is?(Wow::Package::Platform.new(:child2))
-        assert !Wow::Package::Platform.new(:root).is?(Wow::Package::Platform.new(:child1))
-        assert !Wow::Package::Platform.new(:root).is?(Wow::Package::Platform.new(:subchild11))
-        assert !Wow::Package::Platform.new(:child1).is?(Wow::Package::Platform.new(:child2))
-        assert !Wow::Package::Platform.new(:subchild11).is?(Wow::Package::Platform.new(:subchild22))
+        should = [:child1, :root], [:subchild21, :root], [:subchild21, :child2]
+        should_not= [:root, :child1], [:root, :subchild11], [:child1, :child2], [:subchild11, :subchild22]
+        should.each do |a|
+          parent = Wow::Package::Platform.new(a[1])
+          child = Wow::Package::Platform.new(a[0])
+          assert Wow::Package::Platform.based_on?(parent, child), "#{a[1]} should be a parent of #{a[0]}"
+        end
+        should_not.each do |a|
+          parent = Wow::Package::Platform.new(a[1])
+          child = Wow::Package::Platform.new(a[0])
+          assert_not Wow::Package::Platform.based_on?(parent, child), "#{a[1]} should be a parent of #{a[0]}"
+        end
       end
     end
   end
