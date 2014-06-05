@@ -1,0 +1,6 @@
+lib/wow.rb 0d986a9671c4036d180eb8926bb33ca9d29ec3ac
+lib/wow/config.rb 5d590d8f506087dd7949638769624005eeda39d4
+lib/wow/archive.rb cb4b1985d0564c7614e10a3f6bf14b890b5231be
+lib/wow/extractor.rb 298550aeb584a92f07d54ee83aa7927ac57cd9ee
+lib/wow/package/config.rb e84e60b540fcb5d7b87405dc97c237450fd4aa3b
+lib/wow/package/platform.rb 1df48447903b5d05960cc041f489bb73530e5b71

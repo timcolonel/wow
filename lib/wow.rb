@@ -1,4 +1,13 @@
 require_relative 'wow/archive'
+require_relative 'wow/config'
+require_relative 'wow/package/config'
+
+Wow::Config::ROOT_FOLDER = File.expand_path('..', __FILE__) 
+Wow::Config::DATA_FOLDER = "#{Wow::Config::ROOT_FOLDER}/data"
+
+puts 'Folder: '
+puts Wow::Config::ROOT_FOLDER
+puts Wow::Config::DATA_FOLDER
 module Wow
   class << self
     def run(options)

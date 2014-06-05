@@ -1,0 +1,7 @@
+any:
+	- windows:
+		- win32
+		- x64
+	- unix:
+		- osx
+		- linux

@@ -2,15 +2,16 @@ module Wow
   module Package
     class Platform
       attr_accessor :name
-      
+
+      # plaform.is?(other) => Boolean
       # Return true is the given platform is a parent or equals to this 
       # i.e Self is a subset of the given platform.
-      # @param platform Other platform object to test
-      #
+      # @param platform [Wow::Package::Platform] Other platform object to test
+      # @return [Boolean]
       # e.g.
-      # win32.is?(windows) => true
-      # windows.is?(win32) => false
-      # windows.is?(windows) => true
+      #   win32.is?(windows)    => true
+      #   windows.is?(win32)    => false
+      #   windows.is?(windows)  => true
       def is?(platform)
         fail ArgumentError unless platform.is_a? Wow::Package::Platform
       end
@@ -20,9 +21,10 @@ module Wow
       # @param platform Other platform object to test
       #
       # e.g.
-      # windows.include?(win32) => true
-      # win32.include?(windows) => false
-      # windows.include?(windows) => true
+      #   windows.include?(win32)   => true
+      #   win32.include?(windows)   => false
+      #   windows.include?(windows) => true
+      #
       def include?(platform)
         fail ArgumentError unless platform.is_a? Wow::Package::Platform
       end
