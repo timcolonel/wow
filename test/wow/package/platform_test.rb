@@ -5,10 +5,14 @@ module Wow
 
       def setup_platforms
         platforms = {
-            :root => {
-                :child1 => {:subchild11 => '', :subchild12 => ''},
-                :child2 => {:subchild21 => '', :subchild22 => ''}
-            }
+            :name => :root
+            :children => [{
+                :name => :child1 
+                :children => [:name => :subchild11, :name => :subchild12 => '']},
+              {
+                :name => :child2
+                :children => [:name => :subchild21, :name => :subchild22 => '']}
+            ]
         }
         Wow::Package::Platform.instance_variable_set(:@platforms, platforms)
       end
@@ -30,7 +34,7 @@ module Wow
 
       test 'Test #based_on? function' do
         setup_platforms
-        should = [:child1, :root], [:subchild21, :root], [:subchild21, :child2]
+        should = [:child1, :root], [:subchild21, :root], [:subchild21, :child2], [:root, :root], [:child1, :child1], [:subchild11, :subchild11]
         should_not= [:root, :child1], [:root, :subchild11], [:child1, :child2], [:subchild11, :subchild22]
         should.each do |a|
           parent = Wow::Package::Platform.new(a[1])
