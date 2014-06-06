@@ -1,8 +1,10 @@
-platforms:
-  all:
-    windows:
-      win32:
-      x64:
-    unix:
-      linux:
-      osx:
+name: any
+children:
+  - name: windows
+    children:
+    - name: win32
+    - name: x64
+  - name: unix
+    children:
+    - name: linux
+    - name: osx

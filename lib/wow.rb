@@ -5,6 +5,7 @@ require_relative 'wow/config'
 require_relative 'wow/package/platform'
 require_relative 'wow/package/config'
 require_relative 'core_ext'
+require_relative 'struct/tree'
 
 module Wow
   class << self

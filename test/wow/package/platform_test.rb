@@ -4,22 +4,14 @@ module Wow
     class PlatformTest < ActiveSupport::TestCase
 
       def setup_platforms
-        platforms = {
-            :name => :root
-            :children => [{
-                :name => :child1 
-                :children => [:name => :subchild11, :name => :subchild12 => '']},
-              {
-                :name => :child2
-                :children => [:name => :subchild21, :name => :subchild22 => '']}
-            ]
-        }
-        Wow::Package::Platform.instance_variable_set(:@platforms, platforms)
+        Wow::Config.send(:remove_const, :ASSET_FOLDER) if Wow::Config.const_defined?(:ASSET_FOLDER)
+        Wow::Config.const_set(:ASSET_FOLDER, File.expand_path('../assets', __FILE__))
+        Wow::Package::Platform.instance_variable_set(:@platforms, nil)
       end
 
       test 'should load platform right' do
         assert_not_nil Wow::Package::Platform.platforms
-        assert_kind_of Hash, Wow::Package::Platform.platforms
+        assert_kind_of Tree, Wow::Package::Platform.platforms
       end
 
       test 'Test #based_on? should accept Wow::Package::Platform as argument' do
@@ -39,6 +31,7 @@ module Wow
         should.each do |a|
           parent = Wow::Package::Platform.new(a[1])
           child = Wow::Package::Platform.new(a[0])
+          puts Wow::Package::Platform.platforms
           assert Wow::Package::Platform.based_on?(parent, child), "#{a[1]} should be a parent of #{a[0]}"
         end
         should_not.each do |a|
