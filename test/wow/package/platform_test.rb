@@ -31,7 +31,6 @@ module Wow
         should.each do |a|
           parent = Wow::Package::Platform.new(a[1])
           child = Wow::Package::Platform.new(a[0])
-          puts Wow::Package::Platform.platforms
           assert Wow::Package::Platform.based_on?(parent, child), "#{a[1]} should be a parent of #{a[0]}"
         end
         should_not.each do |a|

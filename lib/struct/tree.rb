@@ -52,5 +52,7 @@ class Tree
     to_hash.to_s
   end
 
+  private
+
   alias_method :<<, :add_child
 end

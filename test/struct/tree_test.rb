@@ -6,6 +6,12 @@ class TreeTest < ActiveSupport::TestCase
     assert node.name == :root
   end
 
+  test 'should add a child' do
+    root = Tree.new(:root)
+    root << Tree.new(:children)
+    assert root.children.size == 1
+  end
+
   test 'should find value' do
     root = Tree.new(:root)
     root << Tree.new(:child1)
