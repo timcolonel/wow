@@ -22,6 +22,7 @@ class Tree
                    Tree.new(child)
                  end
     @children << child_tree
+    self
   end
 
   def deep_symbolize

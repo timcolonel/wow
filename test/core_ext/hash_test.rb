@@ -1,6 +1,5 @@
 require 'test/test_helper'
 class HashTest < ActiveSupport::TestCase
-
   def setup
     @hash = {:root => {:child1 => 'val1', :child2 => 'val2'}}
   end
