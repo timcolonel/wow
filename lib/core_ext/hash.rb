@@ -1,7 +1,7 @@
 class Hash
   def deep_fetch(key, default = nil)
     default = yield if block_given?
-    (deep_find(key) or default) or raise KeyError.new("key not found: #{key}")
+    (deep_find(key) or default) or fail KeyError.new("key not found: #{key}")
   end
 
   def deep_find(key)
