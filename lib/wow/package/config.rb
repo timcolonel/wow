@@ -1,6 +1,7 @@
 module Wow
   module Package
     class Config
+      attr_accessor :platform
       attr_accessor :files
       attr_accessor :executables
 
