@@ -6,9 +6,12 @@ module Wow
       attr_accessor :executables
       attr_accessor :platforms
       attr_accessor :platform_configs
+      attr_accessor :name
+      attr_accessor :version
+
 
       def initialize(platform = nil)
-        @platform = Wow::Package::Plaform.new(platform)
+        @platform = Wow::Package::Platform.new(platform)
         @files = []
         @platforms = []
         @platform_configs = []
@@ -23,7 +26,7 @@ module Wow
       end
 
       def platform(name, &block)
-        platform_configs << {:plaform => Wow::Package::Plaform.new(name), :block => block}
+        platform_configs << {:plaform => Wow::Package::Platform.new(name), :block => block}
       end
 
       def +(config)
@@ -71,6 +74,19 @@ module Wow
           end
         end
         config
+      end
+
+      def validdate!
+        fail WowError, 'Name is not defined!' if name.nil? or name.empty?
+        fail WowError, 'Version is not defined!' if name.nil? or name.empty?
+      end
+
+      def create_archive
+        validate!
+        filename = "#{@name}-#{@version}.wow"
+        Archive.write filename do |archive|
+          archive.add_files @files
+        end
       end
     end
   end

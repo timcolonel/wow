@@ -47,19 +47,20 @@ module Wow
       tar_reader.close if tar_reader
     end
 
-    def add_file(filename, path_in_archive = '')
+    # Add the given file to the archive
+    # @params filename [String] name of the file to add
+    # @params destination [String] name of the file(with path) in the archive
+    def add_file(filename, destination = nil)
       mode = File.stat(filename).mode
-      filename_in_archive = if Pathname.new(filename).absolute?
+      filename_in_archive = if destination
+                              destination
+                            elsif  Pathname.new(filename).absolute?
                               File.basename(filename)
                             else
                               filename
                             end
-      archive_file_path = if path_in_archive.nil? or path_in_archive.empty?
-                            filename_in_archive
-                          else
-                            Join(path_in_archive, filename_in_archive)
-                          end
-      tar_writer.add_file archive_file_path, mode do |tf|
+
+      tar_writer.add_file filename_in_archive, mode do |tf|
         File.open(filename, 'rb') { |f|
           tf.write f.read
         }
@@ -67,10 +68,25 @@ module Wow
     end
 
     # Add the given list of files to the archive into the given folder
-
-    def add_files(filenames, path_in_archive = '')
+    # If the filesname are in an absolute path the file will be added to the root of the destination path
+    # If the filename is a relative path it will be added relative to the destination path unless the flatten params is set to true 
+    # @params filenames [List<String>] list of filenames to include in the archive
+    # @params destination_path [String] folder where all of the file will be placed
+    # @params flatten [Boolean] if set to true any relative files will be placed to the root of the destination path
+    def add_files(filenames, destination_path: nil, flatten: false)
       [*filenames].each do |filename|
-        add_file filename, path_in_archive
+        destination_filename = if Pathname.new(filename).absolute? or flatten
+                                 File.basename(filename)     
+                               else
+                                 filename
+                               end
+
+        destination = if destination_path
+                        File.join(destination_path, destination_filename)
+                      else
+                        destination_filename
+                      end      
+        add_file filename, destination
       end
     end
 

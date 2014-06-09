@@ -1,0 +1,1 @@
+class WowError = Class.new(StandardError)
