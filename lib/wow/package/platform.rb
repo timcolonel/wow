@@ -50,12 +50,8 @@ module Wow
           child_key = parent.is_a?(Wow::Package::Platform) ? child.key : child
           parent_hash = Wow::Package::Platform.platforms.find(parent_key)
           return false if parent_hash.nil?
-          if parent_hash.is_a? Tree
-            child_hash = parent_hash.find(child_key)
-            !child_hash.nil?
-          else
-            child_key == parent_hash
-          end
+          child_hash = parent_hash.find(child_key)
+          !child_hash.nil?
         end
       end
     end

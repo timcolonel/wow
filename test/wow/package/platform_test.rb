@@ -47,7 +47,7 @@ module Wow
 
       test 'Test the #include? method' do
         setup_platforms
-        assert_not Wow::Package::Platform.new(:root).is?(Wow::Package::Platform.new(:child1))
+        assert Wow::Package::Platform.new(:root).include?(Wow::Package::Platform.new(:child1))
       end
     end
   end
