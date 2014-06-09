@@ -5,9 +5,9 @@ module Wow
     class ConfigTest < ActiveSupport::TestCase
       test 'should list all files' do
         config = Wow::Package::Config.new
-        config.files << 'assets/*.*'
-        assert_not config.all_files.empty?
-        assert config.all_files.include? 'assets/platforms.yml'
+        config.files_patterns << 'assets/*.*'
+        assert_not config.files.empty?
+        assert config.files.include? 'assets/platforms.yml'
       end
     end
   end

@@ -2,7 +2,7 @@ module Wow
   module Package
     class Config
       attr_accessor :platform
-      attr_accessor :files
+      attr_accessor :file_patterns
       attr_accessor :executables
       attr_accessor :platforms
       attr_accessor :platform_configs
@@ -12,13 +12,12 @@ module Wow
 
       def initialize(platform = nil)
         @platform = Wow::Package::Platform.new(platform)
-        @files = []
+        @file_patterns = []
         @platforms = []
         @platform_configs = []
       end
 
       def file(files)
-        @files += files
       end
 
       def executable(executables)
@@ -47,9 +46,9 @@ module Wow
       end
 
       # @return all files matching the pattern given in the files
-      def all_files
+      def files
         results = []
-        @files.each do |file_pattern|
+        @file_patterns.each do |file_pattern|
           results += Dir.glob(file_pattern)
         end
         results
@@ -85,7 +84,7 @@ module Wow
         validate!
         filename = "#{@name}-#{@version}.wow"
         Archive.write filename do |archive|
-          archive.add_files @files
+          archive.add_files all_files
         end
       end
     end
