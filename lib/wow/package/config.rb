@@ -75,7 +75,7 @@ module Wow
         config
       end
 
-      def validdate!
+      def validate!
         fail WowError, 'Name is not defined!' if name.nil? or name.empty?
         fail WowError, 'Version is not defined!' if name.nil? or name.empty?
       end
