@@ -1,1 +1,1 @@
-class WowError = Class.new(StandardError)
+WowError = Class.new(StandardError)

@@ -35,7 +35,11 @@ module Wow
     end
 
     def each (&block)
-      tar.each(&block)
+      if tar_reader
+        tar_reader.each(&block)
+      else
+        fail WowError, "Must open archive for reading mode!"
+      end
     end
 
     #Close the file
