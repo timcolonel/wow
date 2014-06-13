@@ -16,7 +16,7 @@ class Package:
 
     config_format = ConfigFormat()
     config_format.validate_presence_of(['name', 'version', 'files'])
-    config_format.validate_with('name', '^[a-z0-9_-]+$', 'Error in config file. Name should'
+    config_format.validate_with('name', '\A[a-z0-9_-]+\z', 'Error in config file. Name should'
                                                          ' only contain lowercase, numbers and _-')
 
     def __init__(self, config_file='wow.yml'):

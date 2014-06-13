@@ -1,5 +1,6 @@
 require 'active_support'
 require 'active_support/core_ext'
+require 'active_model'
 require_relative 'wow/archive'
 require_relative 'wow/config'
 require_relative 'wow/package/platform'

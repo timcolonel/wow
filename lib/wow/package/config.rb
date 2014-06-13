@@ -1,6 +1,8 @@
 module Wow
   module Package
     class Config
+      include ActiveModel::Validations
+
       attr_accessor :platform
       attr_accessor :file_patterns
       attr_accessor :executables
@@ -9,6 +11,15 @@ module Wow
       attr_accessor :name
       attr_accessor :version
 
+      validates_presence_of :name, :version
+      validates_format_of :name, :with => /\A[a-z0-9_-]+\z/,
+         :message => 'Error in config file. Name should only contain lowercase, numbers and _-'
+
+      validate do 
+        @file_patterns.each do |pattern|
+          errors.add :file_patterns, "Path `#{pattern}`should be relative to the root but is an absolute path!" if Pathname.new(pattern).absolute?
+        end
+      end
 
       def initialize(platform = nil)
         @platform = Wow::Package::Platform.new(platform)
@@ -75,12 +86,11 @@ module Wow
         config
       end
 
+      # Raise am error if the config is invalid
+      # @return [Boolean] true if succeed and raise WowError if not
       def validate!
-        fail WowError, 'Name is not defined!' if name.nil? or name.empty?
-        fail WowError, 'Version is not defined!' if version.nil? or version.empty?
-        @file_patterns.each do |pattern|
-          fail WowError, "Path `#{pattern}`should be relative to the root but is an absolute path!" if Pathname.new(pattern).absolute?
-        end
+        fail WowError, errors.full_messages unless valid?
+        true
       end
 
       def create_archive
