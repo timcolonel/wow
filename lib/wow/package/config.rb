@@ -77,7 +77,10 @@ module Wow
 
       def validate!
         fail WowError, 'Name is not defined!' if name.nil? or name.empty?
-        fail WowError, 'Version is not defined!' if name.nil? or name.empty?
+        fail WowError, 'Version is not defined!' if version.nil? or version.empty?
+        @file_patterns.each do |pattern|
+          fail WowError, "Path `#{pattern}`should be relative to the root but is an absolute path!" if Pathname.new(pattern).absolute?
+        end
       end
 
       def create_archive
@@ -86,6 +89,10 @@ module Wow
         Archive.write filename do |archive|
           archive.add_files all_files
         end
+      end
+
+      def install_to(destination)
+
       end
     end
   end

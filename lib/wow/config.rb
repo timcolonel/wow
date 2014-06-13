@@ -2,6 +2,7 @@ module Wow
   module Config
     ROOT_FOLDER = File.expand_path('../../..', __FILE__)
     ASSET_FOLDER = "#{Wow::Config::ROOT_FOLDER}/assets"
+    
     class << self
       attr_accessor :install_folder
 
