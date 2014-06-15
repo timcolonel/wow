@@ -2,7 +2,7 @@ require 'test/test_helper'
 
 module Wow
   module Package
-  class ConfigTest < ActiveSupport::TestCase
+    class ConfigTest < ActiveSupport::TestCase
       test 'should list all files' do
         config = Wow::Package::Config.new
         config.file_patterns << 'assets/*.*'
@@ -10,30 +10,30 @@ module Wow
         assert config.files.include? 'assets/platforms.yml'
       end
 
-      test 'validate should fail without name' do 
+      test 'validate should fail without name' do
         config = Wow::Package::Config.new
         config.version = '1.0.0'
         assert_not config.valid?
       end
 
-      test 'validate should fail with bad name' do 
+      test 'validate should fail with bad name' do
         config = Wow::Package::Config.new
         config.name = 'Bad name with space'
         config.version = '1.0.0'
         assert_not config.valid?
       end
 
-      test 'validate should fail without version' do 
+      test 'validate should fail without version' do
         config = Wow::Package::Config.new
         config.name = 'super_name'
         assert_not config.valid?
       end
 
-      test 'validate should fail with absolute path' do 
+      test 'validate should fail with absolute path' do
         config = Wow::Package::Config.new
         config.name = 'super_name'
         config.version = '1.0.0'
-        config.file_patterns << 'D:/absolute/path'
+        config.file_patterns << '/absolute/path'
         assert_not config.valid?
       end
 
