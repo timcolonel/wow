@@ -17,7 +17,8 @@ module Wow
 
       validate do 
         @file_patterns.each do |pattern|
-          errors.add :file_patterns, "Path `#{pattern}`should be relative to the root but is an absolute path!" if Pathname.new(pattern).absolute?
+          errors.add :file_patterns, 
+            "Path `#{pattern}`should be relative to the root but is an absolute path!" if Pathname.new(pattern).absolute?
         end
       end
 
