@@ -13,9 +13,9 @@ module Wow
 
       validates_presence_of :name, :version
       validates_format_of :name, :with => /\A[a-z0-9_-]+\z/,
-         :message => 'Error in config file. Name should only contain lowercase, numbers and _-'
+                          :message => 'Error in config file. Name should only contain lowercase, numbers and _-'
 
-      validate do 
+      validate do
         @file_patterns.each do |pattern|
           errors.add :file_patterns, 
             "Path `#{pattern}`should be relative to the root but is an absolute path!" if Pathname.new(pattern).absolute?
@@ -73,7 +73,7 @@ module Wow
       def plaform_specific?
         not platform.nil?
       end
-    
+
       # Return the platform specific config
       # @return [Wow::Package::Config]
       def get_plaform_config(platform)
