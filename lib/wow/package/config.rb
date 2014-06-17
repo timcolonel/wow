@@ -95,7 +95,7 @@ module Wow
       end
 
       # Build an archive from this config
-      # @param destination Destination folder of the file
+      # @param destination Destination folder of the archive file
       # @param filename Name of the archive file, optional, by default is name-version.wow
       # @return archive path with filename
       def create_archive(destination, filename = nil)
@@ -110,6 +110,7 @@ module Wow
 
       # Copy files to the installation folder
       # To install a program directly from the source(not an archive)
+      # @param destination [String] folder where to install files
       def install_to(destination)
         files.each do |file|
           destination = File.join(Wow::Config.install_folder)

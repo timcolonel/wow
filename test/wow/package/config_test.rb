@@ -55,7 +55,7 @@ module Wow
 
       test 'should create archive from config' do
         config = Wow::Package::Config.new
-        config.name = 'super_name'
+        config.name = 'from_archive'
         config.version = '1.0.0'
         filenames = TmpFile.create_files(:count => 5, :folder => File.join(folder, 'input'), :absolute => false)
         config.file_patterns = filenames
@@ -64,6 +64,15 @@ module Wow
       end
       test 'should install to installation folder' do 
         config = Wow::Package::Config.new
+        config.name = 'to_install'
+        config.version = '1.0.0'
+        filenames = TmpFile.create_files(:count => 5, :folder => File.join(folder, 'input'), :absolute => false)
+        config.file_patterns = filenames
+        destination = File.join(TmpFile.folder_path(folder), 'output')
+        config.install_to(destination)
+        filenames.each do |filename|
+          assert File.exists?(File.join(Wow::Config::ROOT_FOLDER, filename)), "File #{filename} should exists in #{destination} but doesn't"
+        end
       end
     end
   end
