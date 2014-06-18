@@ -44,6 +44,14 @@ module Wow
         config.file_patterns << 'relative/path'
         assert config.valid?, "Should be valid!, #{config.errors.full_messages}"
       end
+
+      test 'should create config from string' do
+        config = Wow::Package::Config.new
+        filename = 'dumfile.txt'
+        config.init_from_rb("file '#{filename}'")
+        puts config.file_patterns
+        assert config.file_patterns.include?(filename)
+      end
     end
   end
 end

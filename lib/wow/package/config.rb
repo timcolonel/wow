@@ -29,6 +29,7 @@ module Wow
       end
 
       def file(files)
+        @file_patterns += [*files]
       end
 
       def executable(executables)
