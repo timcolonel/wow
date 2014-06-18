@@ -2,12 +2,12 @@ module Wow
   module Config
     ROOT_FOLDER = File.expand_path('../../..', __FILE__)
     ASSET_FOLDER = "#{Wow::Config::ROOT_FOLDER}/assets"
-    
+
     class << self
       attr_accessor :install_folder
 
       def load
-        @install_folder = 'install'
+        @install_folder = File.join(ROOT_FOLDER, 'packages')
       end
 
       # Return the full path to the given file that should be on the root of the data folder
@@ -17,7 +17,6 @@ module Wow
         File.join(Wow::Config::ASSET_FOLDER, filename)
       end
     end
-
 
   end
 end

@@ -17,7 +17,8 @@ module Wow
 
       validate do
         @file_patterns.each do |pattern|
-          errors.add :file_patterns, "Path `#{pattern}`should be relative to the root but is an absolute path!" if Pathname.new(pattern).absolute?
+          errors.add :file_patterns, 
+            "Path `#{pattern}`should be relative to the root but is an absolute path!" if Pathname.new(pattern).absolute?
         end
       end
 
@@ -94,16 +95,28 @@ module Wow
         true
       end
 
-      def create_archive
+      # Build an archive from this config
+      # @param destination Destination folder of the archive file
+      # @param filename Name of the archive file, optional, by default is name-version.wow
+      # @return archive path with filename
+      def create_archive(destination, filename = nil)
         validate!
-        filename = "#{@name}-#{@version}.wow"
-        Archive.write filename do |archive|
-          archive.add_files all_files
+        filename ||= "#{@name}-#{@version}.wow"
+        path = File.join(destination, filename)
+        Archive.write path do |archive|
+          archive.add_files files
         end
+        path
       end
 
+      # Copy files to the installation folder
+      # To install a program directly from the source(not an archive)
+      # @param destination [String] folder where to install files
       def install_to(destination)
-
+        files.each do |file|
+          destination = File.join(Wow::Config.install_folder)
+          FileUtils.cp(file, destination)
+        end
       end
     end
   end
