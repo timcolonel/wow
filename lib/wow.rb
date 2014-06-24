@@ -25,7 +25,7 @@ module Wow
     end
 
     def build(platform = :any)
-      Wow::Archive.create('test/test.txt', 'output.tar.gz')
+      Wow::Builder.build(platform, Dir.pwd)
     end
 
   end
