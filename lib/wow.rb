@@ -25,7 +25,7 @@ module Wow
     end
 
     def build(platform = :any)
-      Wow::Builder.build(platform, Dir.pwd)
+      Wow::Builder.build(Dir.pwd, platform)
     end
 
   end
