@@ -14,7 +14,7 @@ module Wow
     def run(options)
       puts options
       if options['build']
-        build options['<platform>']
+        Wow::Builder.build(Dir.pwd, options['<platform>'])
       end
     end
 
@@ -22,10 +22,6 @@ module Wow
     def extract(filename)
       extractor = Wow::Extractor.new(filename)
       extractor.extract
-    end
-
-    def build(platform = :any)
-      Wow::Builder.build(Dir.pwd, platform)
     end
   end
 end
