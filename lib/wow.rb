@@ -12,6 +12,7 @@ require_relative 'wow/exception'
 
 module Wow
   class << self
+    #To be called with docopt arguments
     def run(options)
       puts options
       if options['build']
