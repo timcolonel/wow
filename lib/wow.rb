@@ -17,6 +17,9 @@ module Wow
       puts options
       if options['build']
         Wow::Builder.build(Dir.pwd, options['<platform>'])
+      elsif options['install']
+
+      elsif options['extract']
       end
     end
 
