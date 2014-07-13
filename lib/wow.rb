@@ -12,15 +12,11 @@ require_relative 'wow/exception'
 
 module Wow
   class << self
-    #To be called with docopt arguments
-    def run(options)
-      puts options
-      if options['build']
-        Wow::Builder.build(Dir.pwd, options['<platform>'])
-      elsif options['install']
-
-      elsif options['extract']
-      end
+    def initialize(options)
+      @options = options
+    end
+    def run
+      Wow::Builder.build(Dir.pwd, options['<platform>'])
     end
 
     #Extract the given filename to the installation folder
@@ -28,5 +24,13 @@ module Wow
       extractor = Wow::Extractor.new(filename)
       extractor.extract
     end
+    
+    def build
+      
+    end
+    
+    def install
+    end
+    
   end
 end
