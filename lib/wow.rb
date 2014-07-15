@@ -31,6 +31,16 @@ module Wow
     
     def install
     end
+
+    def uninstall
+    end
     
+    def update
+
+    end
+
+    def updgrade
+
+    end
   end
 end
