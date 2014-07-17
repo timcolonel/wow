@@ -9,19 +9,38 @@ require_relative 'core_ext'
 require_relative 'struct/tree'
 require_relative 'wow/exception'
 
+
 module Wow
   class << self
-    def run(options)
-      puts options
-      if options['build']
-        Wow::Builder.build(Dir.pwd, options['<platform>'])
-      end
+    def initialize(options)
+      @options = options
+    end
+    def run
+      Wow::Builder.build(Dir.pwd, options['<platform>'])
     end
 
     #Extract the given filename to the installation folder
     def extract(filename)
       extractor = Wow::Extractor.new(filename)
       extractor.extract
+    end
+    
+    def build
+      
+    end
+    
+    def install
+    end
+
+    def uninstall
+    end
+    
+    def update
+
+    end
+
+    def updgrade
+
     end
   end
 end
