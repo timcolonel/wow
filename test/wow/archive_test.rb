@@ -10,7 +10,7 @@ class Wow::ArchiveTest < ActiveSupport::TestCase
   end
 
   def create_archive(filename = 'archive.tar.gz')
-    archive = TmpFile.path('archive.tar.gz', folder)
+    archive = TmpFile.path(filename, folder)
     filenames = TmpFile.create_files(:count => 5, :folder => 'test_archive')
     Wow::Archive.create(filenames, archive)
     return archive, filenames
