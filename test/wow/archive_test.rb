@@ -15,7 +15,7 @@ class Wow::ArchiveTest < ActiveSupport::TestCase
     Wow::Archive.create(filenames, archive)
     return archive, filenames
   end
-  
+
   test 'Should create an archive then extract successfully' do
     archive, filenames = create_archive
 
@@ -30,13 +30,13 @@ class Wow::ArchiveTest < ActiveSupport::TestCase
     end
   end
 
-  test 'Should iterate throught archive file when reading' do 
+  test 'Should iterate throught archive file when reading' do
     archive_file, filenames = create_archive
     assert_nothing_raised do
       Wow::Archive.open archive_file do |archive|
         count = 0
         archive.each do |entity|
-          assert filenames.map{|x| File.basename(x)}.include?(entity.full_name)
+          assert filenames.map { |x| File.basename(x) }.include?(entity.full_name)
           count += 1
         end
         assert count == filenames.size, "Should be #{filenames.size} but there is #{count}"
@@ -44,9 +44,9 @@ class Wow::ArchiveTest < ActiveSupport::TestCase
     end
   end
 
-  test 'Opening in write mode should fail' do 
+  test 'Opening in write mode should fail' do
     archive_file = TmpFile.path('archive.tar.gz', folder)
-    assert_raise WowError do 
+    assert_raise WowError do
       Wow::Archive.write archive_file do |archive|
         archive.each do |entity|
           #Should have failed

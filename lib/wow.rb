@@ -12,9 +12,18 @@ require_relative 'wow/exception'
 
 module Wow
   class << self
+
+    actions = {
+        install: :install,
+        instal: :install,
+        build: :build
+    }
+
+
     def initialize(options)
       @options = options
     end
+
     def run
       Wow::Builder.build(Dir.pwd, options['<platform>'])
     end
@@ -24,17 +33,17 @@ module Wow
       extractor = Wow::Extractor.new(filename)
       extractor.extract
     end
-    
+
     def build
-      
+
     end
-    
+
     def install
     end
 
     def uninstall
     end
-    
+
     def update
 
     end
