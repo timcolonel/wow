@@ -13,12 +13,17 @@ require_relative 'wow/exception'
 module Wow
   class << self
 
-    actions = {
-        install: :install,
-        instal: :install,
-        build: :build
-    }
+    actions = [
+        :install,
+        :build,
+        :extract,
+        :uninstall
+    ]
 
+    aliases = {
+        instal: :install,
+        uninstal: :uninstall
+    }
 
     def initialize(options)
       @options = options
