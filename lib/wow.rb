@@ -30,6 +30,11 @@ module Wow
     end
 
     def run
+      actions.each do |action|
+        if options[action.to_s]
+          return self.send(action)
+        end
+      end
       Wow::Builder.build(Dir.pwd, options['<platform>'])
     end
 
