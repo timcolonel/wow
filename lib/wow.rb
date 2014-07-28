@@ -35,6 +35,12 @@ module Wow
           return self.send(action)
         end
       end
+
+      aliases.each do |al, action|
+      	if options[al]
+      		return self.send(action)
+      	end
+      end
       Wow::Builder.build(Dir.pwd, options['<platform>'])
     end
 
