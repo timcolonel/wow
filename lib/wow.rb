@@ -55,9 +55,11 @@ module Wow
     end
 
     def install
+    
     end
 
     def uninstall
+
     end
 
     def update
