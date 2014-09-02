@@ -1,1 +1,3 @@
-WowError = Class.new(StandardError)
+module Wow
+  Error = Class.new(StandardError)
+end

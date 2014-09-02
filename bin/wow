@@ -15,7 +15,7 @@ Wow
 
 Usage:
     #{__FILE__}
-#{__FILE__} extract <filename>
+    #{__FILE__} extract <filename>
     #{__FILE__} install <package>...
     #{__FILE__} uninstall <package>...
     #{__FILE__} unpack <file>...
@@ -33,7 +33,7 @@ DOCOPT
 
 begin
   require_relative '../lib/wow'
-  Wow.run Docopt::docopt(doc)
+  Wow.run(Docopt::docopt(doc))
 rescue Docopt::Exit => e
   puts e.message
 end
