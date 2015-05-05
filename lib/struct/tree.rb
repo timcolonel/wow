@@ -4,14 +4,23 @@ class Tree
 
   def initialize(content = nil)
     @children = []
-    if content.is_a? Hash
-      content.deep_symbolize_keys!
+    unless content.is_a? Hash
+      @name = content
+      return
+    end
+    content.deep_symbolize_keys!
+    if content.has_key?(:name)
       @name = content[:name]
       content[:children].each do |child|
         add_child child
       end if content.key?(:children)
+    elsif content.length == 1
+      @name, children = content.first
+      children.each do |child|
+        add_child child
+      end
     else
-      @name = content
+      raise Wow::Error, 'Tree has wrong format! Cannot be a Hash with more than 2 key not being :name and :children.'
     end
   end
 
@@ -46,7 +55,7 @@ class Tree
   end
 
   def to_hash
-    {:name => @name, :children => @children.map(&:to_hash)}
+    {name: @name, children: @children.map(&:to_hash)}
   end
 
   def to_s

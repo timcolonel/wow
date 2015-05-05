@@ -38,7 +38,7 @@ module Wow
       if tar_reader
         tar_reader.each(&block)
       else
-        fail WowError, "Must open archive for reading mode!"
+        fail Wow::Error, 'Must open archive for reading mode!'
       end
     end
 

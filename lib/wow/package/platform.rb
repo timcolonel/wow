@@ -47,7 +47,7 @@ module Wow
 
         def based_on?(parent, child)
           parent_key = parent.is_a?(Wow::Package::Platform) ? parent.key : parent
-          child_key = parent.is_a?(Wow::Package::Platform) ? child.key : child
+          child_key = child.is_a?(Wow::Package::Platform) ? child.key : child
           parent_hash = Wow::Package::Platform.platforms.find(parent_key)
           return false if parent_hash.nil?
           child_hash = parent_hash.find(child_key)

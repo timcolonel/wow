@@ -1,8 +1,9 @@
 module Wow
   class Builder
-    def initialize(directory, filename = 'wow.json', platform = :any)
+    def initialize(directory, config_filename = 'wow.json', platform = :any)
       config = Wow::Package::Config.new(platform)
-      archive_path = config.create_archive(directory, filename)
+      config.load(config_filename)
+      archive_path = config.create_archive(directory)
       puts "Created archive in #{archive_path}"
     end
   end

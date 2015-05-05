@@ -1,6 +1,7 @@
 module Wow
-  class Runner
+  class Command
     ACTIONS = [
+        :init,
         :install,
         :build,
         :extract,
@@ -22,7 +23,7 @@ module Wow
           return self.send(action)
         end
       end
-      fail Wow::Error, 'Unknown command'
+      fail Wow::UnknownCommand, 'Unknown command'
     end
 
     def compute_actions
@@ -40,7 +41,7 @@ module Wow
     end
 
     def install
-
+      puts 'Ins'
     end
 
     def uninstall

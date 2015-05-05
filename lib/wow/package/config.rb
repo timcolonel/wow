@@ -3,13 +3,19 @@ module Wow
     class Config
       include ActiveModel::Validations
 
-      attr_accessor :platform
-      attr_accessor :file_patterns
-      attr_accessor :executables
-      attr_accessor :platforms
-      attr_accessor :platform_configs
+      # User config
       attr_accessor :name
       attr_accessor :version
+      attr_accessor :authors
+      attr_accessor :short_description
+      attr_accessor :description
+      attr_accessor :executables
+
+      # Internal Config
+      attr_accessor :platform
+      attr_accessor :file_patterns
+      attr_accessor :platforms
+      attr_accessor :platform_configs
 
       validates_presence_of :name, :version
       validates_format_of :name, :with => /\A[a-z0-9_-]+\z/,
@@ -17,8 +23,8 @@ module Wow
 
       validate do
         @file_patterns.each do |pattern|
-          errors.add :file_patterns, 
-            "Path `#{pattern}`should be relative to the root but is an absolute path!" if Pathname.new(pattern).absolute?
+          errors.add :file_patterns,
+                     "Path `#{pattern}`should be relative to the root but is an absolute path!" if Pathname.new(pattern).absolute?
         end
       end
 
@@ -38,7 +44,7 @@ module Wow
       end
 
       def platform(name, &block)
-        platform_configs << {:plaform => Wow::Package::Platform.new(name), :block => block}
+        platform_configs << {plaform: Wow::Package::Platform.new(name), block: block}
       end
 
       def +(config)
@@ -49,13 +55,19 @@ module Wow
       end
 
       def init_from_rb_file(file)
-        File.open 'r' do |f|
+        File.open file, 'r' do |f|
           init_from_rb f.read
         end
       end
 
       def init_from_rb(ruby_str)
         self.instance_eval(ruby_str)
+      end
+
+      def init_from_toml(file)
+        toml = TOML.load_file(file).deep_symbolize
+        name = toml[:name]
+
       end
 
       # @return all files matching the pattern given in the files
@@ -69,15 +81,15 @@ module Wow
 
 
       # @return [Boolean]
-      # * true if this config has a platform spcified
+      # * true if this config has a platform specified
       # * false if this config contains multiple platform(Just loaded from file)
-      def plaform_specific?
+      def platform_specific?
         not platform.nil?
       end
 
       # Return the platform specific config
       # @return [Wow::Package::Config]
-      def get_plaform_config(platform)
+      def get_platform_config(platform)
         config = Wow::Package::Config.new(platform)
         config.files = files
         platform_configs.each do |platform_config|
@@ -91,7 +103,7 @@ module Wow
       # Raise am error if the config is invalid
       # @return [Boolean] true if succeed and raise WowError if not
       def validate!
-        fail WowError, errors.full_messages unless valid?
+        fail Wow::Error, errors.full_messages unless valid?
         true
       end
 

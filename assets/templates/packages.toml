@@ -1,0 +1,41 @@
+# Name of the package, must contain only letters, digits and _
+name = "[Package name]"
+
+# Version of the package, should follow the format major.minor.patch[.other]
+version = "[Package Version]"
+
+# List of the authors
+authors = ["Your Name <you@example.com>"]
+
+#Short description
+short_description = "[Short Description]"
+
+# Detailed description of the package(Can be a filename that will be loaded)
+description = "[Description]"
+
+# List of files to be added to the package(List of the files to include in the package). 
+# Each entry can be a folder, filename, path or a wildcard.
+# e.g.
+#   src/            => Will include the entire src folder
+#   Readme.md       => Will include the Readme.md file
+#   bin/myexe       => Will include the bin/myexe file
+#   src/**/*.rb     => Will include all the rb files in the src directory
+files = ['**/*.*']
+
+# List of files to exclude.(Same format as files)
+files_exclude = ['devonly.txt']
+
+# List of executables(Relative to the root of the package) The file will be linked in the WOW bin directory which should be visible by the system path.
+executables = ['[Executables]']
+
+# List of application to install with the package. An application is a GUI program.
+application = ['[Apllication]']
+
+# Platform specific config
+# Here you can repeat any of the specified config above and it will merge but only for the platform specified
+# For example if you had  files = ['src/'] in the main config and add files = ['windows/'] under the [platform.windows] both src and windows will be deployed on install.
+[platform.unix]
+[platform.linux]
+[platform.osx]
+[platform.windows]
+

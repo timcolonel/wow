@@ -1,0 +1,11 @@
+{
+  "any": [
+    "windows",
+    {
+      "unix": [
+        "osx",
+        "linux"
+      ]
+    }
+  ]
+}

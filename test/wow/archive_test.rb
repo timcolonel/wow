@@ -46,7 +46,7 @@ class Wow::ArchiveTest < ActiveSupport::TestCase
 
   test 'Opening in write mode should fail' do
     archive_file = TmpFile.path('archive.tar.gz', folder)
-    assert_raise WowError do
+    assert_raise Wow::Error do
       Wow::Archive.write archive_file do |archive|
         archive.each do |entity|
           #Should have failed

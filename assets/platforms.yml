@@ -1,10 +1,5 @@
-name: any
-children:
-  - name: windows
-    children:
-    - name: win32
-    - name: x64
-  - name: unix
-    children:
-    - name: linux
-    - name: osx
+any:
+  - windows
+  - unix:
+    - osx
+    - linux

@@ -9,7 +9,7 @@ require_relative 'wow/package/config'
 require_relative 'core_ext'
 require_relative 'struct/tree'
 require_relative 'wow/exception'
-require_relative 'wow/runner'
+require_relative 'wow/command'
 
 
 module Wow
@@ -17,7 +17,7 @@ module Wow
 
     # Run with doctopt options
     def run(options)
-      runner = Wow::Runner.new(options)
+      runner = Wow::Command.new(options)
       runner.run
     end
   end
