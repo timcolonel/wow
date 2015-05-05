@@ -10,6 +10,8 @@ module Wow
       attr_accessor :short_description
       attr_accessor :description
       attr_accessor :executables
+      attr_accessor :files
+      attr_accessor :files_exclude
 
       # Internal Config
       attr_accessor :platform
@@ -33,6 +35,8 @@ module Wow
         @file_patterns = []
         @platforms = []
         @platform_configs = []
+        @description = ''
+        @short_description = ''
       end
 
       def file(files)
@@ -66,8 +70,17 @@ module Wow
 
       def init_from_toml(file)
         toml = TOML.load_file(file).deep_symbolize
-        name = toml[:name]
+        @name = toml[:name]
+        @version = toml[:version]
+        @authors = toml[:authors]
+        @short_description = toml[:description]
+        self.description = toml[:short_description]
+        @files = toml[:files]
+        @files_excluded = toml[:files_excluded]
+        @executables = toml[:executables]
+        if toml[:platform]
 
+        end
       end
 
       # @return all files matching the pattern given in the files
@@ -79,6 +92,15 @@ module Wow
         results
       end
 
+      # Set the description of the package.
+      # @param content: Can either be the description itself or a filename.
+      def description=(content)
+        if File.exists?(content)
+          @description = IO.read(content)
+        else
+          @description = content
+        end
+      end
 
       # @return [Boolean]
       # * true if this config has a platform specified
@@ -130,6 +152,8 @@ module Wow
           FileUtils.cp(file, destination)
         end
       end
+
+
     end
   end
 end
