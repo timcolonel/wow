@@ -1,17 +1,17 @@
 # Name of the package, must contain only letters, digits and _
-name = "[Package name]"
+name = '[Package name]'
 
 # Version of the package, should follow the format major.minor.patch[.other]
-version = "[Package Version]"
+version = '[Package Version]'
 
 # List of the authors
-authors = ["Your Name <you@example.com>"]
+authors = ['Your Name <you@example.com>']
 
 #Short description
-short_description = "[Short Description]"
+short_description = '[Short Description]'
 
 # Detailed description of the package(Can be a filename that will be loaded)
-description = "[Description]"
+description = '[Description]'
 
 # List of files to be added to the package(List of the files to include in the package). 
 # Each entry can be a folder, filename, path or a wildcard.

@@ -10,4 +10,4 @@ gem 'coveralls', require: false
 gem 'docopt'
 
 gem 'win32console', platform: :mswin
-gem 'toml'
+gem 'toml-rb'

@@ -6,7 +6,7 @@ module Wow
       attr_accessor :key
 
       def initialize(key)
-        @key= key
+        @key = key
       end
 
       # platform.is?(other) => Boolean

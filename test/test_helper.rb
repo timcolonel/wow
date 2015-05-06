@@ -8,7 +8,7 @@ require 'yaml'
 require 'minitest/reporters'
 require 'lib/wow'
 require 'test/tmp_file'
-
+require 'test/renderer'
 
 
 MiniTest::Reporters.use!

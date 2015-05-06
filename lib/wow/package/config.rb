@@ -1,3 +1,5 @@
+require 'toml'
+
 module Wow
   module Package
     class Config
@@ -33,8 +35,8 @@ module Wow
       def initialize(platform = nil)
         @platform = Wow::Package::Platform.new(platform)
         @file_patterns = []
-        @platforms = []
-        @platform_configs = []
+        @platforms = Set.new
+        @platform_configs = {}
         @description = ''
         @short_description = ''
       end
@@ -69,18 +71,29 @@ module Wow
       end
 
       def init_from_toml(file)
-        toml = TOML.load_file(file).deep_symbolize
-        @name = toml[:name]
-        @version = toml[:version]
-        @authors = toml[:authors]
-        @short_description = toml[:description]
-        self.description = toml[:short_description]
-        @files = toml[:files]
-        @files_excluded = toml[:files_excluded]
-        @executables = toml[:executables]
-        if toml[:platform]
+        hash = TOML.load_file(file).deep_symbolize_keys
+        init_from_hash(hash)
+      end
 
+      def init_from_hash(hash)
+        @name = hash[:name]
+        @version = hash[:version]
+        @authors = hash[:authors]
+        @short_description = hash[:description]
+        self.description = hash[:short_description]
+        @files = hash[:files]
+        @files_excluded = hash[:files_excluded]
+        @executables = hash[:executables]
+        if hash[:platform]
+          hash[:platform].each do |platform_name, data|
+            platform = Platform.new(platform_name)
+            @platforms << platform
+            platform_config = Wow::Package::Config.new(@platform)
+            platform_config.init_from_hash(data)
+            @platform_configs[platform] = platform_config
+          end
         end
+        puts 'ji'
       end
 
       # @return all files matching the pattern given in the files
@@ -95,6 +108,7 @@ module Wow
       # Set the description of the package.
       # @param content: Can either be the description itself or a filename.
       def description=(content)
+        return if content.nil?
         if File.exists?(content)
           @description = IO.read(content)
         else

@@ -3,6 +3,7 @@ class TmpFile
   def self.clean(folder)
     FileUtils.rm_rf File.join(tmp_folder, folder)
   end
+
   #Return the path of a new file in the tmp folder
   def self.path(filename = '', folder = '')
     _folder = File.join(tmp_folder, folder)
@@ -18,6 +19,7 @@ class TmpFile
       File.join(tmp_folder, folder)
     end
   end
+
   def self.tmp_folder
     "#{File.dirname(__FILE__)}/tmp/"
   end

@@ -1,5 +1,4 @@
 require 'test/test_helper'
-
 module Wow
   module Package
     class ConfigTest < ActiveSupport::TestCase
@@ -11,6 +10,23 @@ module Wow
       def folder
         'test_package_config'
       end
+
+      def asset(path)
+        return File.join(File.dirname(__FILE__), path)
+      end
+
+      test 'should parse toml file' do
+        hash = {name: 'Some name', version: '1.2.3', author: 'Some author'}
+        tmp = TmpFile.path('package.toml', self.folder)
+        erb = Renderer::ERB.render_file(asset('assets/package_config.toml.erb'), hash)
+        File.write(tmp, erb)
+        config = Wow::Package::Config.new(:any)
+        config.init_from_toml(tmp)
+        assert_equal hash[:name], config.name
+        assert_equal hash[:version], config.version
+        assert_includes config.authors, hash[:author]
+      end
+
       test 'should list all files' do
         config = Wow::Package::Config.new
         config.file_patterns << 'assets/*.*'
@@ -62,7 +78,8 @@ module Wow
         archive = config.create_archive(TmpFile.folder_path(folder))
         assert File.exists?(archive)
       end
-      test 'should install to installation folder' do 
+
+      test 'should install to installation folder' do
         config = Wow::Package::Config.new
         config.name = 'to_install'
         config.version = '1.0.0'
