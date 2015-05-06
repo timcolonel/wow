@@ -62,7 +62,6 @@ DEPENDENCIES
   minitest-reporters
   rake
   toml-rb
-  win32console
 
 BUNDLED WITH
   1.10.0.pre

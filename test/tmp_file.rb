@@ -1,3 +1,4 @@
+require 'tempfile'
 class TmpFile
 
   def self.clean(folder)
