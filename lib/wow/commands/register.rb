@@ -1,4 +1,4 @@
-class Command::Init
+class Wow::Command::Register
   def initialize
 
   end

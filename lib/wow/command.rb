@@ -1,5 +1,3 @@
-require_all 'lib/wow/commands'
-
 module Wow
   class Command
     ACTIONS = [
@@ -40,16 +38,17 @@ module Wow
     end
 
     def init
-      Command::Init.new
+      Wow::Command::Init.new
     end
 
     def pack
-      Command::Pack.new(@options['<platform>'])
+      Wow::Command::Pack.new(@options['<platform>'])
     end
 
     def register
-      Command::Register.new
+      Wow::Command::Register.new
     end
+
     def build
 
     end
@@ -71,3 +70,5 @@ module Wow
     end
   end
 end
+
+require_all 'lib/wow/commands'

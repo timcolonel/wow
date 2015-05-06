@@ -81,7 +81,7 @@ module Wow
         config = Wow::Package::Config.new
         config.name = 'from_archive'
         config.version = '1.0.0'
-        filenames = TmpFile.create_files(:count => 5, :folder => File.join(folder, 'input'), :absolute => false)
+        filenames = TmpFile.create_files(count: 5, :folder => File.join(folder, 'input'), absolute: false)
         config.file_patterns = filenames
         archive = config.create_archive(TmpFile.folder_path(folder))
         assert File.exists?(archive)
@@ -91,7 +91,7 @@ module Wow
         config = Wow::Package::Config.new
         config.name = 'to_install'
         config.version = '1.0.0'
-        filenames = TmpFile.create_files(:count => 5, :folder => File.join(folder, 'input'), :absolute => false)
+        filenames = TmpFile.create_files(:count => 5, folder: File.join(folder, 'input'), absolute: false)
         config.file_patterns = filenames
         destination = File.join(TmpFile.folder_path(folder), 'output')
         config.install_to(destination)

@@ -36,3 +36,5 @@ class ActiveSupport::TestCase
   def set_current_scenario(scenario)
   end
 end
+
+ActiveSupport::TestCase.test_order = :random

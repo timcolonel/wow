@@ -1,4 +1,4 @@
-class Command::Pack
+class Wow::Command::Pack
   def initialize(platform = :any)
     @platform = platform
   end

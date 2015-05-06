@@ -6,6 +6,7 @@ module Wow
       attr_accessor :key
 
       def initialize(key)
+        key ||= :any
         @key = key
       end
 
@@ -35,6 +36,10 @@ module Wow
       def include?(platform)
         fail ArgumentError unless platform.is_a? Wow::Package::Platform
         Wow::Package::Platform.based_on?(self, platform)
+      end
+
+      def to_s
+        @key.to_s
       end
 
       class << self

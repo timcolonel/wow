@@ -1,11 +1,16 @@
 require 'test/test_helper'
 
 class Wow::ArchiveTest < ActiveSupport::TestCase
+  class TmpSub
+    def run
+      'Installing'
+    end
+  end
 
   test 'Test Should call right method' do
     Wow::Command.class_eval do
       def install
-        return 'Installing'
+        return TmpSub.new
       end
     end
     assert_nothing_raised Wow::UnknownCommand do
@@ -13,10 +18,11 @@ class Wow::ArchiveTest < ActiveSupport::TestCase
     end
   end
 
+
   test 'Aliases should work' do
     Wow::Command.class_eval do
       def install
-        return 'Installing'
+        return TmpSub.new
       end
     end
     assert_nothing_raised Wow::UnknownCommand do

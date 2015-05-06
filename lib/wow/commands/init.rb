@@ -1,4 +1,5 @@
-class Command::Init
+
+class Wow::Command::Init
   def initialize
 
   end
