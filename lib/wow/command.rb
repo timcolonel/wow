@@ -1,7 +1,10 @@
+require_all 'lib/wow/commands'
+
 module Wow
   class Command
     ACTIONS = [
         :init,
+        :pack,
         :install,
         :build,
         :extract,
@@ -20,7 +23,7 @@ module Wow
     def run
       compute_actions.each do |al, action|
         if @options[al.to_s]
-          return self.send(action)
+          return self.send(action).run
         end
       end
       fail Wow::UnknownCommand, 'Unknown command'
@@ -36,6 +39,17 @@ module Wow
       extractor.extract
     end
 
+    def init
+      Command::Init.new
+    end
+
+    def pack
+      Command::Pack.new(@options['<platform>'])
+    end
+
+    def register
+      Command::Register.new
+    end
     def build
 
     end

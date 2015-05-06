@@ -32,6 +32,10 @@ module Wow
         end
       end
 
+      def self.filename
+        return 'wow.toml'
+      end
+
       def initialize(platform = nil)
         @platform = Wow::Package::Platform.new(platform)
         @file_patterns = []
@@ -93,14 +97,17 @@ module Wow
             @platform_configs[platform] = platform_config
           end
         end
-        puts 'ji'
       end
 
       # @return all files matching the pattern given in the files
       def files
         results = []
         @file_patterns.each do |file_pattern|
-          results += Dir.glob(file_pattern)
+          if File.directory?(file_pattern)
+            results += Dir.glob(File.join(file_pattern, '**/*'))
+          else
+            results += Dir.glob(file_pattern)
+          end
         end
         results
       end
@@ -149,7 +156,7 @@ module Wow
       # @return archive path with filename
       def create_archive(destination, filename = nil)
         validate!
-        filename ||= "#{@name}-#{@version}.wow"
+        filename ||= "#{@name}-#{@version}-#{@platform}.wow"
         path = File.join(destination, filename)
         Archive.write path do |archive|
           archive.add_files files

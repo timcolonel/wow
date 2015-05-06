@@ -5,6 +5,7 @@ module Wow
 
       def setup
         TmpFile.clean folder
+        change_asset_folder(File.expand_path('../assets', __FILE__))
       end
 
       def folder
@@ -12,7 +13,7 @@ module Wow
       end
 
       def asset(path)
-        return File.join(File.dirname(__FILE__), path)
+        File.join(File.dirname(__FILE__), path)
       end
 
       test 'should parse toml file' do
@@ -30,6 +31,13 @@ module Wow
       test 'should list all files' do
         config = Wow::Package::Config.new
         config.file_patterns << 'assets/*.*'
+        assert_not config.files.empty?
+        assert config.files.include? 'assets/platforms.yml'
+      end
+
+      test 'should list all files in folder' do
+        config = Wow::Package::Config.new
+        config.file_patterns << 'assets/'
         assert_not config.files.empty?
         assert config.files.include? 'assets/platforms.yml'
       end

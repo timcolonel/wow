@@ -4,10 +4,10 @@ module Wow
     class PlatformTest < ActiveSupport::TestCase
 
       def setup_platforms
-        Wow::Config.send(:remove_const, :ASSET_FOLDER) if Wow::Config.const_defined?(:ASSET_FOLDER)
-        Wow::Config.const_set(:ASSET_FOLDER, File.expand_path('../assets', __FILE__))
+        change_asset_folder(File.expand_path('../assets', __FILE__))
         Wow::Package::Platform.instance_variable_set(:@platforms, nil)
       end
+
 
       test 'should load platform right' do
         assert_not_nil Wow::Package::Platform.platforms

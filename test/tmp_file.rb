@@ -1,4 +1,52 @@
 require 'tempfile'
+
+module Tmp
+  class Folder
+
+    attr_accessor :relative_path
+    attr_accessor :fullpath
+
+    def initialize(name = nil, parent = nil)
+      if name.nil?
+        name = SecureRandom.uuid
+      end
+      unless parent.nil?
+        name = File.join(parent.relative_path, name)
+      end
+      @relative_path = name
+      @fullpath = File.join(Tmp::Folder.tmp_dir, name)
+      self.clean
+      FileUtils.mkdir_p(@fullpath)
+    end
+
+    def sub_folder(name)
+      Tmp::Folder.new(name, self)
+    end
+
+    def path(path)
+      File.join(@fullpath, path)
+    end
+
+    def file(filename=nil)
+      if filename.nil?
+        filename = "#{SecureRandom.uuid}.tmp"
+      end
+      path(filename)
+    end
+
+    def self.tmp_dir
+      "#{File.dirname(__FILE__)}/tmp/"
+    end
+
+    def clean
+      FileUtils.rm_rf @fullpath
+    end
+
+    def to_s
+      @fullpath
+    end
+  end
+end
 class TmpFile
 
   def self.clean(folder)

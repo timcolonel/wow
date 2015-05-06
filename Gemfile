@@ -10,3 +10,5 @@ gem 'coveralls', require: false
 gem 'docopt'
 
 gem 'toml-rb'
+
+gem 'require_all'

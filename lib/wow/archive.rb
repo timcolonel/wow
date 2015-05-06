@@ -72,7 +72,7 @@ module Wow
     end
 
     # Add the given list of files to the archive into the given folder
-    # If the filesname are in an absolute path the file will be added to the root of the destination path
+    # If the filenames are in an absolute path the file will be added to the root of the destination path
     # If the filename is a relative path it will be added relative to the destination path unless the flatten params is set to true 
     # @params filenames [List<String>] list of filenames to include in the archive
     # @params destination_path [String] folder where all of the file will be placed

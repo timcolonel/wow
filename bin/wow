@@ -15,7 +15,9 @@ Wow
 
 Usage:
     #{__FILE__}
-    #{__FILE__} init <project_name>
+    #{__FILE__} init
+    #{__FILE__} pack [<platform>]
+    #{__FILE__} register
     #{__FILE__} extract <filename>
     #{__FILE__} install <package>...
     #{__FILE__} uninstall <package>...
