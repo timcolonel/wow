@@ -71,4 +71,4 @@ module Wow
   end
 end
 
-require_all 'lib/wow/commands'
+require_rel 'commands'

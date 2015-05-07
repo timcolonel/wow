@@ -1,6 +1,6 @@
 require 'coveralls'
 Coveralls.wear!
-
+$:.push File.expand_path('../../lib', __FILE__)
 require 'active_support'
 require 'active_support/testing/autorun'
 require 'active_support/test_case'
