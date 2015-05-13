@@ -3,7 +3,7 @@ module Wow
   module Package
     class PlatformTest < ActiveSupport::TestCase
 
-      def setup_platforms
+      def setup
         change_asset_folder(File.expand_path('../assets', __FILE__))
         Wow::Package::Platform.instance_variable_set(:@platforms, nil)
       end
@@ -25,7 +25,6 @@ module Wow
       end
 
       test 'Test #based_on? function' do
-        setup_platforms
         should = [:child1, :root], [:subchild21, :root], [:subchild21, :child2], [:root, :root], [:child1, :child1], [:subchild11, :subchild11]
         should_not= [:root, :child1], [:root, :subchild11], [:child1, :child2], [:subchild11, :subchild22]
         should.each do |a|
@@ -41,12 +40,10 @@ module Wow
       end
 
       test 'Test the #is? method' do
-        setup_platforms
         assert Wow::Package::Platform.new(:child1).is?(Wow::Package::Platform.new(:root))
       end
 
       test 'Test the #include? method' do
-        setup_platforms
         assert Wow::Package::Platform.new(:root).include?(Wow::Package::Platform.new(:child1))
       end
     end

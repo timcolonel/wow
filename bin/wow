@@ -14,10 +14,9 @@ doc = <<DOCOPT
 Wow
 
 Usage:
-    #{__FILE__}
-#{__FILE__} init
+    #{__FILE__} init
     #{__FILE__} pack [<platform>]
-    #{__FILE__} register
+    #{__FILE__} register [options]
     #{__FILE__} extract <filename>
     #{__FILE__} install <package>...
     #{__FILE__} uninstall <package>...
@@ -32,6 +31,9 @@ Action
 Options:
   -h --help     Show this screen.
   --version     Show version.
+  -r --remote=<remote>    Remote server. If not specified will either use the default server or try each one depending on the action.
+  -u --username=<username>  Username for remote
+  -p --password=<password>  Password for remote
 DOCOPT
 
 begin
@@ -39,5 +41,7 @@ begin
   require 'wow'
   Wow.run(Docopt::docopt(doc))
 rescue Docopt::Exit => e
+  puts e.message
+rescue Wow::Error => e
   puts e.message
 end

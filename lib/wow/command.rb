@@ -1,8 +1,10 @@
+require 'wow/api_client/config'
 module Wow
   class Command
     ACTIONS = [
         :init,
         :pack,
+        :register,
         :install,
         :build,
         :extract,
@@ -18,7 +20,14 @@ module Wow
       @options = options
     end
 
+    def extract_common_options
+      Wow::ApiClient::Config.remote = @options['--remote']
+      Wow::ApiClient::Config.username = @options['--username']
+      Wow::ApiClient::Config.password = @options['--password']
+    end
+
     def run
+      extract_common_options
       compute_actions.each do |al, action|
         if @options[al.to_s]
           return self.send(action).run

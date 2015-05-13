@@ -5,8 +5,11 @@ module Wow
 
     class << self
       attr_accessor :install_folder
+      attr_accessor :remote
+
 
       def load
+        @remote = 'http://localhost:3000'
         @install_folder = File.join(ROOT_FOLDER, 'packages')
       end
 

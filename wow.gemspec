@@ -19,11 +19,14 @@ Gem::Specification.new do |s|
   s.add_dependency 'rake'
   s.add_dependency 'activesupport'
   s.add_dependency 'activemodel'
-  s.add_dependency 'coveralls'
   s.add_dependency 'docopt'
   s.add_dependency 'toml-rb'
   s.add_dependency 'require_all'
+  s.add_dependency 'rest-client'
+  s.add_dependency 'highline'
 
   s.add_development_dependency 'minitest'
   s.add_development_dependency 'minitest-reporters'
+  s.add_development_dependency 'coveralls'
+  s.add_development_dependency 'faker'
 end
