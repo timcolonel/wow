@@ -12,7 +12,9 @@ class Wow::Command::Register
     client.sign_in
     result = client.get('/api/v1/tags')
     puts result
-    r = agree("Are you sure you want to register this '#{}' with this name? [yn]") { |q| q.default = true}
+    config = Wow::Package::Config.new
+    config.init_from_toml(Wow::Package::Config.filename)
+    r = agree("Are you sure you want to register this '#{config.name}' with this name? [yn]") { |q| q.default = true }
     puts r
     # puts result.code
     # puts result.cookies
