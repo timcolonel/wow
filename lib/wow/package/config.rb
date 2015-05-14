@@ -8,12 +8,14 @@ module Wow
       # User config
       attr_accessor :name
       attr_accessor :version
+      attr_accessor :homepage
       attr_accessor :authors
       attr_accessor :short_description
       attr_accessor :description
       attr_accessor :executables
       attr_accessor :files
       attr_accessor :files_exclude
+      attr_accessor :tags
 
       # Internal Config
       attr_accessor :platform
@@ -82,7 +84,9 @@ module Wow
       def init_from_hash(hash)
         @name = hash[:name]
         @version = hash[:version]
+        @homepage = hash[:homepage]
         @authors = hash[:authors]
+        @tags = hash[:tags]
         @short_description = hash[:description]
         self.description = hash[:short_description]
         @files = hash[:files]

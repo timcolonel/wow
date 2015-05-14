@@ -43,5 +43,5 @@ begin
 rescue Docopt::Exit => e
   puts e.message
 rescue Wow::Error => e
-  puts e.message
+  puts e.error_message
 end

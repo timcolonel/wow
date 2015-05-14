@@ -10,8 +10,8 @@ class Wow::Command::Init
       unless agree("#{Wow::Package::Config.filename} already exists in this folder are you sure you want to override it? [yn]")
         return
       end
-      FileUtils.cp(src, dst)
-      puts "Created config successfully in #{Wow::Package::Config.filename}"
     end
+    FileUtils.cp(src, dst)
+    puts "Created config successfully in #{Wow::Package::Config.filename}"
   end
 end
