@@ -1,12 +1,13 @@
+require 'wow/package/specification'
+
 class Wow::Command::Pack
   def initialize(platform = :any)
     @platform = platform
   end
 
   def run
-    config = Wow::Package::Config.new(platform)
-    config.init_from_toml(Wow::Package::Config.filename)
-    archive_path = config.create_archive(directory)
+    config = Wow::Package::Specification.load_valid!(@platform)
+    archive_path = config.create_archive(Dir.pwd)
     puts "Created archive in #{archive_path}"
   end
 end

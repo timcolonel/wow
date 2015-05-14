@@ -8,9 +8,7 @@ class Wow::Command::Register
   end
 
   def run
-    config = Wow::Package::Config.new
-    config.init_from_toml(Wow::Package::Config.filename)
-    config.validate!
+    config = Wow::Specification.load_valid!
 
     client = Wow::ApiClient.new
     client.sign_in

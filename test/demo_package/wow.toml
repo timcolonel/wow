@@ -4,7 +4,7 @@ name = 'test_package'
 homepage = 'http://example.com'
 
 # Version of the package, should follow the format major.minor.patch[.other]
-version = '[Package Version]'
+version = '1.2.3'
 
 # List of the authors
 authors = ['Your Name <you@example.com>']
@@ -25,7 +25,7 @@ description = '[Description]'
 #   Readme.md       => Will include the Readme.md file
 #   bin/myexe       => Will include the bin/myexe file
 #   src/**/*.rb     => Will include all the rb files in the src directory
-files = ['**/*.*']
+files = ['bin/*.*', 'lib/*.*']
 
 # List of files to exclude.(Same format as files)
 files_exclude = ['devonly.txt']
