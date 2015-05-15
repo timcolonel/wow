@@ -1,7 +1,10 @@
 .idea/
 test/tmp
+spec/tmp
 coverage/
 Gemfile.lock
+
 doc/
+.yardoc/
 
 *.wow

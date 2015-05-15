@@ -26,7 +26,7 @@ class Wow::Package::FilePattern
       @destination = destination
       self.pattern = pattern
     elsif pattern.is_a? Hash
-      self.pattern, @destination = pattern.first
+      self.pattern, @destination = pattern.first.map(&:to_s)
     else
       if pattern.include? '=>'
         self.pattern, @destination = pattern.split('=>', 2).map(&:strip)
@@ -73,11 +73,7 @@ class Wow::Package::FilePattern
               end
       files.each do |file|
         path = root.blank? ? file : File.join(@root, file)
-        results[path] = if @destination.nil?
-                          path
-                        else
-                          File.join(@destination, file)
-                        end
+        results[path] = @destination.nil? ? path : File.join(@destination, file)
       end
     end
     results
@@ -89,7 +85,7 @@ class Wow::Package::FilePattern
   #   Wow::Package::FilePattern.split_pattern('lib/sub/**/*') # => ['lib/sub', '**/*']
   # ```
   def self.split_pattern(pattern)
-    pathname = Pathname(pattern)
+    pathname = Pathname(pattern.to_s)
     segments = pathname.each_filename.to_a
     root = pathname.absolute? ? Pathname('/') : nil
     wildcard = nil

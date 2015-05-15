@@ -17,7 +17,7 @@ class Wow::Package::Specification
   attr_accessor :files_excluded
 
   # Internal Config
-  attr_accessor :platform
+  attr_reader :platform
   attr_accessor :platforms
   attr_accessor :platform_configs
 
@@ -152,6 +152,14 @@ class Wow::Package::Specification
     end
   end
 
+  def platform=(platform)
+    if platform.is_a? Symbol
+      @platform = Wow::Package::Platform.new(platform)
+    else
+      @platform = platform
+    end
+  end
+
   # @return [Boolean]
   # * true if this config has a platform specified
   # * false if this config contains multiple platform(Just loaded from file)
@@ -193,22 +201,33 @@ class Wow::Package::Specification
     path
   end
 
-  # Copy files to the installation folder
+  # Equivalent to creating the archive then installing the archive to the given destination
   # To install a program directly from the source(not an archive)
   # @param destination [String] folder where to install files
   def install_to(destination)
-    destination ||= File.join(Wow::Config.install_folder)
-    files.each do |source, _|
-      FileUtils.cp(source, destination)
+    destination ||= File.join(Wow::Config.package_install_root, package_folder)
+    files.each do |source, file_destination|
+      output = File.join(destination, file_destination)
+      FileUtils.mkdir_p(output)
+      FileUtils.cp(source, output)
     end
   end
 
   # Return the name of the archive file
-  # In the following format <name>-<version>[-<platform>[-<architecture>]]
-  # e.g.
-  #   example-1.2.3.wow
-  #   example-1.2.3-unix-x86
+  # In the following format <name>-<version>[-<platform>[-<architecture>]].wow
+  # See {Wow::Package::Specification#package_folder}
   def archive_name
+    "#{package_folder}.wow"
+  end
+
+  # Return name of the folder. Used during installation and archive creation.
+  # It follows this format <name>-<version>[-<platform>[-<architecture>]]
+  # ```
+  #   {name: 'example', version: '1.2.3'} # => example-1.2.3
+  #   {name: 'example', version: '1.2.3', platform: 'unix'} # => example-1.2.3-unix
+  #   {name: 'example', version: '1.2.3', platform: 'unix', arch: 'x86'} # => example-1.2.3-unix-x86
+  # ```
+  def package_folder
     @arch = nil
     array = [@name, @version]
     if @platform and @platform.key != :any
@@ -217,8 +236,6 @@ class Wow::Package::Specification
         array << @arch
       end
     end
-
-
-    "#{array.join('-')}.wow"
+    array.join('-')
   end
 end

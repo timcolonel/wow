@@ -36,6 +36,16 @@ executables = ['[Executables]']
 # List of application to install with the package. An application is a GUI program.
 application = ['[Apllication]']
 
+# Package dependencies
+# The version can be in the following format
+# 'x.y.z'    => Require version x.y.z
+# '= x.y.z'  => Require version x.y.z
+# '>= x.y.z' => Require any version more than x.y.z
+# '~> x.y.z' => Require any version more thatn x.y.z but less than x.(y+1).0
+[dependencies]
+# mydependency  = '[Version Pattern]'
+
+
 # Platform specific config
 # Here you can repeat any of the specified config above and it will merge but only for the platform specified
 # For example if you had  files = ['src/'] in the main config and add files = ['windows/'] under the [platform.windows] both src and windows will be deployed on install.

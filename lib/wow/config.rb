@@ -4,13 +4,13 @@ module Wow
     ASSET_FOLDER = "#{Wow::Config::ROOT_FOLDER}/assets"
 
     class << self
-      attr_accessor :install_folder
+      attr_accessor :package_install_root
       attr_accessor :remote
 
 
       def load
         @remote = 'http://localhost:3000'
-        @install_folder = File.join(ROOT_FOLDER, 'packages')
+        @package_install_root = File.join(ROOT_FOLDER, 'packages')
       end
 
       # Return the full path to the given file that should be on the root of the data folder
