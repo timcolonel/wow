@@ -1,5 +1,6 @@
 require 'toml'
 
+
 class Wow::Package::Specification
   include ActiveModel::Validations
 
@@ -11,13 +12,12 @@ class Wow::Package::Specification
   attr_accessor :short_description
   attr_accessor :description
   attr_accessor :executables
-  attr_accessor :files
-  attr_accessor :files_exclude
   attr_accessor :tags
+  attr_accessor :files_included
+  attr_accessor :files_excluded
 
   # Internal Config
   attr_accessor :platform
-  attr_accessor :file_patterns
   attr_accessor :platforms
   attr_accessor :platform_configs
 
@@ -26,7 +26,7 @@ class Wow::Package::Specification
                       :message => 'Error in config file. Name should only contain lowercase, numbers and _-'
 
   validate do
-    @file_patterns.each do |pattern|
+    @files_included.each do |pattern|
       errors.add :file_patterns,
                  "Path `#{pattern}`should be relative to the root but is an absolute path!" if Pathname.new(pattern).absolute?
     end
@@ -56,7 +56,8 @@ class Wow::Package::Specification
 
   def initialize(platform = nil)
     @platform = Wow::Package::Platform.new(platform)
-    @file_patterns = []
+    @files_included = []
+    @files_excluded = []
     @platforms = Set.new
     @platform_configs = {}
     @description = ''
@@ -65,7 +66,7 @@ class Wow::Package::Specification
 
 
   def file(files)
-    @file_patterns += [*files]
+    @files_included += [*files]
   end
 
   def executable(executables)
@@ -106,7 +107,7 @@ class Wow::Package::Specification
     @tags = hash[:tags]
     @short_description = hash[:description]
     self.description = hash[:short_description]
-    @files = hash[:files]
+    @files_included = hash[:files]
     @files_excluded = hash[:files_excluded]
     @executables = hash[:executables]
     if hash[:platform]
@@ -120,10 +121,10 @@ class Wow::Package::Specification
     end
   end
 
-  # @return all files matching the pattern given in the files
-  def files
+  def list_files_matching_patterns(patterns = [])
+    patterns = [*patterns]
     results = []
-    @file_patterns.each do |file_pattern|
+    patterns.each do |file_pattern|
       if File.directory?(file_pattern)
         results += Dir.glob(File.join(file_pattern, '**/*'))
       else
@@ -131,6 +132,13 @@ class Wow::Package::Specification
       end
     end
     results
+  end
+
+  # @return all files matching the pattern given in the files
+  def files
+    included_files = list_files_matching_patterns(@files_included)
+    excluded_files = list_files_matching_patterns(@files_excluded)
+    included_files - excluded_files
   end
 
   # Set the description of the package.

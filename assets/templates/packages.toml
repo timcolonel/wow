@@ -27,8 +27,8 @@ description = '[Description]'
 #   src/**/*.rb     => Will include all the rb files in the src directory
 files = ['**/*.*']
 
-# List of files to exclude.(Same format as files)
-files_exclude = ['devonly.txt']
+# List of files to exclude that are already matched in the files property.(Same format as files)
+files_excluded = ['devonly.txt']
 
 # List of executables(Relative to the root of the package) The file will be linked in the WOW bin directory which should be visible by the system path.
 executables = ['[Executables]']

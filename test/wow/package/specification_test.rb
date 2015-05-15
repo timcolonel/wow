@@ -27,14 +27,14 @@ class Wow::Package::SpecificationTest < ActiveSupport::TestCase
 
   test 'should list all files' do
     config = Wow::Package::Specification.new
-    config.file_patterns << 'assets/*.*'
+    config.files_included << 'assets/*.*'
     assert_not config.files.empty?
     assert config.files.include? 'assets/platforms.yml'
   end
 
   test 'should list all files in folder' do
     config = Wow::Package::Specification.new
-    config.file_patterns << 'assets/'
+    config.files_included << 'assets/'
     assert_not config.files.empty?
     assert config.files.include? 'assets/platforms.yml'
   end
@@ -62,7 +62,7 @@ class Wow::Package::SpecificationTest < ActiveSupport::TestCase
     config = Wow::Package::Specification.new
     config.name = 'super_name'
     config.version = '1.0.0'
-    config.file_patterns << '/absolute/path'
+    config.files_included << '/absolute/path'
     assert_not config.valid?
   end
 
@@ -70,7 +70,7 @@ class Wow::Package::SpecificationTest < ActiveSupport::TestCase
     config = Wow::Package::Specification.new
     config.name = 'super_name'
     config.version = '1.0.0'
-    config.file_patterns << 'relative/path'
+    config.files_included << 'relative/path'
     assert config.valid?, "Should be valid!, #{config.errors.full_messages}"
   end
 
@@ -79,7 +79,7 @@ class Wow::Package::SpecificationTest < ActiveSupport::TestCase
     config.name = 'from_archive'
     config.version = '1.0.0'
     filenames = TmpFile.create_files(count: 5, :folder => File.join(folder, 'input'), absolute: false)
-    config.file_patterns = filenames
+    config.files_included = filenames
     archive = config.create_archive(TmpFile.folder_path(folder))
     assert File.exists?(archive)
   end
@@ -89,7 +89,7 @@ class Wow::Package::SpecificationTest < ActiveSupport::TestCase
     config.name = 'to_install'
     config.version = '1.0.0'
     filenames = TmpFile.create_files(:count => 5, folder: File.join(folder, 'input'), absolute: false)
-    config.file_patterns = filenames
+    config.files_included = filenames
     destination = File.join(TmpFile.folder_path(folder), 'output')
     config.install_to(destination)
     filenames.each do |filename|
@@ -101,8 +101,7 @@ class Wow::Package::SpecificationTest < ActiveSupport::TestCase
     config = Wow::Package::Specification.new
     filename = 'dumfile.txt'
     config.init_from_rb("file '#{filename}'")
-    puts config.file_patterns
-    assert config.file_patterns.include?(filename)
+    assert config.files_included.include?(filename)
   end
 
 
@@ -114,7 +113,6 @@ class Wow::Package::SpecificationTest < ActiveSupport::TestCase
   end
 
   test 'archive name with platform' do
-
     platform = :unix
     config = Wow::Package::Specification.new(platform)
     params = {name: Faker::Name.name, version: '1.2.3'}
