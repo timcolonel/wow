@@ -2,5 +2,6 @@
 test/tmp
 coverage/
 Gemfile.lock
+doc/
 
 *.wow

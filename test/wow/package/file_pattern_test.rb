@@ -44,6 +44,7 @@ module Wow
 
 
       test 'test split pattern' do
+        test_split_pattern '/absolute', 'path'
         test_split_pattern 'lib', '**/*'
         test_split_pattern 'lib', '*'
         test_split_pattern 'lib/sub', '**/*'
@@ -91,6 +92,18 @@ module Wow
           assert_not_equal src, dst
           assert dst.start_with?(destination)
         end
+      end
+
+      test 'patterns= with file no folder' do
+        pattern = 'somefile.txt'
+        p = Wow::Package::FilePattern.new(pattern)
+        assert_equal pattern, p.pattern
+      end
+
+      test 'patterns= with file and folder' do
+        pattern = 'some/somefile.txt'
+        p = Wow::Package::FilePattern.new(pattern)
+        assert_equal pattern, p.pattern
       end
     end
   end

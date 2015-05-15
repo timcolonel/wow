@@ -1,7 +1,7 @@
 require 'test/test_helper'
 class Wow::Package::SpecificationTest < ActiveSupport::TestCase
   def setup
-    TmpFile.clean folder
+    # TmpFile.clean folder
     change_asset_folder(File.expand_path('../assets', __FILE__))
   end
 
@@ -27,16 +27,16 @@ class Wow::Package::SpecificationTest < ActiveSupport::TestCase
 
   test 'should list all files' do
     config = Wow::Package::Specification.new
-    config.files_included << 'assets/*.*'
+    config.file 'assets/*.*'
     assert_not config.files.empty?
     assert config.files.include? 'assets/platforms.yml'
   end
 
   test 'should list all files in folder' do
     config = Wow::Package::Specification.new
-    config.files_included << 'assets/'
-    assert_not config.files.empty?
-    assert config.files.include? 'assets/platforms.yml'
+    config.file 'assets/'
+    assert_not_empty config.files
+    assert config.files.keys.include? 'assets/platforms.yml'
   end
 
   test 'validate should fail without name' do
@@ -62,15 +62,15 @@ class Wow::Package::SpecificationTest < ActiveSupport::TestCase
     config = Wow::Package::Specification.new
     config.name = 'super_name'
     config.version = '1.0.0'
-    config.files_included << '/absolute/path'
-    assert_not config.valid?
+    config.file '/absolute/path'
+    assert_not config.valid?, 'Config should be invalid!'
   end
 
   test 'validate should succeed' do
     config = Wow::Package::Specification.new
     config.name = 'super_name'
     config.version = '1.0.0'
-    config.files_included << 'relative/path'
+    config.file 'relative/path'
     assert config.valid?, "Should be valid!, #{config.errors.full_messages}"
   end
 
@@ -79,7 +79,7 @@ class Wow::Package::SpecificationTest < ActiveSupport::TestCase
     config.name = 'from_archive'
     config.version = '1.0.0'
     filenames = TmpFile.create_files(count: 5, :folder => File.join(folder, 'input'), absolute: false)
-    config.files_included = filenames
+    config.file filenames
     archive = config.create_archive(TmpFile.folder_path(folder))
     assert File.exists?(archive)
   end
@@ -89,7 +89,7 @@ class Wow::Package::SpecificationTest < ActiveSupport::TestCase
     config.name = 'to_install'
     config.version = '1.0.0'
     filenames = TmpFile.create_files(:count => 5, folder: File.join(folder, 'input'), absolute: false)
-    config.files_included = filenames
+    config.file filenames
     destination = File.join(TmpFile.folder_path(folder), 'output')
     config.install_to(destination)
     filenames.each do |filename|
@@ -97,11 +97,11 @@ class Wow::Package::SpecificationTest < ActiveSupport::TestCase
     end
   end
 
-  test 'should create config from string' do
+  test 'should create config from ruby' do
     config = Wow::Package::Specification.new
     filename = 'dumfile.txt'
     config.init_from_rb("file '#{filename}'")
-    assert config.files_included.include?(filename)
+    assert config.files_included.map(&:pattern).include?(filename)
   end
 
 

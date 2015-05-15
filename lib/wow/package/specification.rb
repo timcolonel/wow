@@ -1,5 +1,5 @@
 require 'toml'
-
+require 'wow/package/file_pattern'
 
 class Wow::Package::Specification
   include ActiveModel::Validations
@@ -28,7 +28,7 @@ class Wow::Package::Specification
   validate do
     @files_included.each do |pattern|
       errors.add :file_patterns,
-                 "Path `#{pattern}`should be relative to the root but is an absolute path!" if Pathname.new(pattern).absolute?
+                 "Path `#{pattern.pattern}`should be relative to the root but is an absolute path!" if Pathname.new(pattern.pattern).absolute?
     end
   end
 
@@ -66,7 +66,11 @@ class Wow::Package::Specification
 
 
   def file(files)
-    @files_included += [*files]
+    @files_included += [*files].map { |x| Wow::Package::FilePattern.new(x) }
+  end
+
+  def exclude(files)
+    @files_excluded += [*files].map { |x| Wow::Package::FilePattern.new(x) }
   end
 
   def executable(executables)
@@ -107,8 +111,8 @@ class Wow::Package::Specification
     @tags = hash[:tags]
     @short_description = hash[:description]
     self.description = hash[:short_description]
-    @files_included = hash[:files]
-    @files_excluded = hash[:files_excluded]
+    @files_included = hash.fetch(:files, []).map { |x| Wow::Package::FilePattern.new(x) }
+    @files_excluded = hash.fetch(:files_excluded, []).map { |x| Wow::Package::FilePattern.new(x) }
     @executables = hash[:executables]
     if hash[:platform]
       hash[:platform].each do |platform_name, data|
@@ -121,15 +125,11 @@ class Wow::Package::Specification
     end
   end
 
-  def list_files_matching_patterns(patterns = [])
-    patterns = [*patterns]
-    results = []
+  def list_files_matching_patterns(file_patterns = [])
+    patterns = [*file_patterns]
+    results = {}
     patterns.each do |file_pattern|
-      if File.directory?(file_pattern)
-        results += Dir.glob(File.join(file_pattern, '**/*'))
-      else
-        results += Dir.glob(file_pattern)
-      end
+      results.merge! file_pattern.file_map
     end
     results
   end
@@ -138,7 +138,7 @@ class Wow::Package::Specification
   def files
     included_files = list_files_matching_patterns(@files_included)
     excluded_files = list_files_matching_patterns(@files_excluded)
-    included_files - excluded_files
+    included_files.except(excluded_files.keys)
   end
 
   # Set the description of the package.
@@ -198,8 +198,8 @@ class Wow::Package::Specification
   # @param destination [String] folder where to install files
   def install_to(destination)
     destination ||= File.join(Wow::Config.install_folder)
-    files.each do |file|
-      FileUtils.cp(file, destination)
+    files.each do |source, _|
+      FileUtils.cp(source, destination)
     end
   end
 
