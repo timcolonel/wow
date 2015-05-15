@@ -2,7 +2,6 @@ require 'rake/testtask'
 require 'bundler/setup'
 Bundler.setup
 
-task :default => [:spec]
 Rake::TestTask.new do |t|
   t.libs = ['.']
   t.warning = false

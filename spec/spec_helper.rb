@@ -4,15 +4,10 @@ $:.push File.expand_path('../../lib', __FILE__)
 require 'faker'
 require 'rspec'
 require 'active_support'
-require 'active_support/testing/autorun'
-require 'active_support/test_case'
 require 'yaml'
-require 'minitest/reporters'
 require 'wow'
 require 'tmp_file'
 require 'renderer'
-
-MiniTest::Reporters.use!
 
 
 RSpec.configure do |config|

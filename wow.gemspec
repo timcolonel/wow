@@ -25,8 +25,6 @@ Gem::Specification.new do |s|
   s.add_dependency 'rest-client'
   s.add_dependency 'highline'
 
-  s.add_development_dependency 'minitest'
-  s.add_development_dependency 'minitest-reporters'
   s.add_development_dependency 'coveralls'
   s.add_development_dependency 'faker'
   s.add_development_dependency 'rspec'
