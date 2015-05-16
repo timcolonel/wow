@@ -7,13 +7,14 @@ module Wow
     attr_accessor :io
     attr_accessor :tar_writer
     attr_accessor :tar_reader
-    attr_accessor :archive_filename
+    attr_accessor :filename
 
     #Open archive file to read
     # @param filename Archive filename
     # @param block Optional block the archive is given as param
     def self.open(filename, &block)
       archive = Archive.new
+      archive.filename = filename
       archive.tar_reader = Gem::Package::TarReader.new(Zlib::GzipReader.open(filename))
       if block_given?
         block.call(archive)
@@ -24,6 +25,7 @@ module Wow
 
     def self.write(filename, &block)
       archive = Archive.new
+      archive.filename = filename
       archive.io = StringIO.new('')
       archive.gz = Zlib::GzipWriter.open(filename)
       archive.tar_writer = Gem::Package::TarWriter.new(archive.io)
@@ -38,7 +40,7 @@ module Wow
       if tar_reader
         tar_reader.each(&block)
       else
-        fail Wow::Error, 'Must open archive for reading mode!'
+        fail Wow::Error, 'Must open archive in reading mode!'
       end
     end
 
@@ -106,8 +108,8 @@ module Wow
       end
     end
 
-    def self.extract(filename, destination)
-      Archive.open(filename) do |archive|
+    def self.extract(archive_filename, destination)
+      Archive.open(archive_filename) do |archive|
         archive.extract_all(destination)
       end
     end
