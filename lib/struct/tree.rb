@@ -54,6 +54,10 @@ class Tree
     @name == key ? self : @children.inject(nil) { |memo, v| memo ||= v.find(key) if v.respond_to?(:find) }
   end
 
+  def exist?(key)
+    not find(key).nil?
+  end
+
   def to_hash
     {name: @name, children: @children.map(&:to_hash)}
   end

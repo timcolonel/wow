@@ -7,9 +7,6 @@ end
 
 RSpec.describe Wow::Package::Specification do
   let (:folder) { 'test_package_config' }
-  before :each do
-    change_asset_folder(File.expand_path('../assets', __FILE__))
-  end
 
   describe '#init_from_toml' do
     subject { Wow::Package::Specification.new }
@@ -30,12 +27,12 @@ RSpec.describe Wow::Package::Specification do
     subject { Wow::Package::Specification.new }
     it 'list files with pattern' do
       subject.file 'assets/*.*'
-      expect(subject.files.keys).to include('assets/platforms.yml')
+      expect(subject.files.keys).to include('assets/targets.yml')
     end
 
     it 'list file in folder' do
       subject.file 'assets/'
-      expect(subject.files.keys).to include('assets/platforms.yml')
+      expect(subject.files.keys).to include('assets/targets.yml')
     end
   end
 
@@ -126,10 +123,67 @@ RSpec.describe Wow::Package::Specification do
     it { expect(subject.package_folder).to eq("#{name}-#{version}") }
 
     context 'when platform is specified' do
-      let (:platform) { :unix }
-      before { subject.platform = platform }
+      let (:target) { Wow::Package::Platform.new(:unix) }
+      before { subject.target = target }
 
-      it { expect(subject.package_folder).to eq("#{name}-#{version}-#{platform}") }
+      it { expect(subject.package_folder).to eq("#{name}-#{version}-#{target.platform}") }
+    end
+
+    context 'when architecture is specified' do
+      let (:target) { Wow::Package::Platform.new(:unix, :x86) }
+      before { subject.target = target }
+
+      it {
+        expect(subject.package_folder).to eq("#{name}-#{version}-#{target.platform}-#{target.architecture}")
+      }
+    end
+  end
+
+  describe '#get_platform_config' do
+    let (:hash) { {name: Faker::App.name, files: ['any.rb'],
+                   platform: {unix: {files: ['unix.rb']},
+                              osx: {files: ['osx.rb'], x86: {files: ['osx-x86.rb']}}}}
+    }
+
+    subject do
+      specification = Wow::Package::Specification.new
+      specification.init_from_hash(hash)
+      specification
+    end
+
+    def files_list(subject)
+      subject.files_included.map(&:wildcard)
+    end
+
+    it { expect(files_list(subject)).to include('any.rb') }
+
+    context 'when getting with general platform' do
+      before do
+        @generated = subject.get_platform_config(:unix)
+      end
+
+      it { expect(files_list(@generated)).to include('unix.rb') }
+      it { expect(files_list(@generated)).not_to include('osx.rb') }
+    end
+
+    context 'when getting nested platform' do
+      before do
+        @generated = subject.get_platform_config(:osx)
+      end
+
+      it { expect(files_list(@generated)).to include('unix.rb') }
+      it { expect(files_list(@generated)).to include('osx.rb') }
+      it { expect(files_list(@generated)).not_to include('osx-x86.rb') }
+    end
+
+    context 'when getting nested platform with architecture' do
+      before do
+        @generated = subject.get_platform_config(:osx, :x86)
+      end
+
+      it { expect(files_list(@generated)).to include('unix.rb') }
+      it { expect(files_list(@generated)).to include('osx.rb') }
+      it { expect(files_list(@generated)).to include('osx-x86.rb') }
     end
   end
 end

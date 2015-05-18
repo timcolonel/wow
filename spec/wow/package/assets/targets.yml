@@ -1,0 +1,15 @@
+platforms:
+  name: root
+  children:
+    - name: child1
+      children:
+      - name: subchild11
+      - name: subchild12
+    - name: child2
+      children:
+      - name: subchild21
+      - name: subchild22
+architectures:
+  any:
+    - x86
+    - x64

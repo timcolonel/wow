@@ -1,0 +1,10 @@
+platforms:
+  any:
+    - windows
+    - unix:
+      - osx
+      - linux
+architectures:
+  any:
+    - x86
+    - x64

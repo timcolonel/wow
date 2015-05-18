@@ -77,7 +77,7 @@ RSpec.describe Wow::Package::FilePattern do
   describe '#file_map' do
     dir = File.dirname(__FILE__)
     context 'when pattern is a single file' do
-      pattern = 'assets/platforms.yml'
+      pattern = 'assets/targets.yml'
 
       let (:map) { Wow::Package::FilePattern.new(pattern).file_map(dir) }
 

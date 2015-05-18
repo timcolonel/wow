@@ -17,7 +17,7 @@ class Wow::Package::Specification
   attr_accessor :files_excluded
 
   # Internal Config
-  attr_reader :platform
+  attr_reader :target
   attr_accessor :platforms
   attr_accessor :platform_configs
 
@@ -38,8 +38,8 @@ class Wow::Package::Specification
 
   # Will load the config from the current working directory
   # @return loaded config
-  def self.load(platform=:any)
-    config = Wow::Package::Specification.new(platform)
+  def self.load(platform=:any, architecture=:any)
+    config = Wow::Package::Specification.new(platform, architecture)
     config.init_from_toml(Wow::Package::Specification.filename)
     config
   end
@@ -47,17 +47,24 @@ class Wow::Package::Specification
   # Will load the config from the current working directory and check it's valid
   # @return loaded config
   # @throw Wow::Error if the config is invalid @see Wow::Specification.validate!
-  def self.load_valid!(platform=:any)
-    config = Wow::Package::Specification.new(platform)
+  def self.load_valid!(platform=:any, architecture=:any)
+    config = Wow::Package::Specification.new(platform, architecture)
     config.init_from_toml(Wow::Package::Specification.filename)
     config.validate!
     config
   end
 
-  def initialize(platform = nil)
-    @platform = Wow::Package::Platform.new(platform)
+  def initialize(platform = nil, architecture=nil)
+    @target = if platform.nil? or not platform.is_a? Wow::Package::Platform
+                Wow::Package::Platform.new(platform, architecture)
+              else
+                platform
+              end
     @files_included = []
     @files_excluded = []
+    @tags = []
+    @executables = []
+
     @platforms = Set.new
     @platform_configs = {}
     @description = ''
@@ -108,18 +115,31 @@ class Wow::Package::Specification
     @version = hash[:version]
     @homepage = hash[:homepage]
     @authors = hash[:authors]
-    @tags = hash[:tags]
+    @tags = hash.fetch(:tags, 0)
     @short_description = hash[:description]
     self.description = hash[:short_description]
     @files_included = hash.fetch(:files, []).map { |x| Wow::Package::FilePattern.new(x) }
     @files_excluded = hash.fetch(:files_excluded, []).map { |x| Wow::Package::FilePattern.new(x) }
-    @executables = hash[:executables]
+    @executables = hash.fetch(:executables, [])
     if hash[:platform]
+      exclude_arch = []
       hash[:platform].each do |platform_name, data|
+        data.each do |arch_name, content|
+          if Wow::Package::Platform.architectures.exist?(arch_name)
+            platform = Wow::Package::Platform.new(platform_name, arch_name)
+            @platforms << platform
+            exclude_arch << arch_name
+            platform_config = Wow::Package::Specification.new(platform)
+            platform_config.init_from_hash(content)
+            @platform_configs[platform] = platform_config
+          end
+        end
+        next if exclude_arch.size == data.size
+
         platform = Wow::Package::Platform.new(platform_name)
+        platform_config = Wow::Package::Specification.new(platform)
+        platform_config.init_from_hash(data.except(exclude_arch))
         @platforms << platform
-        platform_config = Wow::Package::Specification.new(@platform)
-        platform_config.init_from_hash(data)
         @platform_configs[platform] = platform_config
       end
     end
@@ -152,11 +172,11 @@ class Wow::Package::Specification
     end
   end
 
-  def platform=(platform)
+  def target=(platform, architecture=:any)
     if platform.is_a? Symbol
-      @platform = Wow::Package::Platform.new(platform)
+      @target = Wow::Package::Platform.new(platform, architecture)
     else
-      @platform = platform
+      @target = platform
     end
   end
 
@@ -164,20 +184,28 @@ class Wow::Package::Specification
   # * true if this config has a platform specified
   # * false if this config contains multiple platform(Just loaded from file)
   def platform_specific?
-    not platform.nil?
+    not @target.platform == :any
   end
 
   # Return the platform specific config
+  # i.e Flatten the platform specific Specs
   # @return [Wow::Package::Config]
-  def get_platform_config(platform)
-    config = Wow::Package::Specification.new(platform)
-    config.files = files
-    platform_configs.each do |platform_config|
-      if config.plaform.is? platform_config[:platform]
-        config.instance_eval platform_config[:block]
+  def get_platform_config(platform, architecture=:any)
+    config = self.clone
+    config.target = Wow::Package::Platform.new(platform, architecture)
+    @platform_configs.each do |target, specification|
+      if config.target.is? target
+        config.merge_with(specification)
       end
     end
     config
+  end
+
+  def merge_with(specification)
+    @files_included += specification.files_included
+    @files_excluded += specification.files_excluded
+    @executables += specification.executables
+    @tags += specification.tags
   end
 
   # Raise am error if the config is invalid
@@ -230,10 +258,10 @@ class Wow::Package::Specification
   def package_folder
     @arch = nil
     array = [@name, @version]
-    if @platform and @platform.key != :any
-      array << @platform
-      if @arch and @arch != :any
-        array << @arch
+    if @target and @target.platform != :any
+      array << @target.platform
+      if @target.architecture and @target.architecture != :any
+        array << @target.architecture
       end
     end
     array.join('-')

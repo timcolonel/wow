@@ -3,11 +3,14 @@ require 'yaml'
 module Wow
   module Package
     class Platform
-      attr_accessor :key
+      attr_accessor :platform
+      attr_accessor :architecture
 
-      def initialize(key)
-        key ||= :any
-        @key = key
+      def initialize(platform = nil, architecture = nil)
+        platform ||= :any
+        architecture ||= :any
+        @platform = platform
+        @architecture = architecture
       end
 
       # platform.is?(other) => Boolean
@@ -39,24 +42,70 @@ module Wow
       end
 
       def to_s
-        @key.to_s
+        str = @platform.to_s
+        str << "-#{@architecture}" if @architecture != :any
+        str
+      end
+
+      def ==(other)
+        @platform == other.platform && @architecture == other.architecture
       end
 
       class << self
+        def load
+          hash = YAML.load_file(Wow::Config.asset_path('targets.yml'))
+          @platforms = Tree.new(hash['platforms']).deep_symbolize
+          @architectures = Tree.new(hash['architectures']).deep_symbolize
+        end
+
         def platforms
-          if @platforms.nil?
-            @platforms = Tree.new(YAML.load_file(Wow::Config.asset_path('platforms.yml'))).deep_symbolize
-          end
+          load if @platforms.nil?
           @platforms
         end
 
+        def architectures
+          load if @architectures.nil?
+          @architectures
+        end
+
+        # Test to see if the child is based on the parent in the platform hierarchy
+        # @param parent [Symbol|Wow::Package::Platform] Parent to test against
+        # @param child [Symbol|Wow::Package::Platform] Child to test against
+        # If parent or child are symbol the architecture will be default to `:any`
+        # @return [Boolean]
+        #
+        # ```
+        # Wow::Package::Platform.based_on? :all, :windows # => true
+        # Wow::Package::Platform.based_on? :unix, :osx # => true
+        # Wow::Package::Platform.based_on? Platform.new(:unix), Platform.new(:osx, :x64) # => true
+        # Wow::Package::Platform.based_on? Platform.new(:unix, :x64), Platform.new(:osx, :x64) # => true
+        # Wow::Package::Platform.based_on? Platform.new(:unix, :x64), Platform.new(:osx, :x32) # => false
+        # ```
+        #
         def based_on?(parent, child)
-          parent_key = parent.is_a?(Wow::Package::Platform) ? parent.key : parent
-          child_key = child.is_a?(Wow::Package::Platform) ? child.key : child
-          parent_hash = Wow::Package::Platform.platforms.find(parent_key)
-          return false if parent_hash.nil?
-          child_hash = parent_hash.find(child_key)
-          !child_hash.nil?
+          parent = Wow::Package::Platform.new(parent) if parent.is_a? Symbol
+          child = Wow::Package::Platform.new(child) if child.is_a? Symbol
+          platform_based_on?(parent, child) and architecture_base_on?(parent, child)
+        end
+
+        def platform_based_on?(parent, child)
+          parent = parent.platform if parent.is_a? Wow::Package::Platform
+          child = child.platform if child.is_a? Wow::Package::Platform
+
+          parent_tree = Wow::Package::Platform.platforms.find(parent)
+          return false if parent_tree.nil?
+          child_tree = parent_tree.find(child)
+          !child_tree.nil?
+        end
+
+        def architecture_base_on?(parent, child)
+          parent = parent.architecture if parent.is_a? Wow::Package::Platform
+          child = child.architecture if child.is_a? Wow::Package::Platform
+
+          parent_tree = Wow::Package::Platform.architectures.find(parent)
+          return false if parent_tree.nil?
+          child_tree = parent_tree.find(child)
+          !child_tree.nil?
         end
       end
     end

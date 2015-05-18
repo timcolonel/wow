@@ -28,6 +28,21 @@ RSpec.describe Tree do
       it { expect(subject.children[1].name).to eq(child2[:name]) }
       it { expect(subject.children[1].children.size).to eq(2) }
     end
+
+    context 'when argument is a hash/array combination' do
+      let (:child1) { 'child1' }
+      let (:child2) { {child2: %w(sub_child1 sub_child2)} }
+
+      let (:hash) { {root: [child1, child2]} }
+
+      subject { Tree.new(hash) }
+
+      it { expect(subject.name).to eq(:root) }
+      it { expect(subject.children.size).to eq(2) }
+      it { expect(subject.children[0].name).to eq(child1) }
+      it { expect(subject.children[1].name).to eq(child2.first[0]) }
+      it { expect(subject.children[1].children.size).to eq(2) }
+    end
   end
 
   describe '#<<' do
