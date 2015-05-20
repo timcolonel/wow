@@ -25,7 +25,7 @@ description = '[Description]'
 #   Readme.md       => Will include the Readme.md file
 #   bin/myexe       => Will include the bin/myexe file
 #   src/**/*.rb     => Will include all the rb files in the src directory
-files = ['bin/*', 'lib/*']
+files = ['bin/*', 'lib/**/*']
 
 # List of files to exclude.(Same format as files)
 files_excluded = ['lib/util.rb']

@@ -72,6 +72,7 @@ class Wow::Package::FilePattern
                 Dir.glob(@wildcard)
               end
       files.each do |file|
+        next unless File.file? file
         path = root.blank? ? file : File.join(@root, file)
         results[path] = @destination.nil? ? path : File.join(@destination, file)
       end

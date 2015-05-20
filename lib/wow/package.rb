@@ -1,0 +1,3 @@
+module Wow::Package
+
+end

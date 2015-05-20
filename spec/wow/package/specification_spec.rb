@@ -83,7 +83,7 @@ RSpec.describe Wow::Package::Specification do
       config
     end
 
-    let (:archive) { subject.create_archive(TmpFile.folder_path(folder)) }
+    let (:archive) { subject.create_archive(:any, destination: TmpFile.folder_path(folder)) }
 
     it 'archive file should exists' do
       expect(File).to exist(archive)
@@ -102,7 +102,7 @@ RSpec.describe Wow::Package::Specification do
     end
 
     it 'files should be installed' do
-      subject.install_to(destination)
+      subject.install_to(:any, destination: destination)
       subject.files.each do |_, filename|
         expect(File).to exist(File.join(destination, filename))
       end
@@ -139,7 +139,7 @@ RSpec.describe Wow::Package::Specification do
     end
   end
 
-  describe '#get_platform_config' do
+  describe '#lock' do
     let (:hash) { {name: Faker::App.name, files: ['any.rb'],
                    platform: {unix: {files: ['unix.rb']},
                               osx: {files: ['osx.rb'], x86: {files: ['osx-x86.rb']}}}}
@@ -150,40 +150,40 @@ RSpec.describe Wow::Package::Specification do
       specification.init_from_hash(hash)
       specification
     end
-
-    def files_list(subject)
-      subject.files_included.map(&:wildcard)
+    before do
+      allow_any_instance_of(Wow::Package::Specification).to receive(:files) do |spec|
+        Hash[spec.files_included.map(&:wildcard).map { |x| [x, x] }]
+      end
     end
-
-    it { expect(files_list(subject)).to include('any.rb') }
+    it { expect(subject.files.values).to include('any.rb') }
 
     context 'when getting with general platform' do
       before do
-        @generated = subject.get_platform_config(:unix)
+        @generated = subject.lock(:unix)
       end
 
-      it { expect(files_list(@generated)).to include('unix.rb') }
-      it { expect(files_list(@generated)).not_to include('osx.rb') }
+      it { expect(@generated.files).to include('unix.rb') }
+      it { expect(@generated.files).not_to include('osx.rb') }
     end
 
     context 'when getting nested platform' do
       before do
-        @generated = subject.get_platform_config(:osx)
+        @generated = subject.lock(:osx)
       end
 
-      it { expect(files_list(@generated)).to include('unix.rb') }
-      it { expect(files_list(@generated)).to include('osx.rb') }
-      it { expect(files_list(@generated)).not_to include('osx-x86.rb') }
+      it { expect(@generated.files).to include('unix.rb') }
+      it { expect(@generated.files).to include('osx.rb') }
+      it { expect(@generated.files).not_to include('osx-x86.rb') }
     end
 
     context 'when getting nested platform with architecture' do
       before do
-        @generated = subject.get_platform_config(:osx, :x86)
+        @generated = subject.lock(:osx, :x86)
       end
 
-      it { expect(files_list(@generated)).to include('unix.rb') }
-      it { expect(files_list(@generated)).to include('osx.rb') }
-      it { expect(files_list(@generated)).to include('osx-x86.rb') }
+      it { expect(@generated.files).to include('unix.rb') }
+      it { expect(@generated.files).to include('osx.rb') }
+      it { expect(@generated.files).to include('osx-x86.rb') }
     end
   end
 end

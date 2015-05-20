@@ -1,5 +1,6 @@
 require 'toml'
 require 'wow/package/file_pattern'
+require 'wow/package/specification_lock'
 
 class Wow::Package::Specification
   include ActiveModel::Validations
@@ -17,7 +18,6 @@ class Wow::Package::Specification
   attr_accessor :files_excluded
 
   # Internal Config
-  attr_reader :target
   attr_accessor :platforms
   attr_accessor :platform_configs
 
@@ -38,8 +38,8 @@ class Wow::Package::Specification
 
   # Will load the config from the current working directory
   # @return loaded config
-  def self.load(platform=:any, architecture=:any)
-    config = Wow::Package::Specification.new(platform, architecture)
+  def self.load
+    config = Wow::Package::Specification.new
     config.init_from_toml(Wow::Package::Specification.filename)
     config
   end
@@ -47,22 +47,18 @@ class Wow::Package::Specification
   # Will load the config from the current working directory and check it's valid
   # @return loaded config
   # @throw Wow::Error if the config is invalid @see Wow::Specification.validate!
-  def self.load_valid!(platform=:any, architecture=:any)
-    config = Wow::Package::Specification.new(platform, architecture)
+  def self.load_valid!
+    config = Wow::Package::Specification.new
     config.init_from_toml(Wow::Package::Specification.filename)
     config.validate!
     config
   end
 
-  def initialize(platform = nil, architecture=nil)
-    @target = if platform.nil? or not platform.is_a? Wow::Package::Platform
-                Wow::Package::Platform.new(platform, architecture)
-              else
-                platform
-              end
+  def initialize
     @files_included = []
     @files_excluded = []
     @tags = []
+    @authors = []
     @executables = []
 
     @platforms = Set.new
@@ -70,7 +66,6 @@ class Wow::Package::Specification
     @description = ''
     @short_description = ''
   end
-
 
   def file(files)
     @files_included += [*files].map { |x| Wow::Package::FilePattern.new(x) }
@@ -106,6 +101,7 @@ class Wow::Package::Specification
   end
 
   def init_from_toml(file)
+    @files_included << Wow::Package::FilePattern.new(file)
     hash = TOML.load_file(file).deep_symbolize_keys
     init_from_hash(hash)
   end
@@ -114,13 +110,13 @@ class Wow::Package::Specification
     @name = hash[:name]
     @version = hash[:version]
     @homepage = hash[:homepage]
-    @authors = hash[:authors]
-    @tags = hash.fetch(:tags, 0)
+    @authors = hash.fetch(:authors, [])
+    @tags = hash.fetch(:tags, [])
     @short_description = hash[:description]
     self.description = hash[:short_description]
-    @files_included = hash.fetch(:files, []).map { |x| Wow::Package::FilePattern.new(x) }
-    @files_excluded = hash.fetch(:files_excluded, []).map { |x| Wow::Package::FilePattern.new(x) }
-    @executables = hash.fetch(:executables, [])
+    @files_included += hash.fetch(:files, []).map { |x| Wow::Package::FilePattern.new(x) }
+    @files_excluded += hash.fetch(:files_excluded, []).map { |x| Wow::Package::FilePattern.new(x) }
+    @executables += hash.fetch(:executables, [])
     if hash[:platform]
       exclude_arch = []
       hash[:platform].each do |platform_name, data|
@@ -129,7 +125,7 @@ class Wow::Package::Specification
             platform = Wow::Package::Platform.new(platform_name, arch_name)
             @platforms << platform
             exclude_arch << arch_name
-            platform_config = Wow::Package::Specification.new(platform)
+            platform_config = Wow::Package::Specification.new
             platform_config.init_from_hash(content)
             @platform_configs[platform] = platform_config
           end
@@ -137,7 +133,7 @@ class Wow::Package::Specification
         next if exclude_arch.size == data.size
 
         platform = Wow::Package::Platform.new(platform_name)
-        platform_config = Wow::Package::Specification.new(platform)
+        platform_config = Wow::Package::Specification.new
         platform_config.init_from_hash(data.except(exclude_arch))
         @platforms << platform
         @platform_configs[platform] = platform_config
@@ -201,6 +197,17 @@ class Wow::Package::Specification
     config
   end
 
+  def lock(platform, architecture=nil)
+    spec_lock = Wow::Package::SpecificationLock.new(platform, architecture)
+    spec_lock.insert_specification(self)
+    @platform_configs.each do |target, specification|
+      if spec_lock.target.is? target
+        spec_lock.insert_specification(specification)
+      end
+    end
+    spec_lock
+  end
+
   def merge_with(specification)
     @files_included += specification.files_included
     @files_excluded += specification.files_excluded
@@ -217,13 +224,15 @@ class Wow::Package::Specification
 
   # Build an archive from this config
   # @param destination Destination folder of the archive file
-  # @param filename Name of the archive file, optional, by default is name-version.wow
   # @return archive path with filename
-  def create_archive(destination, filename = nil)
+  def create_archive(platform, architecture=nil, destination: nil)
     validate!
-    filename ||= archive_name
-    path = File.join(destination, filename)
+    spec_lock = self.lock(platform, architecture)
+    spec_lock.save
+    destination ||= Dir.pwd
+    path = File.join(destination, archive_name)
     Wow::Archive.write path do |archive|
+      archive.add_file spec_lock.filename
       archive.add_files files
     end
     path
@@ -232,9 +241,11 @@ class Wow::Package::Specification
   # Equivalent to creating the archive then installing the archive to the given destination
   # To install a program directly from the source(not an archive)
   # @param destination [String] folder where to install files
-  def install_to(destination)
+  def install_to(platform, architecture=nil, destination: nil)
     destination ||= File.join(Wow::Config.package_install_root, package_folder)
-    files.each do |source, file_destination|
+    spec_lock = self.lock(platform, architecture)
+    spec_lock.save
+    files.merge({spec_lock.filename => spec_lock.filename}).each do |source, file_destination|
       output = File.join(destination, file_destination)
       FileUtils.mkdir_p(output)
       FileUtils.cp(source, output)
