@@ -1,6 +1,7 @@
 class Wow::Package::SpecificationLock
 
-  attr_accessor :target, :files, :executables, :version, :authors, :tags, :homepage, :description, :short_description
+  attr_accessor :target, :files, :executables,
+                :name, :version, :authors, :tags, :homepage, :description, :short_description
 
   def initialize(platform, architecture=nil)
     @target = if platform.nil? or not platform.is_a? Wow::Package::Platform
@@ -51,7 +52,7 @@ class Wow::Package::SpecificationLock
       end
     end
 
-    "#{array.join('-')}-.lock.toml"
+    "#{array.join('-')}.lock.toml"
   end
 
   def save

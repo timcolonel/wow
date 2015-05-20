@@ -69,7 +69,8 @@ class Wow::Package::Version
   # @param allow_incomplete [Boolean] If true the version must have a valid format if false. Only the major and minor can be provided(Used for dependency matching)
   # @return [Wow::Package::Version]
   def self.parse(str, allow_incomplete=false)
-    result = str.scan(Wow::Package::Version::VERSION_REGEX)
+
+    result = str.strip.scan(Wow::Package::Version::VERSION_REGEX)
     if result.empty? or (not allow_incomplete and result[0][2].nil?)
       fail ArgumentError.new("Version string '#{str}' is in the wrong format check the documentation!")
     end
