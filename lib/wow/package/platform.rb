@@ -61,6 +61,10 @@ class Wow::Package::Platform
     to_a.hash
   end
 
+  def <=>(other)
+    to_a <=> other.to_a
+  end
+
   class << self
     def load
       hash = YAML.load_file(Wow::Config.asset_path('targets.yml'))

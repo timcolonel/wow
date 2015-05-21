@@ -64,8 +64,7 @@ class Wow::Package::NameTuple
   end
 
   def <=>(other)
-    [@name, @version, @target] <=>
-        [other.name, other.version, other.target]
+    to_a <=> other.to_a
   end
 
   def ==(other)
