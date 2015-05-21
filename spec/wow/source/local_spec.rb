@@ -24,7 +24,7 @@ RSpec.describe Wow::Source::Local do
       expect(subject.load_specs(:latest_release)).to eq([@spec_a2.name_tuple, @spec_b.name_tuple].sort)
     end
     it 'get only the latest version' do
-      expect(subject.load_specs(:latest)).to eq([@spec_ap.name_tuple, @spec_b.name_tuple].sort)
+      expect(subject.load_specs(:latest).sort).to eq([@spec_ap.name_tuple, @spec_b.name_tuple].sort)
     end
   end
 
