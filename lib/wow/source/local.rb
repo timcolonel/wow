@@ -1,5 +1,8 @@
 require 'wow/source'
 require 'wow/package/version_range'
+
+##
+# Source for a directory containing .wow package.
 class Wow::Source::Local < Wow::Source
 
   def initialize(folder)
