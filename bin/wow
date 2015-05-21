@@ -18,22 +18,23 @@ Usage:
     #{__FILE__} pack [<platform>]
     #{__FILE__} register [options]
     #{__FILE__} extract <filename>
-    #{__FILE__} install <package>...
-    #{__FILE__} uninstall <package>...
+    #{__FILE__} install <package> [options]
+    #{__FILE__} uninstall <package>
     #{__FILE__} unpack <file>...
     #{__FILE__} build [<platform>]
     #{__FILE__} push <file>
     #{__FILE__} compile
     #{__FILE__} (-h | --help)
-    #{__FILE__} --version
     #{__FILE__} use <package> <version>
 Action
 Options:
-  -h --help     Show this screen.
-  --version     Show version.
-  -r --remote=<remote>    Remote server. If not specified will either use the default server or try each one depending on the action.
+  -h --help                 Show this screen.
+  -v --version=<version>    Show version or Set Version for the package
+  -s --source=<source>      Set the source for the package. Override the user config
+  --add-source=<source>     Add a source to the list of sources.
   -u --username=<username>  Username for remote
   -p --password=<password>  Password for remote
+  --prerelease              Authorize to install prerelease
 DOCOPT
 
 begin

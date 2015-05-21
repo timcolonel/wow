@@ -24,6 +24,8 @@ module Wow
       Wow::ApiClient::Config.remote = @options['--remote']
       Wow::ApiClient::Config.username = @options['--username']
       Wow::ApiClient::Config.password = @options['--password']
+      Wow.sources.replace(@options['--source'].split(',')) unless @options['--source'].nil?
+      Wow.sources << @options['--add-source'] unless @options['--add-source'].nil?
     end
 
     def run
@@ -63,7 +65,7 @@ module Wow
     end
 
     def install
-      puts 'Ins'
+      Wow::Command::Install.new(@options['<package>'], @options['--version'], prerelease: @options['--prerelease'])
     end
 
     def uninstall

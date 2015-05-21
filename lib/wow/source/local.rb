@@ -5,10 +5,6 @@ require 'wow/package/version_range'
 # Source for a directory containing .wow package.
 class Wow::Source::Local < Wow::Source
 
-  def initialize(folder)
-    @folder = folder
-  end
-
   def <=> (other)
     case other
       when Wow::Source::Installed,
@@ -28,7 +24,7 @@ class Wow::Source::Local < Wow::Source
     names = []
 
     @specs = {}
-    Dir.chdir @folder do
+    Dir.chdir @source do
       Dir['*.wow'].each do |file|
         begin
           pkg = Wow::Package.new(file)
@@ -80,9 +76,10 @@ class Wow::Source::Local < Wow::Source
   end
 
   # @see Wow::Source#find_package
-  def find_package(package_name, version_range = Wow::Package::VersionRange.any, prerelease: false)
+  def find_package(package_name, version_range = nil, prerelease: false)
     load_specs :complete
     found = []
+    version_range ||= Wow::Package::VersionRange.any
     version_range = Wow::Package::VersionRange.parse(version_range) if version_range.is_a? String
     @specs.each do |n, data|
       if n.name == package_name
@@ -107,7 +104,7 @@ class Wow::Source::Local < Wow::Source
     if (data = @specs[name])
       data.last.spec
     else
-      raise Gem::Exception, "Unable to find spec for #{name.inspect}"
+      raise Wow::Error, "Unable to find spec for #{name.inspect}"
     end
   end
 

@@ -7,6 +7,7 @@ class Wow::Source::SpecificFile < Wow::Source
   attr_accessor :path
 
   def initialize(path)
+    super(path)
     @path = path
     @package = Wow::Package.new(@path)
   end
