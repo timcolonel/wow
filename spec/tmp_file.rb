@@ -2,11 +2,15 @@ require 'tempfile'
 
 module Tmp
   class Folder
+    class << self
+      attr_accessor :cleaned_folder
+      Tmp::Folder.cleaned_folder = Set.new
+    end
 
     attr_accessor :relative_path
     attr_accessor :fullpath
 
-    def initialize(name = nil, parent = nil)
+    def initialize(name = nil, parent = nil, clean_first_only: false)
       if name.nil?
         name = SecureRandom.uuid
       end
@@ -15,11 +19,14 @@ module Tmp
       end
       @relative_path = name
       @fullpath = File.join(Tmp::Folder.tmp_dir, name)
-      self.clean
+      unless clean_first_only and Tmp::Folder.cleaned_folder.include? @fullpath
+        self.clean
+        Tmp::Folder.cleaned_folder << @fullpath
+      end
       FileUtils.mkdir_p(@fullpath)
     end
 
-    def sub_folder(name)
+    def sub_folder(name=nil)
       Tmp::Folder.new(name, self)
     end
 
@@ -53,8 +60,7 @@ module Tmp
         filenames << if absolute
                        filename
                      else
-                       root = Pathname.new(Wow::Config::ROOT_FOLDER)
-                       Pathname.new(filename).relative_path_from(root).to_s
+                       Pathname.new(filename).relative_path_from(Pathname.new(@fullpath)).to_s
                      end
         File.open filename, 'w' do |f|
           f.write Random.rand

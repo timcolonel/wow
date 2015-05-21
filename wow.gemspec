@@ -20,7 +20,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'activesupport'
   s.add_dependency 'activemodel'
   s.add_dependency 'docopt'
-  s.add_dependency 'toml-rb'
+  s.add_dependency 'toml-rb', '>= 0.3.5'
   s.add_dependency 'require_all'
   s.add_dependency 'rest-client'
   s.add_dependency 'highline'

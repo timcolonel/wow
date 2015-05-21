@@ -45,8 +45,20 @@ class Wow::Package::Platform
     str
   end
 
+  def to_hash
+    {platform: @platform.to_s, architecture: @architecture.to_s}
+  end
+
   def ==(other)
-    @platform == other.platform && @architecture == other.architecture
+    self.to_a == other.to_a
+  end
+
+  def to_a
+    [@platform, @architecture]
+  end
+
+  def hash
+    to_a.hash
   end
 
   class << self
@@ -105,10 +117,11 @@ class Wow::Package::Platform
       child_tree = parent_tree.find(child)
       !child_tree.nil?
     end
+
+    def from_hash(hash)
+      Wow::Package::Platform.new(hash[:platform].to_sym, hash[:architecture].to_sym)
+    end
   end
 
-  def to_hash
-    {platform: @platform.to_s, architecture: @architecture.to_s}
-  end
 end
 

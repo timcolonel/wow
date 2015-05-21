@@ -7,7 +7,7 @@ class Wow::Package::Specification
 
   # User config
   attr_accessor :name
-  attr_accessor :version
+  attr_reader :version
   attr_accessor :homepage
   attr_accessor :authors
   attr_accessor :short_description
@@ -83,6 +83,14 @@ class Wow::Package::Specification
     platform_configs << {plaform: Wow::Package::Platform.new(name), block: block}
   end
 
+  def version=(version)
+    @version = if version.is_a? String
+                 Wow::Package::Version.parse(version)
+               else
+                 version
+               end
+  end
+
   def +(config)
     fail ArgumentError unless config.is_a? Wow::Package::Specification
     self.files += config.files
@@ -108,7 +116,7 @@ class Wow::Package::Specification
 
   def init_from_hash(hash)
     @name = hash[:name]
-    @version = hash[:version]
+    @version = Wow::Package::Version.parse(hash[:version]) if hash[:version]
     @homepage = hash[:homepage]
     @authors = hash.fetch(:authors, [])
     @tags = hash.fetch(:tags, [])

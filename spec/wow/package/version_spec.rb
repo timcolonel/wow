@@ -10,8 +10,8 @@ RSpec.describe Wow::Package::Version, type: :model do
       before do
         subject.stage = :beta
       end
-      it { expect(subject.to_s).to eq('1.2.3-b') }
-      it { expect(subject.to_s(short: false)).to eq('1.2.3-beta') }
+      it { expect(subject.to_s).to eq('1.2.3.b') }
+      it { expect(subject.to_s(short: false)).to eq('1.2.3.beta') }
     end
 
     context 'when identifier is specified' do
@@ -19,8 +19,8 @@ RSpec.describe Wow::Package::Version, type: :model do
         subject.identifier = 764
       end
       it { expect(subject.to_s).to eq('1.2.3.764') }
-      it { expect(subject.to_s(hide_release: false)).to eq('1.2.3-r.764') }
-      it { expect(subject.to_s(short: false, hide_release: false)).to eq('1.2.3-release.764') }
+      it { expect(subject.to_s(hide_release: false)).to eq('1.2.3.r.764') }
+      it { expect(subject.to_s(short: false, hide_release: false)).to eq('1.2.3.release.764') }
 
     end
 
@@ -29,8 +29,8 @@ RSpec.describe Wow::Package::Version, type: :model do
         subject.stage = :alpha
         subject.identifier = 717
       end
-      it { expect(subject.to_s).to eq('1.2.3-a.717') }
-      it { expect(subject.to_s(short: false)).to eq('1.2.3-alpha.717') }
+      it { expect(subject.to_s).to eq('1.2.3.a.717') }
+      it { expect(subject.to_s(short: false)).to eq('1.2.3.alpha.717') }
     end
   end
 
@@ -40,7 +40,7 @@ RSpec.describe Wow::Package::Version, type: :model do
       it { expect { Wow::Package::Version.parse('1.2') }.to raise_error(ArgumentError) }
 
       it { expect { Wow::Package::Version.parse('1.2', true) }.not_to raise_error }
-      
+
       it { expect { Wow::Package::Version.parse('1.2.3-') }.to raise_error(ArgumentError) }
       it { expect { Wow::Package::Version.parse('1.2.3+r') }.to raise_error(ArgumentError) }
       it { expect { Wow::Package::Version.parse('1.2.3b') }.to raise_error(ArgumentError) }

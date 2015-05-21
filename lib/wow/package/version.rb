@@ -106,7 +106,7 @@ class Wow::Package::Version
   def to_s(short: true, hide_release: true)
     str = [major, minor, patch].join('.')
     unless hide_release and stage.to_sym == :release
-      str << "-#{short ? Wow::Package::Version.stage_initial[stage.to_sym] : stage}"
+      str << ".#{short ? Wow::Package::Version.stage_initial[stage.to_sym] : stage}"
     end
     str << ".#{identifier}" unless identifier.nil?
     str
@@ -147,6 +147,18 @@ class Wow::Package::Version
       upper_bound.patch = 0
     end
     upper_bound
+  end
+
+  def prerelease?
+    stage != :release
+  end
+
+  def to_a
+    [@major, @minor, @patch, @stage, @identifier]
+  end
+
+  def hash
+    to_a.hash
   end
 
   private def unique_value(attribute, value)

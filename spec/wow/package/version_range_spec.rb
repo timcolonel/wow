@@ -10,7 +10,8 @@ RSpec.describe Wow::Package::VersionRange do
   describe '#merge' do
     let (:range) { Wow::Package::VersionRange.parse('~> 1.2') }
     subject { range.merge(Wow::Package::VersionRange.parse('>= 1.2.3')) }
-    it {expect(subject.lower_bound).to eq(Wow::Package::Version)}
+    it { expect(subject.lower_bound).to eq(Wow::Package::Version.parse('1.2.3')) }
+    it { expect(subject.upper_bound).to eq(Wow::Package::Version.parse('2.0.0')) }
   end
 
   describe '.parse' do

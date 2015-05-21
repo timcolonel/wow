@@ -18,7 +18,7 @@ RSpec.describe Wow::Package::Specification do
       File.write(tmp, erb)
       subject.init_from_toml(tmp)
       expect(subject.name).to eq(hash[:name])
-      expect(subject.version).to eq(hash[:version])
+      expect(subject.version).to eq(Wow::Package::Version.parse(hash[:version]))
       expect(subject.authors).to include(hash[:author])
     end
   end

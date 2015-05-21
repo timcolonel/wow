@@ -3,17 +3,21 @@ require 'pathname'
 
 module Wow
   class Archive
+    MODES = [:read, :write]
+
+    attr_accessor :mode
     attr_accessor :gz
     attr_accessor :io
     attr_accessor :tar_writer
     attr_accessor :tar_reader
     attr_accessor :filename
 
-    #Open archive file to read
+    # Open archive file to read
     # @param filename Archive filename
     # @param block Optional block the archive is given as param
     def self.open(filename, &block)
       archive = Archive.new
+      archive.mode = :read
       archive.filename = filename
       archive.tar_reader = Gem::Package::TarReader.new(Zlib::GzipReader.open(filename))
       if block_given?
@@ -25,6 +29,7 @@ module Wow
 
     def self.write(filename, &block)
       archive = Archive.new
+      archive.mode = :write
       archive.filename = filename
       archive.io = StringIO.new('')
       archive.gz = Zlib::GzipWriter.open(filename)
@@ -36,15 +41,42 @@ module Wow
       archive
     end
 
+    # Iterate through the file entity in the archive
+    # @param block [Block] callback that will get an TarReader::Entry as argument
     def each (&block)
-      if tar_reader
+      if mode == :read
         tar_reader.each(&block)
       else
         fail Wow::Error, 'Must open archive in reading mode!'
       end
     end
 
-    #Close the file
+    # Open a file for reading in the archive
+    # @param filename [String] name of the file relative to the root of the archive
+    # @param block [Block] Callback taking the file IO as argument
+    # ```
+    # archive.open_file 'file.txt' do |f|
+    #   puts f.read
+    # end
+    # ```
+    def open_file(filename, &block)
+      fail Wow::Error, 'Must open archive in reading mode!' if mode != :read
+      tar_reader.seek(filename, &block)
+    end
+
+    # Read the content of a file in the archive.
+    # @param filename [String] name of the file relative to the root of the archive
+    # ```
+    # archive.read_file 'file.txt'
+    # ```
+    def read_file(filename)
+      open_file filename do |f|
+        return f.read
+      end
+    end
+
+    # Close the archive file
+    # Only needed if the open/write was called without a block
     def close
       unless gz.nil?
         gz.write io.string

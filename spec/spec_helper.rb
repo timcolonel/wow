@@ -9,6 +9,27 @@ require 'wow'
 require 'tmp_file'
 require 'renderer'
 
+module Helper
+
+  # Create a tmp package archive
+  def tmp_package(name, version, platform=nil, arch=nil, destination: nil)
+    folder = Tmp::Folder.new('tmp_package', clean_first_only: true).sub_folder
+    Dir.chdir folder.to_s do
+      filenames = folder.create_files(count: 3, absolute: false)
+      spec = Wow::Package::Specification.new
+      spec.name = name
+      spec.version = version
+      spec.files_included = filenames.map { |x| Wow::Package::FilePattern.new(x) }
+      archive_path = spec.create_archive(platform, arch, destination: folder.to_s)
+      if destination
+        FileUtils.mv archive_path, destination
+        archive_path = File.join(destination, File.basename(archive_path))
+      end
+      return archive_path, spec.lock(platform, arch)
+    end
+  end
+end
+
 
 module Macros
   def change_dir(&block)
@@ -38,6 +59,7 @@ module Macros
 end
 
 RSpec.configure do |config|
+  config.include Helper
   config.extend Macros
 
   config.order = 'random'

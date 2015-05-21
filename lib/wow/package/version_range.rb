@@ -4,6 +4,7 @@ class Wow::Package::VersionRange
   attr_accessor :lower_bound
   attr_accessor :upper_bound
 
+
   EQUAL_REGEX = /\A=? (.*)\Z/x
 
   MORE_REGEX = /\A>= (.*)\Z/x
@@ -61,7 +62,18 @@ class Wow::Package::VersionRange
     version <= upper_bound
   end
 
+  alias_method :include?, :match?
+
+  def self.any
+    Wow::Package::VersionRange.new(lower_bound: Wow::Package::Version.new(major: 0, minor: 0, patch: 0, stage: :alpha))
+  end
+
   def to_s
+    if upper_bound
+      "#{lower_bound} - #{upper_bound}"
+    else
+      ">= #{lower_bound}"
+    end
 
   end
 end
