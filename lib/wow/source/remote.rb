@@ -8,7 +8,7 @@ class Wow::Source::Remote < Wow::Source
 
   def initialize(uri)
     begin
-      unless uri.kind_of? URI
+      unless uri.is_a? URI
         uri = URI.parse(uri.to_s)
       end
     rescue URI::InvalidURIError

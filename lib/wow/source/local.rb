@@ -7,15 +7,15 @@ class Wow::Source::Local < Wow::Source
 
   def <=> (other)
     case other
-      when Wow::Source::Installed,
-          Wow::Source::Lock then
-        -1
-      when Wow::Source::Local then
-        0
-      when Wow::Source then
-        1
-      else
-        nil
+    when Wow::Source::Installed,
+      Wow::Source::Lock then
+      -1
+    when Wow::Source::Local then
+      0
+    when Wow::Source then
+      1
+    else
+      nil
     end
   end
 
@@ -44,23 +44,12 @@ class Wow::Source::Local < Wow::Source
     @specs = load_packages
     @specs.each do |tup, pkg|
       case filter
-        when :released
-          names << pkg.spec.name_tuple unless pkg.spec.version.prerelease?
-        when :prerelease
-          names << pkg.spec.name_tuple if pkg.spec.version.prerelease?
-        when :latest_release
-          unless pkg.spec.version.prerelease?
-            tup = pkg.spec.name_tuple
-
-            cur = names.find { |x| x.name == tup.name }
-            if !cur
-              names << tup
-            elsif cur.version < tup.version
-              names.delete cur
-              names << tup
-            end
-          end
-        when :latest
+      when :released
+        names << pkg.spec.name_tuple unless pkg.spec.version.prerelease?
+      when :prerelease
+        names << pkg.spec.name_tuple if pkg.spec.version.prerelease?
+      when :latest_release
+        unless pkg.spec.version.prerelease?
           tup = pkg.spec.name_tuple
 
           cur = names.find { |x| x.name == tup.name }
@@ -70,8 +59,19 @@ class Wow::Source::Local < Wow::Source
             names.delete cur
             names << tup
           end
-        else
-          names << pkg.spec.name_tuple
+        end
+      when :latest
+        tup = pkg.spec.name_tuple
+
+        cur = names.find { |x| x.name == tup.name }
+        if !cur
+          names << tup
+        elsif cur.version < tup.version
+          names.delete cur
+          names << tup
+        end
+      else
+        names << pkg.spec.name_tuple
       end
     end
 
@@ -88,7 +88,7 @@ class Wow::Source::Local < Wow::Source
         s = pkg.spec
 
         if version_range.include?(s.version)
-          if prerelease or !s.version.prerelease?
+          if prerelease || !s.version.prerelease?
             found << pkg
           end
         end
@@ -104,7 +104,7 @@ class Wow::Source::Local < Wow::Source
     if (data = @specs[name])
       data.spec
     else
-      raise Wow::Error, "Unable to find spec for #{name.inspect}"
+      fail Wow::Error, "Unable to find spec for #{name.inspect}"
     end
   end
 
@@ -116,6 +116,6 @@ class Wow::Source::Local < Wow::Source
       return pkg.path if pkg.spec == spec
     end
 
-    raise Gem::Exception, "Unable to find file for '#{spec.full_name}'"
+    fail Gem::Exception, "Unable to find file for '#{spec.full_name}'"
   end
 end

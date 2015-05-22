@@ -1,3 +1,3 @@
 require_relative '../lib/wow/archive'
 
-Archive.open
+Gem.spec_cache_dir

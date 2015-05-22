@@ -1,0 +1,12 @@
+Metrics/LineLength:
+  Max: 100
+
+Style/ClassAndModuleChildren:
+  Enabled: false
+
+Style/SpaceInsideHashLiteralBraces:
+  EnforcedStyle: no_space
+
+AllCops:
+  Exclude:
+    - 'spec/**/*'

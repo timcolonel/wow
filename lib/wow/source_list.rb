@@ -1,5 +1,7 @@
 require 'wow/source'
 
+# SourceList contains an ordered list of sources
+# which provide method to find package in any of it's source
 class Wow::SourceList
   include Enumerable
 
@@ -13,22 +15,23 @@ class Wow::SourceList
   def self.from(ary)
     list = new
     list.replace ary
-    return list
+    list
   end
 
   def initialize_copy(other)
-    @sources = @sources.dup
+    @sources = other.dup
   end
 
   # Add a new source to the list
-  # @param source [Wow::Source|String] Source to add. The right source type will be deduced if source is a String
+  # @param source [Wow::Source|String] Source to add.
+  # The correct source type will be deduced if source is a String
   # @return [Wow::Source]
   def <<(source)
     src = case source
-            when Wow::Source
-              source
-            else
-              Wow::Source.for(source)
+          when Wow::Source
+            source
+          else
+            Wow::Source.for(source)
           end
 
     @sources << src
@@ -77,7 +80,7 @@ class Wow::SourceList
   # Returns true if this source list includes +other+ which may be a
   # Wow::Source or a source URI.
   def include?(other)
-    if other.kind_of? Gem::Source
+    if other.is_a? Gem::Source
       @sources.include? other
     else
       @sources.find { |x| x.source.to_s == other.to_s }
@@ -86,7 +89,7 @@ class Wow::SourceList
 
   # Remove given +source+ from list
   def delete(source)
-    if source.kind_of? Gem::Source
+    if source.is_a? Gem::Source
       @sources.delete source
     else
       @sources.delete_if { |x| x.source.to_s == source.to_s }
@@ -110,7 +113,7 @@ class Wow::SourceList
     found = []
     sources.each do |source|
       found << source.find_package(package_name, version_range, prerelease: prerelease)
-      break if first_match and found.any?
+      break if first_match && found.any?
     end
     found.compact.max_by { |s| s.spec.version }
   end

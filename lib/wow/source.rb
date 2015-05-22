@@ -1,4 +1,5 @@
 
+# Template class for a source
 class Wow::Source
   # Url/path/file
   attr_accessor :source
@@ -10,33 +11,31 @@ class Wow::Source
   # Load a list of specs in the source
   # @param filter [Symbol] filter the packages.
   #   Can have the following values: :release, :prerelease, :latest_release, :latest
-  def load_specs(filter)
-    raise NotImplementedError
+  def list_packages(filter)
+    fail NotImplementedError
   end
 
   # Load a list of specs in the source
   def find_package(package_name, version_range = Wow::Package::VersionRange.any, prerelease: false)
-    raise NotImplementedError
+    fail NotImplementedError
   end
 
   def fetch_spec(name)
-    raise NotImplementedError
+    fail NotImplementedError
   end
 
   def self.for(source)
-
     if File.file?(source)
       Wow::Source::SpecificFile.new(source)
     elsif File.exist?(source)
       Wow::Source::Local.new(source)
-    elsif source =~ URI::regexp
+    elsif source =~ URI.regexp
       Wow::Source::Remote.new(source)
     else
       fail ArgumentError, "Unknown source type #{source}"
     end
   end
 end
-
 
 require 'wow/source/local'
 require 'wow/source/remote'

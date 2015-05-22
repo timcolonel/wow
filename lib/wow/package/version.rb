@@ -1,16 +1,17 @@
 require 'prime'
 require 'wow/package'
 
+# Contains a package version.
 class Wow::Package::Version
   include Comparable
 
-  VERSION_REGEX = %r{
+  VERSION_REGEX = /
     \A
     (\d+)\.(\d+)(?:\.(\d+)    # x.y.z
     (?:(?:\.|\-)([a-z]+))?    # (-|.)stage
     (?:\.(\d+))?)?             # .identifier
     \Z
-  }ix
+  /ix
 
   attr_reader :major, :minor, :patch, :stage, :identifier
 
@@ -70,7 +71,6 @@ class Wow::Package::Version
   # @param allow_incomplete [Boolean] If true the version must have a valid format if false. Only the major and minor can be provided(Used for dependency matching)
   # @return [Wow::Package::Version]
   def self.parse(str, allow_incomplete=false)
-
     result = str.strip.scan(Wow::Package::Version::VERSION_REGEX)
     if result.empty? or (not allow_incomplete and result[0][2].nil?)
       fail ArgumentError.new("Version string '#{str}' is in the wrong format check the documentation!")

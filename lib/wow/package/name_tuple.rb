@@ -71,8 +71,8 @@ class Wow::Package::NameTuple
     case other
       when self.class
         @name == other.name and
-            @version == other.version and
-            @target == other.target
+          @version == other.version and
+          @target == other.target
       when Array
         to_a == other
       else

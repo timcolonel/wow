@@ -22,13 +22,15 @@ class Wow::Package::Specification
   attr_accessor :platform_configs
 
   validates_presence_of :name, :version
-  validates_format_of :name, :with => /\A[a-z0-9_-]+\z/,
-                      :message => 'Error in config file. Name should only contain lowercase, numbers and _-'
+  validates_format_of :name, with: /\A[a-z0-9_-]+\z/,
+                      message: 'Error in config file. Name should only contain lowercase, numbers and _-'
 
   validate do
     @files_included.each do |pattern|
-      errors.add :file_patterns,
-                 "Path `#{pattern.pattern}`should be relative to the root but is an absolute path!" if Pathname.new(pattern.pattern).absolute?
+      if Pathname.new(pattern.pattern).absolute?
+        errors.add :file_patterns,
+                   "Path `#{pattern.pattern}`should be relative to the root but is an absolute path!"
+      end
     end
   end
 

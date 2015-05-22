@@ -15,9 +15,9 @@ require 'wow/exception'
 require 'wow/command'
 require 'wow/source_list'
 
+# Wow Module contains all the wow classes and modules
 module Wow
   class << self
-
     # Run with docopt options
     def run(options)
       runner = Wow::Command.new(options)

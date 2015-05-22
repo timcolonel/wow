@@ -1,8 +1,7 @@
 require 'wow/source'
 require 'wow/package/version_range'
 
-##
-# Source for a directory containing .wow package.
+# Source for a specific file(.wow).
 class Wow::Source::SpecificFile < Wow::Source
   attr_accessor :path
 
@@ -20,13 +19,17 @@ class Wow::Source::SpecificFile < Wow::Source
   # @see Wow::Source#fetch_spec
   def fetch_spec(name) # :nodoc:
     return @package.spec if name == @package.spec.name_tuple
-    raise Gem::Exception, "Unable to find '#{name}'"
+    fail Gem::Exception, "Unable to find '#{name}'"
   end
 
   # @see Wow::Source#download
   def download(spec, dir = nil)
-    return @path if spec == @package.spec
-    raise Gem::Exception, "Unable to download '#{spec.full_name}'"
+    fail Gem::Exception, "Unable to download '#{spec.full_name}'" if spec != @package.spec
+    if dir.nil?
+      @path
+    else
+      File.cp @path, dir
+    end
   end
 
   ##
@@ -40,12 +43,12 @@ class Wow::Source::SpecificFile < Wow::Source
   # Otherwise Gem::Source#<=> is used.
   def <=>(other)
     case other
-      when Gem::Source::SpecificFile then
-        return nil if @package.spec.name != other.package.spec.name
+    when Gem::Source::SpecificFile then
+      return nil if @package.spec.name != other.package.spec.name
 
-        @package.spec.version <=> other.package.spec.version
-      else
-        super
+      @package.spec.version <=> other.package.spec.version
+    else
+      super
     end
   end
 end

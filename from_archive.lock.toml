@@ -1,7 +1,7 @@
 authors = []
 description = ""
 executables = []
-files = ["from_archive.lock.toml", "spec/tmp/test_package_config/input/5a21ca06-89f1-432d-9d29-8de3fa87fbdd-0", "spec/tmp/test_package_config/input/4fc9dcdb-69d1-405f-970f-ee5b2908942d-1", "spec/tmp/test_package_config/input/0f7e029b-44cf-4fff-8c89-ed087a08ed02-2", "spec/tmp/test_package_config/input/5f634c75-60ef-4113-bb70-6ad864c13693-3", "spec/tmp/test_package_config/input/8e90de85-cac7-46b2-a4b3-2b56f925c3db-4"]
+files = ["from_archive.lock.toml", "spec/tmp/test_package_config/input/d54dd3fc-1c88-4e46-b245-03b65d20e02d-0", "spec/tmp/test_package_config/input/29e8db61-f725-47bc-a226-74c84622ca6d-1", "spec/tmp/test_package_config/input/0fd1d6dc-7c64-42be-b609-89d383e6a86d-2", "spec/tmp/test_package_config/input/00520725-6d5d-42fe-8d93-a37ac9e25e84-3", "spec/tmp/test_package_config/input/2c77e4f3-8934-442b-a63a-fdbe130d6b9c-4"]
 homepage = ""
 name = "from_archive"
 short_description = ""
