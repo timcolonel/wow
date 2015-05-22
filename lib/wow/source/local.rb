@@ -19,56 +19,59 @@ class Wow::Source::Local < Wow::Source
     end
   end
 
-  # @see Wow::Source#load_spec
-  def load_specs(filter)
-    names = []
-
-    @specs = {}
+  # Method that load the packages in the local directory
+  # @return [Hash<Wow::Package::NameTuple, Wow::Package>]
+  def load_packages
+    packages = {}
     Dir.chdir @source do
       Dir['*.wow'].each do |file|
         begin
-          pkg = Wow::Package.new(file)
+          pkg = Wow::Package.new(File.expand_path(file), self)
+          tuple = pkg.spec.name_tuple
+          packages[tuple] = pkg
         rescue SystemCallError
           # ignore
-        else
-          tup = pkg.spec.name_tuple
-          @specs[tup] = [File.expand_path(file), pkg]
-
-          case filter
-            when :released
-              unless pkg.spec.version.prerelease?
-                names << pkg.spec.name_tuple
-              end
-            when :prerelease
-              if pkg.spec.version.prerelease?
-                names << pkg.spec.name_tuple
-              end
-            when :latest_release
-              unless pkg.spec.version.prerelease?
-                tup = pkg.spec.name_tuple
-
-                cur = names.find { |x| x.name == tup.name }
-                if !cur
-                  names << tup
-                elsif cur.version < tup.version
-                  names.delete cur
-                  names << tup
-                end
-              end
-            when :latest
-              tup = pkg.spec.name_tuple
-
-              cur = names.find { |x| x.name == tup.name }
-              if !cur
-                names << tup
-              elsif cur.version < tup.version
-                names.delete cur
-                names << tup
-              end
-            else
-              names << pkg.spec.name_tuple
-          end
         end
+      end
+    end
+    packages
+  end
+
+  # List the packages matching the filter
+  def list_packages(filter)
+    names = []
+
+    @specs = load_packages
+    @specs.each do |tup, pkg|
+      case filter
+        when :released
+          names << pkg.spec.name_tuple unless pkg.spec.version.prerelease?
+        when :prerelease
+          names << pkg.spec.name_tuple if pkg.spec.version.prerelease?
+        when :latest_release
+          unless pkg.spec.version.prerelease?
+            tup = pkg.spec.name_tuple
+
+            cur = names.find { |x| x.name == tup.name }
+            if !cur
+              names << tup
+            elsif cur.version < tup.version
+              names.delete cur
+              names << tup
+            end
+          end
+        when :latest
+          tup = pkg.spec.name_tuple
+
+          cur = names.find { |x| x.name == tup.name }
+          if !cur
+            names << tup
+          elsif cur.version < tup.version
+            names.delete cur
+            names << tup
+          end
+        else
+          names << pkg.spec.name_tuple
       end
     end
 
@@ -77,32 +80,29 @@ class Wow::Source::Local < Wow::Source
 
   # @see Wow::Source#find_package
   def find_package(package_name, version_range = nil, prerelease: false)
-    load_specs :complete
     found = []
     version_range ||= Wow::Package::VersionRange.any
     version_range = Wow::Package::VersionRange.parse(version_range) if version_range.is_a? String
-    @specs.each do |n, data|
+    load_packages.each do |n, pkg|
       if n.name == package_name
-        s = data[1].spec
+        s = pkg.spec
 
         if version_range.include?(s.version)
-          if prerelease
-            found << s
-          elsif !s.version.prerelease?
-            found << s
+          if prerelease or !s.version.prerelease?
+            found << pkg
           end
         end
       end
     end
 
-    found.max_by { |s| s.version }
+    found.max_by { |pkg| pkg.spec.version }
   end
 
   # @see Wow::Source#fetch_spec
   def fetch_spec(name)
-    load_specs :complete
+    list_packages :complete
     if (data = @specs[name])
-      data.last.spec
+      data.spec
     else
       raise Wow::Error, "Unable to find spec for #{name.inspect}"
     end
@@ -110,10 +110,10 @@ class Wow::Source::Local < Wow::Source
 
   # @see Wow::Source#download
   def download(spec, cache_dir = nil)
-    load_specs :complete
+    list_packages :complete
 
-    @specs.each do |_, data|
-      return data[0] if data[1].spec == spec
+    @specs.each do |_, pkg|
+      return pkg.path if pkg.spec == spec
     end
 
     raise Gem::Exception, "Unable to find file for '#{spec.full_name}'"

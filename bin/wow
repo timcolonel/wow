@@ -36,10 +36,9 @@ Options:
   -p --password=<password>  Password for remote
   --prerelease              Authorize to install prerelease
 DOCOPT
-
+require 'wow'
 begin
   $:.push File.expand_path('../../lib', __FILE__)
-  require 'wow'
   Wow.run(Docopt::docopt(doc))
 rescue Docopt::Exit => e
   puts e.message

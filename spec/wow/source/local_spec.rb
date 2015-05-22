@@ -6,42 +6,46 @@ RSpec.describe Wow::Source::Local do
 
   before :all do
     @folder = Tmp::Folder.new('source/local')
-    @path_a, @spec_a = tmp_package 'a', '1.0.0', destination: @folder.to_s
-    @path_a2, @spec_a2 = tmp_package 'a', '2.0.0', destination: @folder.to_s
-    @path_ap, @spec_ap = tmp_package 'a', '2.1.0-alpha', destination: @folder.to_s
-    @path_b, @spec_b = tmp_package 'b', '1.0.0', destination: @folder.to_s
+    @pkg_a = tmp_package 'a', '1.0.0', destination: @folder.to_s
+    @pkg_a2 = tmp_package 'a', '2.0.0', destination: @folder.to_s
+    @pkg_ap = tmp_package 'a', '2.1.0-alpha', destination: @folder.to_s
+    @pkg_b = tmp_package 'b', '1.0.0', destination: @folder.to_s
   end
 
-  describe '#load_specs' do
+  describe '#list_packages' do
     it 'load specs of release' do
-      expect(subject.load_specs(:released).sort).to eq([@spec_a.name_tuple, @spec_a2.name_tuple, @spec_b.name_tuple].sort)
+      expect(subject.list_packages(:released).sort).to eq([@pkg_a.spec.name_tuple, @pkg_a2.spec.name_tuple, @pkg_b.spec.name_tuple].sort)
     end
 
     it 'load specs of prerelease' do
-      expect(subject.load_specs(:prerelease)).to eq([@spec_ap.name_tuple])
+      expect(subject.list_packages(:prerelease)).to eq([@pkg_ap.spec.name_tuple])
     end
     it 'get only the latest release version' do
-      expect(subject.load_specs(:latest_release).sort).to eq([@spec_a2.name_tuple, @spec_b.name_tuple].sort)
+      expect(subject.list_packages(:latest_release).sort).to eq([@pkg_a2.spec.name_tuple, @pkg_b.spec.name_tuple].sort)
     end
     it 'get only the latest version' do
-      expect(subject.load_specs(:latest).sort).to eq([@spec_ap.name_tuple, @spec_b.name_tuple].sort)
+      expect(subject.list_packages(:latest).sort).to eq([@pkg_ap.spec.name_tuple, @pkg_b.spec.name_tuple].sort)
     end
   end
 
   describe '#find_package' do
     context 'when finding by name' do
-      let (:spec) { subject.find_package('a') }
+      let (:package) { subject.find_package('a') }
+      let (:spec) { package.spec }
+      it { expect(package.source).to eq(subject) }
       it { expect(spec.name).to eq('a') }
       it { expect(spec.version.to_s).to eq('2.0.0') }
     end
     context 'when finding by name and version' do
-      let (:spec) { subject.find_package('a', '1.0.0') }
+      let (:package) { subject.find_package('a', '1.0.0') }
+      let (:spec) { package.spec }
       it { expect(spec.name).to eq('a') }
       it { expect(spec.version.to_s).to eq('1.0.0') }
     end
 
     context 'when finding by name and including prerelease' do
-      let (:spec) { subject.find_package('a', prerelease: true) }
+      let (:package) { subject.find_package('a', prerelease: true) }
+      let (:spec) { package.spec }
       it { expect(spec.name).to eq('a') }
       it { expect(spec.version.to_s).to eq('2.1.0.a') }
     end
@@ -49,13 +53,13 @@ RSpec.describe Wow::Source::Local do
 
   describe '#fetch_spec' do
     it 'fetch spec' do
-      s = subject.fetch_spec @spec_a.name_tuple
-      expect(s).to eq (@spec_a)
+      s = subject.fetch_spec @pkg_a.spec.name_tuple
+      expect(s).to eq (@pkg_a.spec)
     end
   end
 
   describe '#download' do
-    it { expect(subject.download @spec_a).to eq(File.expand_path(@path_a)) }
+    it { expect(subject.download @pkg_a.spec).to eq(File.expand_path(@pkg_a.path)) }
   end
 
 end

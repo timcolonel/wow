@@ -1,4 +1,5 @@
 require 'wow/package/specification'
+require 'wow/package_resolver'
 
 class Wow::Command::Install
   def initialize(package, version=nil, prerelease: false)
@@ -8,7 +9,8 @@ class Wow::Command::Install
   end
 
   def run
-    package = Wow.sources.find_package(@package, @version, prerelease: @prerelease)
+    resolver = Wow::PackageResolver.new(:update)
+    package = resolver.get_package(@package, @version, prerelease: @prerelease)
     if package.nil?
       fail Wow::Error, "No package found with this name #{package}" if @version.nil?
       fail Wow::Error, "No package found with this name #{package} and this version #{@version}"

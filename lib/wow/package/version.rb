@@ -1,4 +1,5 @@
 require 'prime'
+require 'wow/package'
 
 class Wow::Package::Version
   include Comparable

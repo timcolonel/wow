@@ -106,11 +106,12 @@ class Wow::SourceList
   end
 
   # Search for package in all the source and get the latest version matching the query
-  def find_package(package_name, version_range = nil, prerelease: false)
+  def find_package(package_name, version_range = nil, prerelease: false, first_match: true)
     found = []
     sources.each do |source|
       found << source.find_package(package_name, version_range, prerelease: prerelease)
+      break if first_match and found.any?
     end
-    found.compact.max_by { |s| s.version }
+    found.compact.max_by { |s| s.spec.version }
   end
 end

@@ -9,11 +9,11 @@ class Wow::Source::SpecificFile < Wow::Source
   def initialize(path)
     super(path)
     @path = path
-    @package = Wow::Package.new(@path)
+    @package = Wow::Package.new(@path, self)
   end
 
   # @see Wow::Source#load_spec
-  def load_specs(*args) # :nodoc:
+  def list_packages(*args) # :nodoc:
     [@package.spec.name_tuple]
   end
 

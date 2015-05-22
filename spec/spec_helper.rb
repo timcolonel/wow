@@ -12,7 +12,7 @@ require 'renderer'
 module Helper
 
   # Create a tmp package archive
-  def tmp_package(name, version, platform=nil, arch=nil, destination: nil)
+  def tmp_package(name, version, platform=nil, arch=nil, destination: nil, extract_to: nil)
     folder = Tmp::Folder.new('tmp_package', clean_first_only: true).sub_folder
     Dir.chdir folder.to_s do
       filenames = folder.create_files(count: 3, absolute: false)
@@ -22,10 +22,16 @@ module Helper
       spec.files_included = filenames.map { |x| Wow::Package::FilePattern.new(x) }
       archive_path = spec.create_archive(platform, arch, destination: folder.to_s)
       if destination
-        FileUtils.mv archive_path, destination
+        FileUtils.cp archive_path, destination
         archive_path = File.join(destination, File.basename(archive_path))
       end
-      return archive_path, spec.lock(platform, arch)
+
+      if extract_to
+        output = File.join(extract_to, File.basename(archive_path, '.*'))
+        Wow::Archive.extract(archive_path, output)
+        archive_path = output
+      end
+      return Wow::Package.new(archive_path, nil)
     end
   end
 end

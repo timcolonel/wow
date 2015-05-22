@@ -8,3 +8,5 @@ doc/
 .yardoc/
 
 *.wow
+
+packages/
