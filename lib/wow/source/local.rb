@@ -1,11 +1,10 @@
 require 'wow/source'
 require 'wow/package/version_range'
 
-##
 # Source for a directory containing .wow package.
 class Wow::Source::Local < Wow::Source
 
-  def <=> (other)
+  def <=>(other)
     case other
     when Wow::Source::Installed,
       Wow::Source::Lock then
@@ -30,7 +29,7 @@ class Wow::Source::Local < Wow::Source
           tuple = pkg.spec.name_tuple
           packages[tuple] = pkg
         rescue SystemCallError
-          # ignore
+          puts "Error while reading #{file}"
         end
       end
     end
@@ -84,14 +83,11 @@ class Wow::Source::Local < Wow::Source
     version_range ||= Wow::Package::VersionRange.any
     version_range = Wow::Package::VersionRange.parse(version_range) if version_range.is_a? String
     load_packages.each do |n, pkg|
-      if n.name == package_name
-        s = pkg.spec
+      next if n.name != package_name
+      s = pkg.spec
 
-        if version_range.include?(s.version)
-          if prerelease || !s.version.prerelease?
-            found << pkg
-          end
-        end
+      if version_range.include?(s.version) && (prerelease || !s.version.prerelease?)
+        found << pkg
       end
     end
 
@@ -109,7 +105,7 @@ class Wow::Source::Local < Wow::Source
   end
 
   # @see Wow::Source#download
-  def download(spec, cache_dir = nil)
+  def download(spec, _cache_dir = nil)
     list_packages :complete
 
     @specs.each do |_, pkg|

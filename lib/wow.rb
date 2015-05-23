@@ -12,7 +12,6 @@ require 'wow/package/platform'
 require 'wow/package/specification'
 require 'struct/tree'
 require 'wow/exception'
-require 'wow/command'
 require 'wow/source_list'
 
 # Wow Module contains all the wow classes and modules
@@ -30,6 +29,10 @@ module Wow
 
     def installed_sources
       @installed_sources ||= Wow.default_installed_source
+    end
+
+    def exe
+      'wow'
     end
   end
 end

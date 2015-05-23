@@ -1,6 +1,6 @@
 require 'coveralls'
 Coveralls.wear!
-$:.push File.expand_path('../../lib', __FILE__)
+$LOAD_PATH.push File.expand_path('../../lib', __FILE__)
 require 'faker'
 require 'rspec'
 require 'active_support'
@@ -9,6 +9,7 @@ require 'wow'
 require 'tmp_file'
 require 'renderer'
 
+# Rspec helper
 module Helper
 
   # Create a tmp package archive

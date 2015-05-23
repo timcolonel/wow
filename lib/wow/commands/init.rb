@@ -1,4 +1,17 @@
-class Wow::Command::Init
+require 'wow'
+require 'wow/command'
+
+# Command to Initialize a new Wow package
+# Will create a new config file in the working dir.
+class Wow::Command::Init < Wow::Command
+  self.banner = "Usage: #{Wow.exe} init [options]"
+
+
+  def self.parse(argv = ARGV)
+    parse_options(argv)
+    Wow::Command::Init.new
+  end
+
   def initialize
 
   end
@@ -14,4 +27,5 @@ class Wow::Command::Init
     FileUtils.cp(src, dst)
     puts "Created config successfully in #{Wow::Package::Specification.filename}"
   end
+
 end

@@ -140,9 +140,9 @@ RSpec.describe Wow::Package::Specification do
   end
 
   describe '#lock' do
-    let (:hash) { {name: Faker::App.name, files: ['any.rb'],
-                   platform: {unix: {files: ['unix.rb']},
-                              osx: {files: ['osx.rb'], x86: {files: ['osx-x86.rb']}}}}
+    let(:hash) { {name: Faker::App.name, files: ['any.rb'],
+                  platform: {unix: {files: ['unix.rb']},
+                             osx: {files: ['osx.rb'], x86: {files: ['osx-x86.rb']}}}}
     }
 
     subject do

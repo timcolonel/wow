@@ -2,44 +2,29 @@ require 'spec_helper'
 require 'wow/command'
 
 RSpec.describe Wow::Archive do
-  describe '#run' do
-    let (:command) { 'install' }
+  describe '.parse_options' do
+    context '' do
+      let(:doc) { 'usage: wow <command>' }
+      let(:cl) { 'install' }
 
-    context 'when using command' do
-      subject { Wow::Command.new(command => true) }
-      let (:installer) { double('installer') }
       before do
-        allow(installer).to receive(:run)
-        allow(subject).to receive(command).and_return(installer)
-        subject.run
+        Wow::Command.doc = doc
       end
-      it { expect(subject).to have_received(command) }
-      it { expect(installer).to have_received(:run) }
+      it { expect(Wow::Command.parse_options(cl)).to eq('<command>' => cl) }
     end
-    context 'when using alias' do
-      let (:alias_command) { 'instal' }
-      subject { Wow::Command.new(alias_command => true) }
-      let (:installer) { double('installer') }
+
+    context 'when unknown options are authorized' do
+      let(:doc) { 'usage: wow <command> <args>...' }
+      let(:cl) { 'install --opt1 --opt2=val' }
+
       before do
-        allow(installer).to receive(:run)
-        allow(subject).to receive(command).and_return(installer)
-        subject.run
+        Wow::Command.doc = doc
+        Wow::Command.authorize_unknown_options = true
       end
-      it { expect(subject).to have_received(command) }
-      it { expect(installer).to have_received(:run) }
-    end
-  end
-
-  describe '#init' do
-    subject { Wow::Command.new('init' => true) }
-
-    before do
-      allow_any_instance_of(Wow::Command::Init).to receive(:run)
-      expect_any_instance_of(Wow::Command::Init).to receive(:run)
-    end
-
-    it 'call create an instance of init and call run' do
-      subject.run
+      it 'parse options as arguments' do
+        expect(Wow::Command.parse_options(cl)).to eq('<command>' => 'install',
+                                                     '<args>' => %w(--opt1 --opt2=val))
+      end
     end
   end
 end

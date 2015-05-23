@@ -9,5 +9,10 @@ docopt
 
   add_option :remote, '--remote'
   add_option :add_remote, '--add-remote'
+
+  def self.load_options(options)
+    Wow.sources.replace(options[source].split(',')) unless options[:source].nil?
+    Wow.sources << options[:add_source] unless options[:add_source].nil?
+  end
 end
 

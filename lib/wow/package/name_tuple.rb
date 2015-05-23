@@ -43,7 +43,7 @@ class Wow::Package::NameTuple
     array = [@name, @version]
     if @target and @target.platform != :any
       array << @target.platform
-      if @target.architecture and @target.architecture != :any
+      if @target.architecture && @target.architecture != :any
         array << @target.architecture
       end
     end
@@ -53,9 +53,9 @@ class Wow::Package::NameTuple
   def lock_filename
     @arch = nil
     array = [@name]
-    if @target and @target.platform != :any
+    if @target && @target.platform != :any
       array << @target.platform
-      if @target.architecture and @target.architecture != :any
+      if @target.architecture && @target.architecture != :any
         array << @target.architecture
       end
     end
@@ -70,8 +70,8 @@ class Wow::Package::NameTuple
   def ==(other)
     case other
       when self.class
-        @name == other.name and
-          @version == other.version and
+        @name == other.name &&
+          @version == other.version &&
           @target == other.target
       when Array
         to_a == other

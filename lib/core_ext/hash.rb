@@ -1,10 +1,16 @@
+# Extend the hash class to had useful methods
 class Hash
   def deep_fetch(key, default = nil)
     default = yield if block_given?
-    (deep_find(key) or default) or fail KeyError.new("Key not found: #{key}")
+    value = (deep_find(key) || default)
+    fail KeyError, "Key not found: #{key}" if value.nil?
+    value
   end
 
   def deep_find(key)
-    key?(key) ? self[key] : self.values.inject(nil) { |memo, v| memo ||= v.deep_find(key) if v.respond_to?(:deep_find) }
+    return self[key] if self.key?(key)
+    values.inject(nil) do |_a, e|
+      e.deep_find(key) if e.respond_to?(:deep_find)
+    end
   end
 end

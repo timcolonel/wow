@@ -16,12 +16,12 @@ class Wow::ApiClient
   end
 
   def current_source=(new_source)
-    if @sources.has_key? new_source
+    if @sources.key? new_source
       @current_source = @sources[new_source]
     elsif new_source =~ URI::regexp
       @current_source = new_source
     else
-      raise ArgumentError("The given source '#{new_source}' is neither a key in the existing defined sources nor a url!")
+      fail ArgumentError("The given source '#{new_source}' is neither a key in the existing defined sources nor a url!")
     end
   end
 
@@ -36,45 +36,43 @@ class Wow::ApiClient
       data = result.data
       @current_user = {id: data[:id], token: data[:authentication_token]}
     rescue RestClient::Unauthorized => e
-      raise Wow::Error.new(e.response.data[:error])
+      fail Wow::Error.new(e.response.data[:error])
     end
   end
 
   # Get request to the specified path using the current_source as a root.
   # @param params: Param to send with the request. Also include headers.
-  def get(path, params={})
+  def get(path, params = {})
     execute :get, path, params
   end
 
-  def post(path, params={}, headers = {})
+  def post(path, params = {}, headers = {})
     execute :post, path, params, headers
   end
 
-  def put(path, params={}, headers = {})
+  def put(path, params = {}, headers = {})
     execute :put, path, params, headers
   end
 
-  def patch(path, params={}, headers = {})
+  def patch(path, params = {}, headers = {})
     execute :patch, path, params, headers
   end
 
-  def delete(path, params={})
+  def delete(path, params = {})
     execute :get, path, params
   end
 
-  def execute(method, path, params={}, headers={})
-    begin
-      result = if [:get, :delete, :head, :options].include? method
-                 RestClient.send(method, url(path), internal_params.merge(params).merge(headers))
-               else
-                 RestClient.send(method, url(path), params.to_json, internal_params.merge(headers))
-               end
-      result.extend Wow::ApiClient::Response
-      result
-    rescue RestClient::Exception => e
-      e.response.extend Wow::ApiClient::Response
-      raise e
-    end
+  def execute(method, path, params = {}, headers = {})
+    result = if [:get, :delete, :head, :options].include? method
+               RestClient.send(method, url(path), internal_params.merge(params).merge(headers))
+             else
+               RestClient.send(method, url(path), params.to_json, internal_params.merge(headers))
+             end
+    result.extend Wow::ApiClient::Response
+    result
+  rescue RestClient::Exception => e
+    e.response.extend Wow::ApiClient::Response
+    raise e
   end
 
   def auth_headers

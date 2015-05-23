@@ -1,3 +1,4 @@
+# Class representing a tree of node with multiples childrens
 class Tree
   attr_accessor :name
   attr_reader :children
@@ -9,7 +10,7 @@ class Tree
       return
     end
     content.deep_symbolize_keys!
-    if content.has_key?(:name)
+    if content.key?(:name)
       @name = content[:name]
       content[:children].each do |child|
         add_child child
@@ -20,7 +21,8 @@ class Tree
         add_child child
       end
     else
-      raise Wow::Error, 'Tree has wrong format! Cannot be a Hash with more than 2 key not being :name and :children.'
+      fail Wow::Error, 'Tree has wrong format
+                        Cannot be a Hash with more than 2 key not being :name and :children.'
     end
   end
 
@@ -43,21 +45,33 @@ class Tree
     out
   end
 
+  # Symbolize the keys of all the node in the tree.
   def deep_symbolize!
     @name = @name.to_sym
-    @children.each do |child|
-      child.deep_symbolize!
-    end
+    @children.each(&:deep_symbolize!)
+    self
   end
 
+  # Recursively look for a node with the given name
+  # @param key [String] name of the node to look for.
+  # This is using a deep first search.
   def find(key)
-    @name == key ? self : @children.inject(nil) { |memo, v| memo ||= v.find(key) if v.respond_to?(:find) }
+    return self if @name == key
+    @children.each do |child|
+      next unless child.respond_to?(:find)
+      match = child.find(key)
+      return match unless match.nil?
+    end
+    nil
   end
 
+  # Check if the tree contains a node with the givent name
+  # @param key [String] name of the node to look for.
   def exist?(key)
-    not find(key).nil?
+    !find(key).nil?
   end
 
+  # Convert the tree to a Hash with 2 key: name and children
   def to_hash
     {name: @name, children: @children.map(&:to_hash)}
   end
