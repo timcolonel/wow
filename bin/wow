@@ -5,15 +5,15 @@ require 'rubygems/exceptions'
 require 'bundler'
 Bundler.setup
 
-require 'docopt'
+require 'clin'
 
 require 'wow'
 require 'wow/command_parser'
 begin
   $LOAD_PATH.push File.expand_path('../../lib', __FILE__)
   Wow::CommandParser.parse(ARGV).run
-rescue Docopt::Exit => e
-  puts e.message
+rescue Clin::CommandLineError => e
+  puts e.to_s
 rescue Wow::Error => e
   puts e.error_message
 end

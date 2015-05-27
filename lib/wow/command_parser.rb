@@ -6,7 +6,9 @@ require_rel 'commands'
 # Parse the entire command line
 # It will extract which action should be called and then pass it the CL
 class Wow::CommandParser < Wow::Command
-  self.doc = <<DOCOPT
+
+  arguments '<command> [<args>...]'
+  <<DOCOPT
 Wow
 
 Usage:
@@ -22,42 +24,35 @@ Options:
   -p --password=<password>  Password for remote
   --prerelease              Authorize to install prerelease
 DOCOPT
-  self.authorize_unknown_options = true
 
   cattr_accessor :actions
   cattr_accessor :aliases
 
   self.actions = [
-    :init,
-    :pack,
-    :register,
-    :install,
-    :build,
-    :extract,
-    :uninstall
+      :init,
+      :pack,
+      :register,
+      :install,
+      :build,
+      :extract,
+      :uninstall
   ]
 
   self.aliases = {
-    instal: :install,
-    uninstal: :uninstall
+      instal: :install,
+      uninstal: :uninstall
   }
 
-
-  def self.parse(argv = ARGV)
-    options = parse_options(argv, version: Wow::VERSION)
-    command = options['<command>']
-    Wow::CommandParser.new(command, argv: argv)
-  end
-
-  # Create a new command parser.
-  def initialize(command, argv: ARGV)
-    @command = command
-    @argv = argv
+  def initialize(params)
+    super(params)
+    @command = params[:command]
+    @args = [@command]
+    @args += params[:args] unless params[:args].nil?
   end
 
   def run
     cls = command_cls
-    cls.parse(@argv).run
+    cls.parse(@args).run
   end
 
   protected

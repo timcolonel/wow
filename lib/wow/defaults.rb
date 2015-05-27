@@ -1,7 +1,12 @@
 require 'wow/source/installed'
 module Wow
+
+  def self.default_remote
+    'https://localhost:3000'
+  end
+
   def self.default_sources
-    Wow::SourceList.from [Wow::Source::Remote.new('https://localhost:3000')]
+    Wow::SourceList.from [Wow::Source::Remote.new(self.default_remote)]
   end
 
   def self.default_installed_source

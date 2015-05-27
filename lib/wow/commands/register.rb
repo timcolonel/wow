@@ -5,28 +5,9 @@ require 'wow/command'
 
 # Command that handle the registration of a package
 class Wow::Command::Register < Wow::Command
-  self.doc = <<DOCOPT
-Wow register
+  arguments 'register'
 
-Register the package to the server.
-
-Usage:
-    #{Wow.exe} register
-    #{Wow.exe} register (-h | --help)
-Options:
-  -h --help                 Show this screen.
-
-DOCOPT
-
-  def self.parse(argv = ARGV)
-    parse_options(argv)
-    Wow::Command::Init.new
-  end
-
-
-  def initialize
-
-  end
+  general_option Wow::RemoteOptions
 
   def run
     config = Wow::Specification.load_valid!
