@@ -6,7 +6,7 @@ def asset(path)
 end
 
 RSpec.describe Wow::Package::SpecificationLock do
-  let (:folder) { 'test_package_config' }
+  let (:folder) { Tmp::Folder.new('package_spec_lock') }
 
   describe '#filename' do
     let (:name) { Faker::App.name }
@@ -37,7 +37,6 @@ RSpec.describe Wow::Package::SpecificationLock do
 
   describe '#save' do
     let (:name) { Faker::App.name }
-    let (:folder) { Tmp::Folder.new('spec_lock') }
     change_dir { folder }
     subject do
       spec_lock = Wow::Package::SpecificationLock.new(:any)

@@ -24,7 +24,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'require_all'
   s.add_dependency 'rest-client'
   s.add_dependency 'highline'
-  s.add_dependency 'clin'
+  s.add_dependency 'clin', '>= 0.2.0'
 
   s.add_development_dependency 'coveralls'
   s.add_development_dependency 'faker'
