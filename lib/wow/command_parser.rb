@@ -6,7 +6,7 @@ require_rel 'commands'
 # Parse the entire command line
 # It will extract which action should be called and then pass it the CL
 class Wow::CommandParser < Wow::Command
-
+  skip_options true
   arguments '<command> [<args>...]'
   <<DOCOPT
 Wow
@@ -29,18 +29,18 @@ DOCOPT
   cattr_accessor :aliases
 
   self.actions = [
-      :init,
-      :pack,
-      :register,
-      :install,
-      :build,
-      :extract,
-      :uninstall
+    :init,
+    :pack,
+    :register,
+    :install,
+    :build,
+    :extract,
+    :uninstall
   ]
 
   self.aliases = {
-      instal: :install,
-      uninstal: :uninstall
+    instal: :install,
+    uninstal: :uninstall
   }
 
   def initialize(params)
@@ -48,6 +48,7 @@ DOCOPT
     @command = params[:command]
     @args = [@command]
     @args += params[:args] unless params[:args].nil?
+    @args += params[:skipped_options]
   end
 
   def run

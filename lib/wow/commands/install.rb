@@ -14,20 +14,19 @@ class Wow::Command::Install < Wow::Command
 
   def initialize(params)
     super(params)
-    @package = options[:package]
-    @version = options[:version]
-    @prerelease = options[:prerelease]
+    @package = params[:package]
+    @version = params[:version]
+    @prerelease = params[:prerelease]
   end
 
-
   def run
-    resolver = Wow::PackageResolver.new(:update)
+    resolver = Wow::PackageResolver.new(:install)
     package = resolver.get_package(@package, @version, prerelease: @prerelease)
     if package.nil?
       fail Wow::Error, "No package found with this name #{package}" if @version.nil?
       fail Wow::Error, "No package found with this name #{package} and this version #{@version}"
     end
 
-    puts "Package: #{package.name} - #{package.version}"
+    puts "Package: #{package.spec.name} - #{package.spec.version}"
   end
 end
