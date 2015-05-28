@@ -14,7 +14,7 @@ Gem::Specification.new do |s|
   s.description = ''
 
   s.files = Dir['{app,config,db,lib}/**/*', 'MIT-LICENSE', 'Rakefile', 'README.rdoc']
-  s.test_files = Dir['test/**/*']
+  s.test_files = Dir['spec/**/*']
 
   s.add_dependency 'rake'
   s.add_dependency 'activesupport'
@@ -24,7 +24,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'require_all'
   s.add_dependency 'rest-client'
   s.add_dependency 'highline'
-  s.add_dependency 'clin'
+  s.add_dependency 'clin', '>= 0.2.0'
 
   s.add_development_dependency 'coveralls'
   s.add_development_dependency 'faker'

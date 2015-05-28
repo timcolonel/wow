@@ -6,14 +6,14 @@ def asset(path)
 end
 
 RSpec.describe Wow::Package::Specification do
-  let (:folder) { 'test_package_config' }
+  let (:folder) { Tmp::Folder.new('package_spec') }
 
   describe '#init_from_toml' do
     subject { Wow::Package::Specification.new }
 
     it 'load toml file' do
       hash = {name: 'Some name', version: '1.2.3', author: 'Some author'}
-      tmp = TmpFile.path('package.toml', self.folder)
+      tmp = self.folder.path('package.toml')
       erb = Renderer::ERB.render_file(asset('package_config.toml.erb'), hash)
       File.write(tmp, erb)
       subject.init_from_toml(tmp)
@@ -76,14 +76,16 @@ RSpec.describe Wow::Package::Specification do
   describe '#create_archive' do
     subject do
       config = Wow::Package::Specification.new
-      config.name = 'from_archive'
+      config.name = Faker::Lorem.word
       config.version = '1.0.0'
-      filenames = TmpFile.create_files(count: 5, :folder => File.join(folder, 'input'), absolute: false)
+      filenames = folder.sub_folder('input').create_files(count: 5, absolute: false)
       config.file filenames
       config
     end
+    let (:destination) { folder.sub_folder('archive_dst') }
+    change_dir { destination }
 
-    let (:archive) { subject.create_archive(:any, destination: TmpFile.folder_path(folder)) }
+    let (:archive) { subject.create_archive(:any, destination: folder.to_s) }
 
     it 'archive file should exists' do
       expect(File).to exist(archive)
@@ -91,18 +93,19 @@ RSpec.describe Wow::Package::Specification do
   end
 
   describe '#install_to' do
-    let (:filenames) { TmpFile.create_files(count: 5, :folder => File.join(folder, 'input'), absolute: false) }
-    let (:destination) { File.join(TmpFile.folder_path(folder), 'output') }
+    let (:filenames) { folder.sub_folder('input').create_files(count: 5, absolute: false) }
+    let (:destination) { folder.sub_folder('output') }
+    change_dir { folder }
     subject do
       config = Wow::Package::Specification.new
-      config.name = 'from_archive'
+      config.name = Faker::Lorem.word
       config.version = '1.0.0'
       config.file filenames
       config
     end
 
     it 'files should be installed' do
-      subject.install_to(:any, destination: destination)
+      subject.install_to(:any, destination: destination.to_s)
       subject.files.each do |_, filename|
         expect(File).to exist(File.join(destination, filename))
       end
