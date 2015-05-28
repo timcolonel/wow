@@ -17,11 +17,6 @@ require 'wow/source_list'
 module Wow
   class << self
     attr_writer :remote
-    # Run with docopt options
-    def run(options)
-      runner = Wow::Command.new(options)
-      runner.run
-    end
 
     def sources
       @sources ||= Wow.default_sources
