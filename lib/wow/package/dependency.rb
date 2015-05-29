@@ -26,4 +26,11 @@ class Wow::Package::Dependency
   def merge!(dependency)
     @version_range.merge!(dependency.version_range)
   end
+
+  def ==(other)
+    return false unless other.is_a?(Wow::Package::Dependency)
+    @name == other.name && @version_range == other.version_range
+  end
+
+  alias_method :eql?, :==
 end

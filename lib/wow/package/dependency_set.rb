@@ -5,8 +5,9 @@ class Wow::Package::DependencySet
   include Enumerable
   attr_accessor :dependencies
 
-  def initialize
+  def initialize(dependencies = [])
     @dependencies = {}
+    replace(dependencies)
   end
 
   # Insert a new dependency in the list
@@ -31,11 +32,17 @@ class Wow::Package::DependencySet
     @dependencies.clear
     dependencies = dependencies.to_a if dependencies.is_a? Hash
     dependencies.each do |dep|
-      if dep.first.is_a?(Wow::Package::Dependency)
+      if dep.is_a?(Wow::Package::Dependency)
         insert dep
       else
         insert Wow::Package::Dependency.new(dep[0], dep[1])
       end
     end
   end
+
+  def size
+    @dependencies.size
+  end
+
+  alias_method :length, :size
 end

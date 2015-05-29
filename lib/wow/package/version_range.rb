@@ -40,13 +40,11 @@ class Wow::Package::VersionRange
   end
 
   def merge!(other)
-    if other.lower_bound > @lower_bound
-      self.lower_bound = other.lower_bound
-    end
+    self.lower_bound = other.lower_bound if other.lower_bound > @lower_bound
 
     if other.upper_bound
-      if @upper_bound.nil? or other.upper_bound < self.upper_bound
-        @upper_bound == other.upper_bound
+      if @upper_bound.nil? || other.upper_bound < @upper_bound
+        @upper_bound = other.upper_bound
       end
     end
     self

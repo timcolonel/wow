@@ -8,14 +8,23 @@ end
 
 RSpec.describe Wow::Package::VersionRange do
   describe '#merge' do
-    let (:range) { Wow::Package::VersionRange.parse('~> 1.2') }
-    subject { range.merge(Wow::Package::VersionRange.parse('>= 1.2.3')) }
-    it { expect(subject.lower_bound).to eq(Wow::Package::Version.parse('1.2.3')) }
-    it { expect(subject.upper_bound).to eq(Wow::Package::Version.parse('2.0.0')) }
+    context 'when argument as no upper bound' do
+      let(:range) { Wow::Package::VersionRange.parse('~> 1.2') }
+      subject { range.merge(Wow::Package::VersionRange.parse('>= 1.2.3')) }
+      it { expect(subject.lower_bound).to eq(Wow::Package::Version.parse('1.2.3')) }
+      it { expect(subject.upper_bound).to eq(Wow::Package::Version.parse('2.0.0')) }
+    end
+
+    context 'when base has no upper bound' do
+      let(:range) { Wow::Package::VersionRange.parse('>= 1.2.3') }
+      subject { range.merge(Wow::Package::VersionRange.parse('~> 1.2.0')) }
+      it { expect(subject.lower_bound).to eq(Wow::Package::Version.parse('1.2.3')) }
+      it { expect(subject.upper_bound).to eq(Wow::Package::Version.parse('1.3.0')) }
+    end
   end
 
   describe '.parse' do
-    let (:lower_bound) { Wow::Package::Version.parse('1.2.3') }
+    let(:lower_bound) { Wow::Package::Version.parse('1.2.3') }
 
     it 'equal has the same lower and upper bound' do
       expect(Wow::Package::VersionRange.parse('= 1.2.3').lower_bound).to eq(lower_bound)
