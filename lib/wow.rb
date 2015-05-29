@@ -36,4 +36,4 @@ module Wow
   end
 end
 
-require_rel 'wow/general_options'
+require_rel 'wow'

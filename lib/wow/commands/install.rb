@@ -26,7 +26,9 @@ class Wow::Command::Install < Wow::Command
       fail Wow::Error, "No package found with this name #{package}" if @version.nil?
       fail Wow::Error, "No package found with this name #{package} and this version #{@version}"
     end
-
-    puts "Package: #{package.spec.name} - #{package.spec.version}"
+    if package.installed?
+      puts "#{package.spec.name} is already installed nothing to do!"
+    end
+    Wow::Installer.new(package, Wow.default_install_dir).install
   end
 end
