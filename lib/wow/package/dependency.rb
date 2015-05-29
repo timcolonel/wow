@@ -9,7 +9,7 @@ class Wow::Package::Dependency
   attr_accessor :version_range
 
   def initialize(name, version_range = Wow::Package::VersionRange.any)
-    @name = name
+    @name = name.to_s
     if version_range.is_a?(Wow::Package::VersionRange)
       @version_range = version_range
     else
@@ -17,7 +17,7 @@ class Wow::Package::Dependency
     end
   end
 
-  def satisfied_by?(package)
-    @version_range.match? package.version
+  def satisfied_by?(spec)
+    @version_range.match? spec.version
   end
 end

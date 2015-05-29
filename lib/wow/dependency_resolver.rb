@@ -21,13 +21,15 @@ class Wow::DependencyResolver
   end
 
   def update_package(package)
-    @current_packages[package.spec.name] = package.spec
+    @current_packages[package.spec.name] = package
   end
 
+  # Get the list of the dependencies that are not yet satisfied!
+  # @return [Array<Wow::Package::Dependency]
   def remaining_dependencies
     dependencies = []
     @current_packages.each do |_, package|
-      package.dependencies.each do |dep|
+      package.spec.dependencies.each do |dep|
         next if satisfy? dep
         dependencies << dep
       end
@@ -35,9 +37,12 @@ class Wow::DependencyResolver
     dependencies
   end
 
+  # Check if the resolver current status satisfy the given dependency
+  # @param dependency [Wow::Package::Dependency]
+  # @return [Boolean]
   def satisfy?(dependency)
     return false unless @current_packages.key? dependency.name.to_s
-    dependency.satisfied_by?(@current_packages[dependency.name.to_s])
+    dependency.satisfied_by?(@current_packages[dependency.name.to_s].spec)
   end
 end
 

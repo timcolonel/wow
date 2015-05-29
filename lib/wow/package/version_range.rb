@@ -68,6 +68,11 @@ class Wow::Package::VersionRange
     Wow::Package::VersionRange.new(lower_bound: Wow::Package::Version.new(major: 0, minor: 0, patch: 0, stage: :alpha))
   end
 
+  def ==(other)
+    return false unless other.is_a? Wow::Package::VersionRange
+    @upper_bound == other.upper_bound && @lower_bound == other.lower_bound
+  end
+
   def to_s
     if upper_bound
       "#{lower_bound} - #{upper_bound}"
