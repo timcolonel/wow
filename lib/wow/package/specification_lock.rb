@@ -3,7 +3,7 @@ require 'wow/package/platform'
 require 'toml'
 class Wow::Package::SpecificationLock
 
-  attr_accessor :target, :files, :executables,
+  attr_accessor :target, :files, :executables, :dependencies,
                 :name, :version, :authors, :tags, :homepage, :description, :short_description
 
   def initialize(platform, architecture=nil)
@@ -16,6 +16,7 @@ class Wow::Package::SpecificationLock
     @executables = Set.new
     @tags = Set.new
     @authors = Set.new
+    @dependencies = []
   end
 
   # @param [Wow::Package::Specification]
@@ -33,6 +34,7 @@ class Wow::Package::SpecificationLock
     @files << self.filename unless @files.include? self.filename
     @files += specification.files.values
     @executables += specification.executables
+    @dependencies += specification.dependencies
   end
 
   def to_hash
@@ -45,7 +47,8 @@ class Wow::Package::SpecificationLock
      description: @description,
      short_description: @short_description,
      files: @files.to_a,
-     executables: @executables.to_a}
+     executables: @executables.to_a,
+     dependencies: @dependencies}
   end
 
   def filename

@@ -16,6 +16,7 @@ class Wow::Package::Specification
   attr_accessor :tags
   attr_accessor :files_included
   attr_accessor :files_excluded
+  attr_reader :dependencies
 
   # Internal Config
   attr_accessor :platforms
@@ -67,6 +68,7 @@ class Wow::Package::Specification
     @platform_configs = {}
     @description = ''
     @short_description = ''
+    @dependencies = []
   end
 
   def file(files)
@@ -127,6 +129,7 @@ class Wow::Package::Specification
     @files_included += hash.fetch(:files, []).map { |x| Wow::Package::FilePattern.new(x) }
     @files_excluded += hash.fetch(:files_excluded, []).map { |x| Wow::Package::FilePattern.new(x) }
     @executables += hash.fetch(:executables, [])
+    self.dependencies = hash.fetch(:dependencies, [])
     if hash[:platform]
       exclude_arch = []
       hash[:platform].each do |platform_name, data|
@@ -147,6 +150,26 @@ class Wow::Package::Specification
         platform_config.init_from_hash(data.except(exclude_arch))
         @platforms << platform
         @platform_configs[platform] = platform_config
+      end
+    end
+  end
+
+  # Set the dependencies
+  # It can be set in the following ways:
+  # * with an array of Wow::Package::Dependency
+  # * with a Hash with key: package, value: version
+  #   e.g. `{'package1' => '>= 1.1', 'package2' => '~> 1.1'}`
+  # * with a Array of Array
+  #   e.g. `[['package1', '>= 1.1'], ['package2', '~> 1.1']]`
+  # @param array [Array|Hash]
+  def dependencies=(array)
+    @dependencies.clear
+    array = array.to_a if array.is_a? Hash
+    array.each do |dep|
+      if dep.first.is_a?(Wow::Package::Dependency)
+        @dependencies << dep
+      else
+        @dependencies << Wow::Package::Dependency.new(dep[0], dep[1])
       end
     end
   end

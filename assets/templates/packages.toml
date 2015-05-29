@@ -42,6 +42,8 @@ application = ['[Apllication]']
 # '= x.y.z'  => Require version x.y.z
 # '>= x.y.z' => Require any version more than x.y.z
 # '~> x.y.z' => Require any version more thatn x.y.z but less than x.(y+1).0
+# You can have multiple conditions speparated with a comma:
+# '~> 1.0, >= 1.0.3' => Packge must be between 1.0.3 and 2.0
 [dependencies]
 # mydependency  = '[Version Pattern]'
 
