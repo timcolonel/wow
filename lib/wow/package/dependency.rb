@@ -1,5 +1,7 @@
 require 'wow'
 
+# Package Dependency.
+# Contain the name and version condition of a package
 class Wow::Package::Dependency
   # Name of the package
   attr_accessor :name
@@ -19,5 +21,9 @@ class Wow::Package::Dependency
 
   def satisfied_by?(spec)
     @version_range.match? spec.version
+  end
+
+  def merge!(dependency)
+    @version_range.merge!(dependency.version_range)
   end
 end

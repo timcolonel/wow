@@ -109,7 +109,7 @@ class Wow::Package::Specification
   end
 
   def init_from_rb(ruby_str)
-    self.instance_eval(ruby_str)
+    instance_eval(ruby_str)
   end
 
   def init_from_toml(file)

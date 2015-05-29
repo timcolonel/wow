@@ -1,5 +1,6 @@
 require 'wow/package/version'
 
+# Version Range
 class Wow::Package::VersionRange
   attr_accessor :lower_bound
   attr_accessor :upper_bound
@@ -39,20 +40,20 @@ class Wow::Package::VersionRange
   end
 
   def merge!(other)
-    if other.lower_bound > self.lower_bound
-      self.lower_bound=other.lower_bound
+    if other.lower_bound > @lower_bound
+      self.lower_bound = other.lower_bound
     end
 
     if other.upper_bound
-      if self.upper_bound.nil? or other.upper_bound < self.upper_bound
-        self.upper_bound == other.upper_bound
+      if @upper_bound.nil? or other.upper_bound < self.upper_bound
+        @upper_bound == other.upper_bound
       end
     end
     self
   end
 
   def merge(other)
-    self.clone.merge!(other)
+    clone.merge!(other)
   end
 
   # Test if the given version match the range
