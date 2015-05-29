@@ -2,22 +2,26 @@ require 'wow'
 
 # Resolve dependencies from a starting packages
 class Wow::DependencyResolver
-  def initialize(spec)
-    @inital_package = spec
+  def initialize(package)
+    @inital_package = package
     @current_packages = {}
-    update_package(spec)
+    update_package(package)
   end
 
   def resolve
     package_resolver = Wow::PackageResolver.new
-    @dependencies.each do |name, version_range|
-      package = package_resolver.get_package(name, version_range)
-      package.spec.dependencies
+    loop do
+      rem = remaining_dependencies
+      break if rem.empty?
+      rem.each do |dep|
+        package = package_resolver.get_package(dep.name, dep.version_range)
+        update_package(package)
+      end
     end
   end
 
   def update_package(package)
-    @current_packages[package.spec.name] = package
+    @current_packages[package.spec.name] = package.spec
   end
 
   def remaining_dependencies
@@ -28,11 +32,12 @@ class Wow::DependencyResolver
         dependencies << dep
       end
     end
+    dependencies
   end
 
   def satisfy?(dependency)
-    return false unless @current_packages.key? dependency.name
-    dependency.satisfied_by?(@current_packages[dependency.name])
+    return false unless @current_packages.key? dependency.name.to_s
+    dependency.satisfied_by?(@current_packages[dependency.name.to_s])
   end
 end
 
