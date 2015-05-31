@@ -47,7 +47,6 @@ class Wow::Package::VersionRange
   # @param other [Wow::Package::VersionRange]
   def merge!(other)
     self.lower_bound = other.lower_bound if other.lower_bound > @lower_bound
-
     if other.upper_bound
       if @upper_bound.nil? || other.upper_bound < @upper_bound
         @upper_bound = other.upper_bound

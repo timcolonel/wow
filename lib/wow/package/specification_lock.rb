@@ -1,13 +1,15 @@
 require 'wow/package/name_tuple'
 require 'wow/package/platform'
 require 'toml'
+
+# Specification lock.
 class Wow::Package::SpecificationLock
 
   attr_accessor :target, :files, :executables, :dependencies,
                 :name, :version, :authors, :tags, :homepage, :description, :short_description
 
-  def initialize(platform, architecture=nil)
-    @target = if platform.nil? or not platform.is_a? Wow::Package::Platform
+  def initialize(platform, architecture = nil)
+    @target = if platform.nil? || !platform.is_a?(Wow::Package::Platform)
                 Wow::Package::Platform.new(platform, architecture)
               else
                 platform
@@ -16,7 +18,7 @@ class Wow::Package::SpecificationLock
     @executables = Set.new
     @tags = Set.new
     @authors = Set.new
-    @dependencies = []
+    @dependencies = Wow::Package::DependencySet.new
   end
 
   # @param [Wow::Package::Specification]
@@ -31,7 +33,7 @@ class Wow::Package::SpecificationLock
     @tags += specification.tags
     @authors += specification.authors
 
-    @files << self.filename unless @files.include? self.filename
+    @files << filename
     @files += specification.files.values
     @executables += specification.executables
     @dependencies += specification.dependencies
@@ -48,7 +50,7 @@ class Wow::Package::SpecificationLock
      short_description: @short_description,
      files: @files.to_a,
      executables: @executables.to_a,
-     dependencies: @dependencies}
+     dependencies: @dependencies.to_hash}
   end
 
   def filename
@@ -64,7 +66,7 @@ class Wow::Package::SpecificationLock
 
   def save
     File.open filename, 'w' do |f|
-      f.write(TOML.dump(self.to_hash))
+      f.write(TOML.dump(to_hash))
     end
   end
 

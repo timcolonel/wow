@@ -1,3 +1,4 @@
+# Package
 class Wow::Package
   attr_accessor :path, :spec, :source
 

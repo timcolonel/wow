@@ -19,12 +19,12 @@ class Wow::Source::SpecificFile < Wow::Source
   # @see Wow::Source#fetch_spec
   def fetch_spec(name) # :nodoc:
     return @package.spec if name == @package.spec.name_tuple
-    fail Gem::Exception, "Unable to find '#{name}'"
+    fail Wow::Error, "Unable to find '#{name}'"
   end
 
   # @see Wow::Source#download
   def download(spec, dir = nil)
-    fail Gem::Exception, "Unable to download '#{spec.full_name}'" if spec != @package.spec
+    fail Wow::Error, "Unable to download '#{spec.name}'" if spec != @package.spec
     if dir.nil?
       @path
     else

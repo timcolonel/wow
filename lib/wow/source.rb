@@ -1,4 +1,3 @@
-
 # Template class for a source
 class Wow::Source
   # Url/path/file
@@ -9,18 +8,18 @@ class Wow::Source
   end
 
   # Load a list of specs in the source
-  # @param filter [Symbol] filter the packages.
+  # @param _filter [Symbol] filter the packages.
   #   Can have the following values: :release, :prerelease, :latest_release, :latest
-  def list_packages(filter)
+  def list_packages(_filter)
     fail NotImplementedError
   end
 
   # Load a list of specs in the source
-  def find_package(package_name, version_range = Wow::Package::VersionRange.any, prerelease: false)
+  def find_package(_package_name, _version_range = Wow::Package::VersionRange.any, prerelease: false)
     fail NotImplementedError
   end
 
-  def fetch_spec(name)
+  def fetch_spec(_name)
     fail NotImplementedError
   end
 

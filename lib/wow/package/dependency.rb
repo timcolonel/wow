@@ -33,4 +33,8 @@ class Wow::Package::Dependency
   end
 
   alias_method :eql?, :==
+
+  def to_hash
+    {name: @name, version_range: @version_range.to_s}
+  end
 end

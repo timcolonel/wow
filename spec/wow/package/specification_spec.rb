@@ -6,21 +6,21 @@ def asset(path)
 end
 
 RSpec.describe Wow::Package::Specification do
-  let (:folder) { Tmp::Folder.new('package_spec') }
+  let(:folder) { Tmp::Folder.new('package_spec') }
 
-  describe '#init_from_toml' do
-    subject { Wow::Package::Specification.new }
-
-    it 'load toml file' do
-      hash = {name: 'Some name', version: '1.2.3', author: 'Some author'}
-      tmp = self.folder.path('package.toml')
+  describe '.from_toml' do
+    let(:hash) { {name: 'Some name', version: '1.2.3', author: 'Some author'} }
+    let(:filename) do
+      tmp = folder.path('package.toml')
       erb = Renderer::ERB.render_file(asset('package_config.toml.erb'), hash)
       File.write(tmp, erb)
-      subject.init_from_toml(tmp)
-      expect(subject.name).to eq(hash[:name])
-      expect(subject.version).to eq(Wow::Package::Version.parse(hash[:version]))
-      expect(subject.authors).to include(hash[:author])
+      tmp
     end
+    subject { Wow::Package::Specification.from_toml(filename) }
+
+    it { expect(subject.name).to eq(hash[:name]) }
+    it { expect(subject.version).to eq(Wow::Package::Version.parse(hash[:version])) }
+    it { expect(subject.authors).to include(hash[:author]) }
   end
 
   describe '#files' do
@@ -82,10 +82,10 @@ RSpec.describe Wow::Package::Specification do
       config.file filenames
       config
     end
-    let (:destination) { folder.sub_folder('archive_dst') }
+    let(:destination) { folder.sub_folder('archive_dst') }
     change_dir { destination }
 
-    let (:archive) { subject.create_archive(:any, destination: folder.to_s) }
+    let(:archive) { subject.create_archive(:any, destination: folder.to_s) }
 
     it 'archive file should exists' do
       expect(File).to exist(archive)
@@ -93,8 +93,8 @@ RSpec.describe Wow::Package::Specification do
   end
 
   describe '#install_to' do
-    let (:filenames) { folder.sub_folder('input').create_files(count: 5, absolute: false) }
-    let (:destination) { folder.sub_folder('output') }
+    let(:filenames) { folder.sub_folder('input').create_files(count: 5, absolute: false) }
+    let(:destination) { folder.sub_folder('output') }
     change_dir { folder }
     subject do
       config = Wow::Package::Specification.new
@@ -113,8 +113,8 @@ RSpec.describe Wow::Package::Specification do
   end
 
   describe '#package_folder' do
-    let (:name) { Faker::App.name }
-    let (:version) { '1.2.3' }
+    let(:name) { Faker::App.name }
+    let(:version) { '1.2.3' }
 
     subject do
       config = Wow::Package::Specification.new
@@ -126,14 +126,14 @@ RSpec.describe Wow::Package::Specification do
     it { expect(subject.package_folder).to eq("#{name}-#{version}") }
 
     context 'when platform is specified' do
-      let (:target) { Wow::Package::Platform.new(:unix) }
+      let(:target) { Wow::Package::Platform.new(:unix) }
       before { subject.target = target }
 
       it { expect(subject.package_folder).to eq("#{name}-#{version}-#{target.platform}") }
     end
 
     context 'when architecture is specified' do
-      let (:target) { Wow::Package::Platform.new(:unix, :x86) }
+      let(:target) { Wow::Package::Platform.new(:unix, :x86) }
       before { subject.target = target }
 
       it {
@@ -143,14 +143,15 @@ RSpec.describe Wow::Package::Specification do
   end
 
   describe '#lock' do
-    let(:hash) { {name: Faker::App.name, files: ['any.rb'],
-                  platform: {unix: {files: ['unix.rb']},
-                             osx: {files: ['osx.rb'], x86: {files: ['osx-x86.rb']}}}}
-    }
+    let(:hash) do
+      {name: Faker::App.name,
+       files: ['any.rb'],
+       platform: {unix: {files: ['unix.rb']},
+                  osx: {files: ['osx.rb'], x86: {files: ['osx-x86.rb']}}}}
+    end
 
     subject do
-      specification = Wow::Package::Specification.new
-      specification.init_from_hash(hash)
+      specification = Wow::Package::Specification.new(hash)
       specification
     end
     before do

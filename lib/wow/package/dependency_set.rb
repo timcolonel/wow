@@ -20,6 +20,15 @@ class Wow::Package::DependencySet
     end
   end
 
+  # Add another dependency list
+  # @param other [Wow::Package::DependencySet]
+  def +(other)
+    other.each do |dep|
+      add dep
+    end
+    self
+  end
+
   alias_method :insert, :<<
   alias_method :add, :<<
 
@@ -42,6 +51,18 @@ class Wow::Package::DependencySet
 
   def size
     @dependencies.size
+  end
+
+  def ==(other)
+    dependencies == other.dependencies
+  end
+
+  def to_a
+    dependencies.values
+  end
+
+  def to_hash
+    to_a.map(&:to_hash)
   end
 
   alias_method :length, :size

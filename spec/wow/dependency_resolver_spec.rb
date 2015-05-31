@@ -2,8 +2,7 @@ require 'spec_helper'
 
 
 def spec(config)
-  spec = Wow::Package::Specification.new
-  spec.init_from_hash(config)
+  spec = Wow::Package::Specification.new(config)
   spec.lock(:any)
 end
 
@@ -21,7 +20,7 @@ RSpec.describe Wow::DependencyResolver do
     allow_any_instance_of(Wow::PackageResolver).to receive(:get_package) do |_, name, range|
       best = nil
       packages.each do |spec|
-        if spec.name == name.to_s and range.match?(spec.version)
+        if spec.name == name.to_s && range.match?(spec.version)
           best = spec
           break
         end
@@ -41,7 +40,7 @@ RSpec.describe Wow::DependencyResolver do
     subject { Wow::DependencyResolver.new(a) }
 
     before do
-      subject.instance_variable_set(:@current_packages, {'a' => a, 'b' => b})
+      subject.instance_variable_set(:@current_packages, 'a' => a, 'b' => b)
     end
 
     it { expect(subject.satisfy?(Wow::Package::Dependency.new('a', '>= 1.0.0'))).to be true }
@@ -57,7 +56,7 @@ RSpec.describe Wow::DependencyResolver do
     subject { Wow::DependencyResolver.new(a) }
 
     before do
-      subject.instance_variable_set(:@current_packages, {'a' => a, 'b' => b})
+      subject.instance_variable_set(:@current_packages, 'a' => a, 'b' => b)
     end
 
     it { expect(subject.remaining_dependencies.size).to be 1 }
