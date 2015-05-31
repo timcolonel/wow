@@ -112,36 +112,6 @@ RSpec.describe Wow::Package::Specification do
     end
   end
 
-  describe '#package_folder' do
-    let(:name) { Faker::App.name }
-    let(:version) { '1.2.3' }
-
-    subject do
-      config = Wow::Package::Specification.new
-      config.name = name
-      config.version = version
-      config
-    end
-
-    it { expect(subject.package_folder).to eq("#{name}-#{version}") }
-
-    context 'when platform is specified' do
-      let(:target) { Wow::Package::Platform.new(:unix) }
-      before { subject.target = target }
-
-      it { expect(subject.package_folder).to eq("#{name}-#{version}-#{target.platform}") }
-    end
-
-    context 'when architecture is specified' do
-      let(:target) { Wow::Package::Platform.new(:unix, :x86) }
-      before { subject.target = target }
-
-      it {
-        expect(subject.package_folder).to eq("#{name}-#{version}-#{target.platform}-#{target.architecture}")
-      }
-    end
-  end
-
   describe '#lock' do
     let(:hash) do
       {name: Faker::App.name,
