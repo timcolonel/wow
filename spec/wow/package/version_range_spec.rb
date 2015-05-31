@@ -82,6 +82,17 @@ RSpec.describe Wow::Package::VersionRange do
       it { expect(subject.match? Wow::Package::Version.parse('2.0.1')).to be false }
       it { expect(subject.match? Wow::Package::Version.parse('1.0.0')).to be false }
     end
+  end
+
+  describe '#empty?' do
+    it { expect(Wow::Package::VersionRange.parse('~> 1.2.3,>= 2.0')).to be_empty }
+    it { expect(Wow::Package::VersionRange.parse('= 1.2,= 2.0')).to be_empty }
+    it { expect(Wow::Package::VersionRange.parse('>= 1.2,>= 2.0')).not_to be_empty }
+  end
+
+  describe '#any?' do
+    it { expect(Wow::Package::VersionRange.parse('>= 1.2,>= 2.0')).to be_any }
+    it { expect(Wow::Package::VersionRange.parse('= 1.2,= 2.0')).not_to be_any }
 
   end
 end

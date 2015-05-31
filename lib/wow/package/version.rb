@@ -106,7 +106,7 @@ class Wow::Package::Version
   # ```
   def to_s(short: true, hide_release: true)
     str = [major, minor, patch].join('.')
-    unless hide_release and stage.to_sym == :release
+    unless hide_release && stage.to_sym == :release
       str << ".#{short ? Wow::Package::Version.stage_initial[stage.to_sym] : stage}"
     end
     str << ".#{identifier}" unless identifier.nil?
@@ -134,11 +134,11 @@ class Wow::Package::Version
   end
 
   def <=>(other)
-    self.unique <=> other.unique
+    unique <=> other.unique
   end
 
   def get_upper_bound
-    upper_bound = self.clone
+    upper_bound = clone
     if @patch.nil?
       upper_bound.major = @major + 1
       upper_bound.minor = 0
@@ -167,7 +167,10 @@ class Wow::Package::Version
     multiplier = Wow::Package::Version.coefficient_multiplier[attribute]
     coefficient = Wow::Package::Version.coefficient[attribute]
     fail ArgumentError, "Value #{value} cannot be negative" if value < 0
-    fail ArgumentError, "Value #{value} for #{attribute} need to be less than #{multiplier}. Do you REALLY need a number that big in your version!" if value >= multiplier
+    if value >= multiplier
+      fail ArgumentError, "Value #{value} for #{attribute} need to be less than #{multiplier}." \
+                          'Do you REALLY need a number that big in your version!'
+    end
     value * coefficient
   end
 end

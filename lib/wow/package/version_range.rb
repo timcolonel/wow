@@ -18,6 +18,9 @@ class Wow::Package::VersionRange
     @upper_bound = upper_bound
   end
 
+  # Parse a version range
+  # @param str [String]
+  # @return [Wow::Package::VersionRange]
   def self.parse(str)
     parts = str.split(',')
     current_range = nil
@@ -39,6 +42,9 @@ class Wow::Package::VersionRange
     current_range
   end
 
+  # Merge with another version range.
+  # Modify method
+  # @param other [Wow::Package::VersionRange]
   def merge!(other)
     self.lower_bound = other.lower_bound if other.lower_bound > @lower_bound
 
@@ -49,6 +55,7 @@ class Wow::Package::VersionRange
     end
     self
   end
+
 
   def merge(other)
     clone.merge!(other)
@@ -63,8 +70,11 @@ class Wow::Package::VersionRange
 
   alias_method :include?, :match?
 
+  # Return a new range that accept any of the range
+  # @return [Wow::Package::VersionRange]
   def self.any
-    Wow::Package::VersionRange.new(lower_bound: Wow::Package::Version.new(major: 0, minor: 0, patch: 0, stage: :alpha))
+    version = Wow::Package::Version.new(major: 0, minor: 0, patch: 0, stage: :alpha)
+    Wow::Package::VersionRange.new(lower_bound: version)
   end
 
   def ==(other)
@@ -78,6 +88,18 @@ class Wow::Package::VersionRange
     else
       ">= #{lower_bound}"
     end
+  end
 
+  # Return if the range contains at least 1 version(lower_bound <= upper_bound)
+  # @return [Boolean]
+  def any?
+    !empty?
+  end
+
+  # Return if the range cannot contain a version(lower_bound > upper_bound)
+  # @return [Boolean]
+  def empty?
+    return false if @upper_bound.nil?
+    @lower_bound > @upper_bound
   end
 end
