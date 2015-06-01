@@ -4,8 +4,8 @@ require 'wow/package/file_pattern'
 def test_split_pattern(root, wildcard)
   pattern = File.join(root, wildcard)
   result = Wow::Package::FilePattern.split_pattern(pattern)
-  expect(root).to eq(result[0])
-  expect(wildcard).to eq(result[1])
+  expect(result[0]).to eq(root)
+  expect(result[1]).to eq(wildcard)
 end
 
 RSpec.describe Wow::Package::FilePattern do
@@ -16,12 +16,6 @@ RSpec.describe Wow::Package::FilePattern do
       p = Wow::Package::FilePattern.new(pattern, destination)
       expect(p.pattern).to eq(pattern)
       expect(p.destination).to eq(destination)
-    end
-
-    it 'fail when pattern is a hash and destination not empty' do
-      destination = 'dist'
-      pattern = {:'lib/**/*' => destination}
-      expect { Wow::Package::FilePattern.new(pattern, destination) }.to raise_error(ArgumentError)
     end
 
     it 'create file pattern from hash' do

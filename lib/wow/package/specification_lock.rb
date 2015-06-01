@@ -23,7 +23,6 @@ class Wow::Package::SpecificationLock
 
   # @param [Wow::Package::Specification]
   def insert_specification(specification)
-
     @name ||= specification.name
     @version ||= specification.version
     @homepage ||= specification.homepage

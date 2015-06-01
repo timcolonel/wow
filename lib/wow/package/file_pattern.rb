@@ -60,19 +60,10 @@ class Wow::Package::FilePattern
   #   p.file_map  # => {'lib/file1.txt' => 'dist/file2.txt', 'lib/sub/file2.txt' => 'dist/sub/file2.txt'}
   # ```
   def file_map(dir = nil)
-    dir ||= Dir.pwd
     results = {}
-    Dir.chdir(File.join(dir, @root)) do
-      files = if @wildcard.nil? || File.directory?(@wildcard)
-                Dir.glob(File.join(@wildcard, '**/*'))
-              else
-                Dir.glob(@wildcard)
-              end
-      files.each do |file|
-        next unless File.file? file
-        path = root.blank? ? file : File.join(@root, file)
-        results[path] = @destination.nil? ? path : File.join(@destination, file)
-      end
+    glob(dir).each do |file|
+      path = root.blank? ? file : File.join(@root, file)
+      results[path] = @destination.nil? ? path : File.join(@destination, file)
     end
     results
   end
@@ -83,23 +74,23 @@ class Wow::Package::FilePattern
   #   Wow::Package::FilePattern.split_pattern('lib/sub/**/*') # => ['lib/sub', '**/*']
   # ```
   def self.split_pattern(pattern)
-    pathname = Pathname(pattern.to_s)
-    segments = pathname.each_filename.to_a
-    root = pathname.absolute? ? Pathname('/') : nil
-    wildcard = nil
-    found_wildcard = false
-    segments.each_with_index do |segment, i|
-      if found_wildcard || segment.include?('*')
-        wildcard = wildcard.nil? ? Pathname.new(segment) : wildcard + segment
-        found_wildcard = true
-      else
-        if i == segments.size - 1 # For the last segment it might be a filename so we check
-          wildcard = Pathname.new(segment)
-        else
-          root = root.nil? ? Pathname.new(segment) : root + segment
-        end
-      end
+    scanner = Wow::WildcardScanner.new(pattern)
+    [scanner.root.to_s, scanner.wildcard.to_s]
+  end
+
+  protected
+
+  # Glob the files in the root directory matching the pattern
+  # @param dir [String] root scan directory. Default: current working dir.
+  def glob(dir = nil)
+    dir ||= Dir.pwd
+    Dir.chdir(File.join(dir, @root)) do
+      files = if @wildcard.nil? || File.directory?(@wildcard)
+                Dir.glob(File.join(@wildcard, '**/*'))
+              else
+                Dir.glob(@wildcard)
+              end
+      return files.select { |x| File.file?(x) }
     end
-    [root.to_s, wildcard.to_s]
   end
 end
