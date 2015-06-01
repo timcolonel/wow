@@ -19,9 +19,6 @@ class Wow::Package::FilePattern
   #  Wow::Package.new('lib/**/* => dist')
   # ```
   def initialize(pattern, destination=nil)
-    if destination and pattern.is_a? Hash
-      fail ArgumentError.new ("Pattern #{pattern} cannot be a hash if the destination is already provided")
-    end
     if destination
       @destination = destination
       self.pattern = pattern
@@ -62,11 +59,11 @@ class Wow::Package::FilePattern
   #   p = Wow::Package.new('lib/**/*', 'dist')
   #   p.file_map  # => {'lib/file1.txt' => 'dist/file2.txt', 'lib/sub/file2.txt' => 'dist/sub/file2.txt'}
   # ```
-  def file_map(dir=nil)
+  def file_map(dir = nil)
     dir ||= Dir.pwd
     results = {}
     Dir.chdir(File.join(dir, @root)) do
-      files = if @wildcard.nil? or File.directory?(@wildcard)
+      files = if @wildcard.nil? || File.directory?(@wildcard)
                 Dir.glob(File.join(@wildcard, '**/*'))
               else
                 Dir.glob(@wildcard)
@@ -92,7 +89,7 @@ class Wow::Package::FilePattern
     wildcard = nil
     found_wildcard = false
     segments.each_with_index do |segment, i|
-      if found_wildcard or segment.include? '*'
+      if found_wildcard || segment.include?('*')
         wildcard = wildcard.nil? ? Pathname.new(segment) : wildcard + segment
         found_wildcard = true
       else
@@ -103,6 +100,6 @@ class Wow::Package::FilePattern
         end
       end
     end
-    return root.to_s, wildcard.to_s
+    [root.to_s, wildcard.to_s]
   end
 end
