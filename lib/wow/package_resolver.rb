@@ -1,7 +1,7 @@
 class Wow::PackageResolver
   METHODS = [:install, :update]
 
-  def initialize(method=:install)
+  def initialize(method = :install)
     @method = method
   end
 
@@ -15,7 +15,7 @@ class Wow::PackageResolver
 
   def get_package(name, version_range = nil, prerelease: nil)
     installed_package = find_installed_package(name, version_range, prerelease: prerelease)
-    if @method == :install and installed_package
+    if @method == :install && installed_package
       installed_package
     else
       source = find_source_package(name, version_range, prerelease: prerelease)

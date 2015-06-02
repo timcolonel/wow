@@ -2,7 +2,9 @@
 # Class for pattern matching of files
 # Contains a pattern e.g. lib/**/*
 # Can also have a destination folder
-# e.g. If pattern == lib/**/* and destination = 'dist' then all the files in lib will be moved to dist
+# e.g.
+# If pattern == lib/**/* and destination = 'dist'
+# then all the files in lib will be moved to dist
 class Wow::Package::FilePattern
   attr_accessor :root
   attr_accessor :wildcard
@@ -18,7 +20,7 @@ class Wow::Package::FilePattern
   #  Wow::Package.new('lib/**/*' => 'dist')
   #  Wow::Package.new('lib/**/* => dist')
   # ```
-  def initialize(pattern, destination=nil)
+  def initialize(pattern, destination = nil)
     if destination
       @destination = destination
       self.pattern = pattern
@@ -35,7 +37,8 @@ class Wow::Package::FilePattern
   end
 
   #
-  # Setter for the pattern. Split the pattern in root and wildcard, see {Wow::Package::FilePattern.split_pattern}
+  # Setter for the pattern. Split the pattern in root and wildcard
+  # @see Wow::Package::FilePattern.split_pattern
   # @param pattern [String] pattern to set
   def pattern=(pattern)
     @root, @wildcard = Wow::Package::FilePattern.split_pattern(pattern)
@@ -51,13 +54,14 @@ class Wow::Package::FilePattern
     end
   end
 
-  # Glob the file matching the pattern and return a Hash with the key being the file and the value it's destination
-  # @param dir [String] root from where to glob the file. If nil will use the current working directory.
+  # Glob the file matching the pattern and return a Hash with the key being the file and the value
+  # it's destination
+  # @param dir [String] root from where to glob the file. Default current working directory.
   # @return [String]
   # ```
-  #   # Current dir contains the following files lib/file1.txt, lib/sub/file2.txt
-  #   p = Wow::Package.new('lib/**/*', 'dist')
-  #   p.file_map  # => {'lib/file1.txt' => 'dist/file2.txt', 'lib/sub/file2.txt' => 'dist/sub/file2.txt'}
+  # # Current dir contains the following files lib/file1.txt, lib/sub/file2.txt
+  # Wow::Package.new('lib/**/*', 'dist').file_map
+  # # => {'lib/file1.txt' => 'dist/file2.txt', 'lib/sub/file2.txt' => 'dist/sub/file2.txt'}
   # ```
   def file_map(dir = nil)
     results = {}

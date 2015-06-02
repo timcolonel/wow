@@ -25,21 +25,27 @@ class Wow::Package::VersionRange
     parts = str.split(',')
     current_range = nil
     parts.each do |part|
-      range = if part.match(MORE_REGEX)
-                version = Wow::Package::Version.parse(part.scan(MORE_REGEX)[0][0], true)
-                Wow::Package::VersionRange.new(lower_bound: version)
-              elsif part.match(TILT_REGEX)
-                version = Wow::Package::Version.parse(part.scan(TILT_REGEX)[0][0], true)
-                Wow::Package::VersionRange.new(lower_bound: version, upper_bound: version.get_upper_bound)
-              elsif part.match(EQUAL_REGEX)
-                version = Wow::Package::Version.parse(part.scan(EQUAL_REGEX)[0][0], true)
-                Wow::Package::VersionRange.new(lower_bound: version, upper_bound: version)
-              else
-                fail ArgumentError("Version range '#{part}' is invalid!")
-              end
+      range = parse_part(part)
       current_range = current_range.nil? ? range : current_range.merge(range)
     end
+
     current_range
+  end
+
+  def self.parse_part(part)
+    case part
+    when MORE_REGEX
+      version = Wow::Package::Version.parse(Regexp.last_match[1], true)
+      Wow::Package::VersionRange.new(lower_bound: version)
+    when TILT_REGEX
+      version = Wow::Package::Version.parse(Regexp.last_match[1], true)
+      Wow::Package::VersionRange.new(lower_bound: version, upper_bound: version.get_upper_bound)
+    when EQUAL_REGEX
+      version = Wow::Package::Version.parse(Regexp.last_match[1], true)
+      Wow::Package::VersionRange.new(lower_bound: version, upper_bound: version)
+    else
+      fail ArgumentError("Version range '#{part}' is invalid!")
+    end
   end
 
   # Merge with another version range.
@@ -101,4 +107,5 @@ class Wow::Package::VersionRange
     return false if @upper_bound.nil?
     @lower_bound > @upper_bound
   end
+
 end

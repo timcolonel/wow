@@ -7,9 +7,9 @@ class Wow::Package::Version
 
   VERSION_REGEX = /
     \A
-    (\d+)\.(\d+)(?:\.(\d+)    # x.y.z
-    (?:(?:\.|\-)([a-z]+))?    # (-|.)stage
-    (?:\.(\d+))?)?             # .identifier
+    (?<major>\d+)\.(?<minor>\d+)(?:\.(?<patch>\d+)    # x.y.z
+    (?:(?:\.|\-)(?<stage>[a-z]+))?                    # (-|.)stage
+    (?:\.(?<identifier>\d+))?)?                       # .identifier
     \Z
   /ix
 
@@ -32,7 +32,9 @@ class Wow::Package::Version
   end
 
   def stage=(stage)
-    fail ArgumentError("Unknown stage '#{stage}'") unless Wow::Package::Version.stages.has_key? stage.to_sym
+    unless Wow::Package::Version.stages.key?(stage.to_sym)
+      fail ArgumentError("Unknown stage '#{stage}'")
+    end
     @stage = stage.to_sym
   end
 
@@ -53,56 +55,60 @@ class Wow::Package::Version
   end
 
   def self.coefficient_multiplier
-    {major: 1000, minor: 1000, patch: 1000, stage: 10, identifier: 100000}
+    {major: 1000, minor: 1000, patch: 1000, stage: 10, identifier: 100_000}
   end
 
   def self.coefficient
     result = {identifier: coefficient_multiplier[:identifier]}
-    result[:stage]=coefficient_multiplier[:stage]*result[:identifier]
-    result[:patch]=coefficient_multiplier[:patch]*result[:stage]
-    result[:minor]=coefficient_multiplier[:minor]*result[:patch]
-    result[:major]=coefficient_multiplier[:major]*result[:minor]
+    result[:stage] = coefficient_multiplier[:stage] * result[:identifier]
+    result[:patch] = coefficient_multiplier[:patch] * result[:stage]
+    result[:minor] = coefficient_multiplier[:minor] * result[:patch]
+    result[:major] = coefficient_multiplier[:major] * result[:minor]
     result
   end
 
 
   # Parse a version string.
   # @param str [String] version in the string format to parse
-  # @param allow_incomplete [Boolean] If true the version must have a valid format if false. Only the major and minor can be provided(Used for dependency matching)
+  # @param allow_incomplete [Boolean] If true the version must have a valid format if false.
+  # Only the major and minor can be provided(Used for dependency matching)
   # @return [Wow::Package::Version]
-  def self.parse(str, allow_incomplete=false)
-    result = str.strip.scan(Wow::Package::Version::VERSION_REGEX)
-    if result.empty? or (not allow_incomplete and result[0][2].nil?)
-      fail ArgumentError.new("Version string '#{str}' is in the wrong format check the documentation!")
+  def self.parse(str, allow_incomplete = false)
+    match = str.strip.match(Wow::Package::Version::VERSION_REGEX)
+    if !match || (!allow_incomplete && match[:patch].nil?)
+      fail ArgumentError, "Version string '#{str}' is in the wrong format check the documentation!"
     end
-    matches = result[0]
-    stage = if matches[3].nil?
-              :release
-            elsif Wow::Package::Version.stages.has_key? matches[3].to_sym
-              matches[3]
-            elsif Wow::Package::Version.stage_initial.has_value? matches[3]
-              Wow::Package::Version.stage_initial.key(matches[3])
-            else
-              :release
-            end
-    Wow::Package::Version.new(major: matches[0],
-                              minor: matches[1],
-                              patch: matches[2],
-                              stage: stage,
-                              identifier: matches[4])
+    new(major: match[:major],
+        minor: match[:minor],
+        patch: match[:patch],
+        stage: get_stage(match[:stage]),
+        identifier: match[:identifier])
 
   end
 
+  def self.get_stage(str)
+    if str.nil?
+      :release
+    elsif Wow::Package::Version.stages.key?(str.to_sym)
+      str.to_sym
+    elsif Wow::Package::Version.stage_initial.value?(str)
+      Wow::Package::Version.stage_initial.key(str)
+    else
+      :release
+    end
+  end
+
   # Return the version to string
-  # @param short [Boolean] If true the stage will use the initial instead of the full name(e.g. b for beta)
+  # @param short [Boolean] If true the stage will use the initial instead of the full name
   # @param hide_release [Boolean] If true the stage will not be included if it is release
   # ```
-  #   Version.new(major: 1, minor: 2, patch: 3).to_s # => '1.2.3'
-  #   Version.new(major: 1, minor: 2, patch: 3, stage: :beta).to_s # => '1.2.3-b'
-  #   Version.new(major: 1, minor: 2, patch: 3, identifier: 798).to_s # => '1.2.3.798'
-  #   Version.new(major: 1, minor: 2, patch: 3, stage: :beta).to_s(short: false) # => '1.2.3-beta'
-  #   Version.new(major: 1, minor: 2, patch: 3).to_s(include_release: true) # => '1.2.3-r'
-  #   Version.new(major: 1, minor: 2, patch: 3).to_s(short: false, include_release: true) # => '1.2.3-release'
+  # Version.new(major: 1, minor: 2, patch: 3).to_s # => '1.2.3'
+  # Version.new(major: 1, minor: 2, patch: 3, stage: :beta).to_s # => '1.2.3-b'
+  # Version.new(major: 1, minor: 2, patch: 3, identifier: 798).to_s # => '1.2.3.798'
+  # Version.new(major: 1, minor: 2, patch: 3, stage: :beta).to_s(short: false) # => '1.2.3-beta'
+  # Version.new(major: 1, minor: 2, patch: 3).to_s(include_release: true) # => '1.2.3-r'
+  # Version.new(major: 1, minor: 2, patch: 3).to_s(short: false, include_release: true)
+  # # => '1.2.3-release'
   # ```
   def to_s(short: true, hide_release: true)
     str = [major, minor, patch].join('.')

@@ -2,7 +2,6 @@ require 'wow'
 
 # Class to scan a wildcard in a pattern
 class Wow::WildcardScanner
-
   attr_accessor :root
   attr_accessor :wildcard
 
