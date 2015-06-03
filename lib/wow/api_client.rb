@@ -1,6 +1,7 @@
 require 'uri'
 require 'wow/exception'
 
+# Rest-Client overlay to connect to a wow api server.
 class Wow::ApiClient
   attr_accessor :sources
   attr_accessor :default_source
@@ -18,7 +19,7 @@ class Wow::ApiClient
   def current_source=(new_source)
     if @sources.key? new_source
       @current_source = @sources[new_source]
-    elsif new_source =~ URI::regexp
+    elsif new_source =~ URI.regexp
       @current_source = new_source
     else
       fail ArgumentError("The given source '#{new_source}' is neither a key in the existing defined sources nor a url!")
@@ -36,7 +37,7 @@ class Wow::ApiClient
       data = result.data
       @current_user = {id: data[:id], token: data[:authentication_token]}
     rescue RestClient::Unauthorized => e
-      fail Wow::Error.new(e.response.data[:error])
+      raise Wow::Error, e.response.data[:error]
     end
   end
 
