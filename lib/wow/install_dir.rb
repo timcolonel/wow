@@ -1,3 +1,5 @@
+require 'wow'
+
 # Helper class that provide path for the sub directory in the install location
 class Wow::InstallDir
   def initialize(root)
