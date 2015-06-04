@@ -5,14 +5,7 @@ require 'require_all'
 require 'wow/defaults'
 require 'core_ext'
 require 'clin'
-require 'wow/archive'
-require 'wow/config'
-require 'wow/package'
-require 'wow/package/platform'
-require 'wow/package/specification'
 require 'struct/tree'
-require 'wow/exception'
-require 'wow/source_list'
 # Wow Module contains all the wow classes and modules
 module Wow
   class << self
