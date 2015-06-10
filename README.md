@@ -1,6 +1,9 @@
 wow
 ===
-[![Build Status](https://travis-ci.org/timcolonel/wow.svg?branch=master)](https://travis-ci.org/timcolonel/wow)
+[![Build Status](https://img.shields.io/travis/timcolonel/wow/master.svg?style=flat-square)](https://travis-ci.org/timcolonel/wow)
+[![Code Climate](https://img.shields.io/codeclimate/coverage/github/timcolonel/wow.svg?style=flat-square)](https://codeclimate.com/github/timcolonel/wow/coverage)
+[![Test Coverage](https://img.shields.io/codeclimate/github/timcolonel/wow.svg?style=flat-square)](https://codeclimate.com/github/timcolonel/wow)
+[![Inline docs](http://inch-ci.org/github/timcolonel/wow.svg?branch=master&style=flat-square)](http://inch-ci.org/github/timcolonel/wow)
 
 Wow packer. Cross platform package manager
 
