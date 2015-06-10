@@ -1,4 +1,3 @@
-require 'highline/import'
 require 'rest-client'
 require 'wow/api_client'
 require 'wow/command'
@@ -14,7 +13,9 @@ class Wow::Command::Register < Wow::Command
 
     client = Wow::ApiClient.new
     client.sign_in
-    return unless agree("Are you sure you want to register this '#{config.name}' with this name? [yn]")
+    unless shell.yes?("Are you sure you want to register '#{config.name}'? [yn]")
+      return
+    end
     begin
       response = client.post 'api/v1/packages',
                              name: config.name,

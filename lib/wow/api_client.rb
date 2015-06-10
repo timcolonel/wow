@@ -10,7 +10,7 @@ class Wow::ApiClient
   attr_accessor :password
 
   def initialize
-    @sources = {local: 'http://localhost:3000'}
+    @sources = { local: 'http://localhost:3000' }
     @default_source = @sources[:local]
     @current_source = Wow::ApiClient::Config.remote || default_source
     @current_user = nil
@@ -30,15 +30,19 @@ class Wow::ApiClient
   def sign_in
     puts "Enter your '#{Wow::Config.remote}' credentials."
     puts "Don't have an account yet? Create one at #{Wow::Config.remote}/users/sign_up"
-    email = Wow::ApiClient::Config.username || ask("\tEmail: ")
-    password = Wow::ApiClient::Config.password || ask("\tPassword: ") { |q| q.echo = 'x' }
+    email = Wow::ApiClient::Config.username || shell.ask("\tEmail: ")
+    password = Wow::ApiClient::Config.password || shell.ask("\tPassword: ")
     begin
       result = post('users/sign_in', email: email, password: password)
       data = result.data
-      @current_user = {id: data[:id], token: data[:authentication_token]}
+      @current_user = { id: data[:id], token: data[:authentication_token] }
     rescue RestClient::Unauthorized => e
       raise Wow::Error, e.response.data[:error]
     end
+  end
+
+  def shell
+    @shell ||= Clin::Shell.new
   end
 
   # Get request to the specified path using the current_source as a root.
@@ -80,12 +84,12 @@ class Wow::ApiClient
     if @current_user.nil?
       {}
     else
-      {:'X-User-Id' => @current_user[:id], :'X-User-Token' => @current_user[:token]}
+      { :'X-User-Id' => @current_user[:id], :'X-User-Token' => @current_user[:token] }
     end
   end
 
   def internal_params
-    {content_type: :json, accept: :json}.merge(auth_headers)
+    { content_type: :json, accept: :json }.merge(auth_headers)
   end
 
   def url(path)

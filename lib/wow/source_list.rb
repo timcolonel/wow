@@ -108,7 +108,24 @@ class Wow::SourceList
     end
   end
 
+  # List all the package in the source list matching the condition
+  # @param package_name [String] Name of the package to install
+  # @param version_range [VersionRange] Version condition the package must match
+  # @param prerelease [Boolean] Allow prerelease
+  def list_packages(package_name, version_range = nil, prerelease: false)
+    found = []
+    sources.each do |source|
+      found += source.list_packages(package_name, version_range, prerelease: prerelease)
+    end
+    found
+  end
+
   # Search for package in all the source and get the latest version matching the query
+  # @param package_name [String] Name of the package to install
+  # @param version_range [VersionRange] Version condition the package must match
+  # @param prerelease [Boolean] Allow prerelease
+  # @param first_match [Boolean] If true only the first package found will be return,
+  #   if false the package with the highest version will be returned
   def find_package(package_name, version_range = nil, prerelease: false, first_match: true)
     found = []
     sources.each do |source|

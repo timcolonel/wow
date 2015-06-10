@@ -8,22 +8,6 @@ require_rel 'commands'
 class Wow::CommandParser < Wow::Command
   skip_options true
   arguments '<command> [<args>...]'
-  <<DOCOPT
-Wow
-
-Usage:
-    #{Wow.exe} <command> [<args>...]
-    #{Wow.exe} (-v | --version)
-    #{Wow.exe} (-h | --help)
-Options:
-  -h --help                 Show this screen.
-  -v --version              Show version
-  -s --source=<source>      Set the source for the package. Override the user config
-  --add-source=<source>     Add a source to the list of sources.
-  -u --username=<username>  Username for remote
-  -p --password=<password>  Password for remote
-  --prerelease              Authorize to install prerelease
-DOCOPT
 
   cattr_accessor :actions
   cattr_accessor :aliases
@@ -46,12 +30,17 @@ DOCOPT
   def initialize(params)
     super(params)
     @command = params[:command]
-    @args = [@command]
+    @args = []
+    @args << @command unless @command.nil?
     @args += params[:args] unless params[:args].nil?
     @args += params[:skipped_options]
   end
 
   def run
+    if %w(-v --version).include? @command
+      puts "Version: #{Wow::VERSION}"
+      exit
+    end
     cls = command_cls
     cls.parse(@args).run
   end

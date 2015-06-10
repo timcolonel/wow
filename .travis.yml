@@ -11,3 +11,7 @@ matrix:
 
 notifications:
   email: false
+
+addons:
+  code_climate:
+    repo_key: 138fb1975b1869c4bb92f1bcc1c6c5f13668fb47e162e8e04674756185a2b92a

@@ -2,10 +2,10 @@ require 'active_support'
 require 'active_support/core_ext'
 require 'active_model'
 require 'require_all'
-require 'wow/defaults'
 require 'core_ext'
 require 'clin'
 require 'struct/tree'
+
 # Wow Module contains all the wow classes and modules
 module Wow
   class << self
