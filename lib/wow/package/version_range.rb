@@ -13,23 +13,34 @@ class Wow::Package::VersionRange
   TILT_REGEX = /\A~> (.*)\Z/x
 
 
-  def initialize(lower_bound:, upper_bound: nil)
-    @lower_bound = lower_bound
-    @upper_bound = upper_bound
+  # Create a new VersionRange
+  #
+  def initialize(value = nil, lower_bound: nil, upper_bound: nil)
+    if value.nil?
+      @lower_bound = lower_bound || Wow::Package::Version.zero
+      @upper_bound = upper_bound
+    elsif value.is_a? Wow::Package::Version
+      @lower_bound = value
+      @upper_bound = value
+    else
+      @lower_bound = Wow::Package::Version.zero
+      parse(value)
+    end
+  end
+
+  def self.parse(str)
+    new(str)
   end
 
   # Parse a version range
   # @param str [String]
   # @return [Wow::Package::VersionRange]
-  def self.parse(str)
+  def parse(str)
     parts = str.split(',')
-    current_range = nil
     parts.each do |part|
-      range = parse_part(part)
-      current_range = current_range.nil? ? range : current_range.merge(range)
+      range = self.class.parse_part(part)
+      merge!(range)
     end
-
-    current_range
   end
 
   def self.parse_part(part)

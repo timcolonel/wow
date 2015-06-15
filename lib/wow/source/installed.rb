@@ -8,7 +8,8 @@ class Wow::Source::Installed < Wow::Source::Local
     @dir = Wow::InstallDir.new(source)
   end
 
-  # @see Wow::Source::Local#load_packages
+  # Used in all Wow::Source::Local methods
+  # @see Wow::Source::Local#glob_packages
   def glob_packages
     packages = {}
     Dir.chdir @dir.lib do

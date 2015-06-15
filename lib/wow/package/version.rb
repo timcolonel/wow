@@ -47,19 +47,19 @@ class Wow::Package::Version
   end
 
   def self.stages
-    {alpha: 0, beta: 1, release_candidate: 2, release: 3}
+    { alpha: 0, beta: 1, release_candidate: 2, release: 3 }
   end
 
   def self.stage_initial
-    {alpha: 'a', beta: 'b', release_candidate: 'rc', release: 'r'}
+    { alpha: 'a', beta: 'b', release_candidate: 'rc', release: 'r' }
   end
 
   def self.coefficient_multiplier
-    {major: 1000, minor: 1000, patch: 1000, stage: 10, identifier: 100_000}
+    { major: 1000, minor: 1000, patch: 1000, stage: 10, identifier: 100_000 }
   end
 
   def self.coefficient
-    result = {identifier: coefficient_multiplier[:identifier]}
+    result = { identifier: coefficient_multiplier[:identifier] }
     result[:stage] = coefficient_multiplier[:stage] * result[:identifier]
     result[:patch] = coefficient_multiplier[:patch] * result[:stage]
     result[:minor] = coefficient_multiplier[:minor] * result[:patch]
@@ -166,6 +166,10 @@ class Wow::Package::Version
 
   def hash
     to_a.hash
+  end
+
+  def self.zero
+    new(major: 0, minor: 0, patch: 0)
   end
 
   private def unique_value(attribute, value)

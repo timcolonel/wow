@@ -62,8 +62,7 @@ class Wow::Source::Local < Wow::Source
   # @see Wow::Source#find_package
   def list_packages(package_name, version_range = nil, prerelease: false)
     found = []
-    version_range ||= Wow::Package::VersionRange.any
-    version_range = Wow::Package::VersionRange.parse(version_range) if version_range.is_a? String
+    version_range = Wow::Package::VersionRange.parse(version_range)
     glob_packages.each do |n, pkg|
       next if n.name != package_name
       s = pkg.spec
@@ -75,33 +74,14 @@ class Wow::Source::Local < Wow::Source
     found
   end
 
-  # @see Wow::Source#find_package
-  def find_package(package_name, version_range = nil, prerelease: false)
-    packages = list_packages(package_name, version_range, prerelease: prerelease)
-    packages.max_by { |pkg| pkg.spec.version }
-  end
-
-  # @see Wow::Source#fetch_spec
-  def fetch_spec(name)
-    load_packages :complete
-    if (data = @specs[name])
-      data.spec
-    else
-      fail Wow::Error, "Unable to find spec for #{name.inspect}"
-    end
-  end
-
   # @see Wow::Source#download
   def download(spec, _cache_dir = nil)
-    load_packages :complete
-
-    @specs.each do |_, pkg|
+    glob_packages.each do |_, pkg|
       return pkg.path if pkg.spec == spec
     end
 
     fail Gem::Exception, "Unable to find file for '#{spec.full_name}'"
   end
-
 
   # Scan all the packages in the directory
   # @return [Hash<Wow::Package::NameTuple, Wow::Package>]

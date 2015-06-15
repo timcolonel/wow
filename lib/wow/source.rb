@@ -7,20 +7,23 @@ class Wow::Source
     @source = source
   end
 
-  # Load a list of specs in the source
+  # List all the packages matching the query
   def list_packages(_package_name, _version_range = nil, prerelease: false)
     fail NotImplementedError
   end
 
-  # Load a list of specs in the source
-  def find_package(_package_name, _version_range = nil, prerelease: false)
-    fail NotImplementedError
+  # Find the best package matching the query
+  # By default it will use #list_packages and iterate through it.
+  def find_package(package_name, version_range = nil, prerelease: false)
+    packages = list_packages(package_name, version_range, prerelease: prerelease)
+    packages.max_by { |pkg| pkg.spec.version }
   end
 
-  def fetch_spec(_name)
-    fail NotImplementedError
-  end
-
+  # Get the source depending on what +source+ is.
+  # * If source is a file then use SpecificFile
+  # * If source is a folder then use Local
+  # * If source is a url then use Remote
+  # * Otherwise unsupported
   def self.for(source)
     if File.file?(source)
       Wow::Source::SpecificFile.new(source)

@@ -26,7 +26,7 @@ RSpec.describe Wow::PackageResolver do
     context 'when package is not installed' do
       before do
         @pkg_a.source = @local_source
-        allow(@local_source).to receive(:load_packages).and_return({@pkg_a.spec.name_tuple => @pkg_a})
+        allow(@local_source).to receive(:glob_packages).and_return({@pkg_a.spec.name_tuple => @pkg_a})
       end
       context 'when installing ' do
         subject { Wow::PackageResolver.new(:install) }
@@ -47,8 +47,8 @@ RSpec.describe Wow::PackageResolver do
       before do
         @pkg_a.source = @installed_source
         @pkg_a2.source = @local_source
-        allow(@installed_source).to receive(:load_packages).and_return({@pkg_a.spec.name_tuple => @pkg_a})
-        allow(@local_source).to receive(:load_packages).and_return({@pkg_a2.spec.name_tuple => @pkg_a2})
+        allow(@installed_source).to receive(:glob_packages).and_return({@pkg_a.spec.name_tuple => @pkg_a})
+        allow(@local_source).to receive(:glob_packages).and_return({@pkg_a2.spec.name_tuple => @pkg_a2})
       end
 
       context 'when installing ' do
@@ -73,8 +73,8 @@ RSpec.describe Wow::PackageResolver do
 
         @pkg_a.source = @local_source
         @pkg_a2.source = @local_source2
-        allow(@installed_source).to receive(:load_packages).and_return({@pkg_a.spec.name_tuple => @pkg_a})
-        allow(@local_source).to receive(:load_packages).and_return({@pkg_a2.spec.name_tuple => @pkg_a2})
+        allow(@installed_source).to receive(:glob_packages).and_return({@pkg_a.spec.name_tuple => @pkg_a})
+        allow(@local_source).to receive(:glob_packages).and_return({@pkg_a2.spec.name_tuple => @pkg_a2})
       end
 
       subject { Wow::PackageResolver.new(:install) }

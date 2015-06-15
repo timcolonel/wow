@@ -12,23 +12,40 @@ RSpec.describe Wow::Source::Local do
     @pkg_b = tmp_package 'b', '1.0.0', destination: @folder.to_s
   end
 
-  describe '#list_packages' do
+  describe '#load_packages' do
     it 'load specs of release' do
-      expect(subject.list_packages(:released).sort).to eq([@pkg_a.spec.name_tuple,
+      expect(subject.load_packages(:released).sort).to eq([@pkg_a.spec.name_tuple,
                                                            @pkg_a2.spec.name_tuple,
                                                            @pkg_b.spec.name_tuple].sort)
     end
 
     it 'load specs of prerelease' do
-      expect(subject.list_packages(:prerelease)).to eq([@pkg_ap.spec.name_tuple])
+      expect(subject.load_packages(:prerelease)).to eq([@pkg_ap.spec.name_tuple])
     end
     it 'get only the latest release version' do
-      expect(subject.list_packages(:latest_release).sort).to eq([@pkg_a2.spec.name_tuple,
+      expect(subject.load_packages(:latest_release).sort).to eq([@pkg_a2.spec.name_tuple,
                                                                  @pkg_b.spec.name_tuple].sort)
     end
     it 'get only the latest version' do
-      expect(subject.list_packages(:latest).sort).to eq([@pkg_ap.spec.name_tuple,
+      expect(subject.load_packages(:latest).sort).to eq([@pkg_ap.spec.name_tuple,
                                                          @pkg_b.spec.name_tuple].sort)
+    end
+  end
+
+  describe '#list_packages' do
+    it 'get only package with the given name and not prerelease' do
+      expect(subject.list_packages('a').map(&:name_tuple).sort)
+        .to eq([@pkg_a, @pkg_a2].map(&:name_tuple).sort)
+    end
+
+    it 'get only package with the given name and prerelease' do
+      expect(subject.list_packages('a', prerelease: true).map(&:name_tuple).sort)
+        .to eq([@pkg_a, @pkg_a2, @pkg_ap].map(&:name_tuple).sort)
+    end
+
+    it 'get only package with the given name and matching range' do
+      expect(subject.list_packages('a', '>= 2.0', prerelease: true).map(&:name_tuple).sort)
+        .to eq([@pkg_a2, @pkg_ap].map(&:name_tuple).sort)
     end
   end
 
@@ -52,13 +69,6 @@ RSpec.describe Wow::Source::Local do
       let(:spec) { package.spec }
       it { expect(spec.name).to eq('a') }
       it { expect(spec.version.to_s).to eq('2.1.0.a') }
-    end
-  end
-
-  describe '#fetch_spec' do
-    it 'fetch spec' do
-      s = subject.fetch_spec @pkg_a.spec.name_tuple
-      expect(s).to eq(@pkg_a.spec)
     end
   end
 
