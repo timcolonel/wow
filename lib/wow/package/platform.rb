@@ -46,12 +46,19 @@ class Wow::Package::Platform
   end
 
   def to_hash
-    {platform: @platform.to_s, architecture: @architecture.to_s}
+    { platform: @platform.to_s, architecture: @architecture.to_s }
   end
 
   def ==(other)
-    self.to_a == other.to_a
+    if other.is_a? Symbol
+      @architecture == :any && @platform == other
+    elsif other.is_a? Wow::Package::Platform
+      self.to_a == other.to_a
+    else
+      false
+    end
   end
+
 
   def to_a
     [@platform, @architecture]

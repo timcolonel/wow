@@ -9,7 +9,7 @@ class Wow::Source::Installed < Wow::Source::Local
   end
 
   # @see Wow::Source::Local#load_packages
-  def load_packages
+  def glob_packages
     packages = {}
     Dir.chdir @dir.lib do
       Dir.glob('*').each do |folder|

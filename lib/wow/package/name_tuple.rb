@@ -69,14 +69,14 @@ class Wow::Package::NameTuple
 
   def ==(other)
     case other
-      when self.class
-        @name == other.name &&
-          @version == other.version &&
-          @target == other.target
-      when Array
-        to_a == other
-      else
-        false
+    when self.class
+      @name == other.name &&
+        @version == other.version &&
+        @target == other.target
+    when Array
+      to_a == other
+    else
+      false
     end
   end
 
@@ -90,4 +90,7 @@ class Wow::Package::NameTuple
     to_a.hash
   end
 
+  def to_s
+    to_a.compact.reject { |x| x == :any }.join('-')
+  end
 end

@@ -6,7 +6,7 @@ require 'wow'
 # * Delete the installation folder
 # * Removed any linked executable
 # * Removed any linked include header
-class Wow::UnInstaller
+class Wow::Uninstaller
   # Create a new uninstaller
   # @param package [Wow::Package]
   # @param directory [Wow::InstallDir|String] It create the Wow::InstallDir if directory is a String
@@ -22,7 +22,7 @@ class Wow::UnInstaller
   end
 
   def remove_folder
-    File.rm_rf lib_folder
+    FileUtils.rm_rf lib_folder
   end
 
   # Path to the package folder

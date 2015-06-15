@@ -18,29 +18,11 @@ class Wow::Source::Local < Wow::Source
     end
   end
 
-  # Method that load the packages in the local directory
-  # @return [Hash<Wow::Package::NameTuple, Wow::Package>]
-  def load_packages
-    packages = {}
-    Dir.chdir @source do
-      Dir['*.wow'].each do |file|
-        begin
-          pkg = Wow::Package.new(File.expand_path(file), self)
-          tuple = pkg.spec.name_tuple
-          packages[tuple] = pkg
-        rescue SystemCallError
-          puts "Error while reading #{file}"
-        end
-      end
-    end
-    packages
-  end
-
   # List the packages matching the filter
-  def list_packages(filter)
+  def load_packages(filter = :complete)
     names = []
 
-    @specs = load_packages
+    @specs = glob_packages
     @specs.each do |tup, pkg|
       case filter
       when :released
@@ -78,11 +60,11 @@ class Wow::Source::Local < Wow::Source
   end
 
   # @see Wow::Source#find_package
-  def find_package(package_name, version_range = nil, prerelease: false)
+  def list_packages(package_name, version_range = nil, prerelease: false)
     found = []
     version_range ||= Wow::Package::VersionRange.any
     version_range = Wow::Package::VersionRange.parse(version_range) if version_range.is_a? String
-    load_packages.each do |n, pkg|
+    glob_packages.each do |n, pkg|
       next if n.name != package_name
       s = pkg.spec
 
@@ -90,13 +72,18 @@ class Wow::Source::Local < Wow::Source
         found << pkg
       end
     end
+    found
+  end
 
-    found.max_by { |pkg| pkg.spec.version }
+  # @see Wow::Source#find_package
+  def find_package(package_name, version_range = nil, prerelease: false)
+    packages = list_packages(package_name, version_range, prerelease: prerelease)
+    packages.max_by { |pkg| pkg.spec.version }
   end
 
   # @see Wow::Source#fetch_spec
   def fetch_spec(name)
-    list_packages :complete
+    load_packages :complete
     if (data = @specs[name])
       data.spec
     else
@@ -106,12 +93,31 @@ class Wow::Source::Local < Wow::Source
 
   # @see Wow::Source#download
   def download(spec, _cache_dir = nil)
-    list_packages :complete
+    load_packages :complete
 
     @specs.each do |_, pkg|
       return pkg.path if pkg.spec == spec
     end
 
     fail Gem::Exception, "Unable to find file for '#{spec.full_name}'"
+  end
+
+
+  # Scan all the packages in the directory
+  # @return [Hash<Wow::Package::NameTuple, Wow::Package>]
+  def glob_packages
+    packages = {}
+    Dir.chdir @source do
+      Dir['*.wow'].each do |file|
+        begin
+          pkg = Wow::Package.new(File.expand_path(file), self)
+          tuple = pkg.spec.name_tuple
+          packages[tuple] = pkg
+        rescue SystemCallError
+          puts "Error while reading #{file}"
+        end
+      end
+    end
+    packages
   end
 end

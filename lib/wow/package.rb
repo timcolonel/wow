@@ -27,4 +27,12 @@ class Wow::Package
   def archive?
     @is_archive
   end
+
+  def name_tuple
+    spec.name_tuple
+  end
+  
+  def to_s
+    name_tuple.to_s
+  end
 end

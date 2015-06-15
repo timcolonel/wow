@@ -31,7 +31,7 @@ class Wow::ApiClient
     puts "Enter your '#{Wow::Config.remote}' credentials."
     puts "Don't have an account yet? Create one at #{Wow::Config.remote}/users/sign_up"
     email = Wow::ApiClient::Config.username || shell.ask("\tEmail: ")
-    password = Wow::ApiClient::Config.password || shell.ask("\tPassword: ")
+    password = Wow::ApiClient::Config.password || shell.password("\tPassword: ")
     begin
       result = post('users/sign_in', email: email, password: password)
       data = result.data
