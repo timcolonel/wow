@@ -6,16 +6,18 @@ class Wow::SourceList
   include Enumerable
 
   attr_accessor :sources
+
   # Creates a new SourceList
-  def initialize
+  def initialize(sources = [])
     @sources = []
+    sources.each do |source|
+      self << source
+    end
   end
 
   # Creates a new SourceList from an array of sources.
   def self.from(ary)
-    list = new
-    list.replace ary
-    list
+    new(ary)
   end
 
   def initialize_copy(other)
@@ -27,26 +29,16 @@ class Wow::SourceList
   # The correct source type will be deduced if source is a String
   # @return [Wow::Source]
   def <<(source)
-    src = case source
-          when Wow::Source
-            source
-          else
-            Wow::Source.for(source)
-          end
-
-    @sources << src
-    src
+    source = Wow::Source.for(source) unless source.is_a? Wow::Source
+    @sources << source
+    source
   end
 
   # Replaces this SourceList with the sources in +other+
   # The sources are cleared then added back with #<<.
   def replace(other)
-    clear
-
-    other.each do |x|
-      self << x
-    end
-
+    other = Wow::SourceList.new(other) if other.is_a? Array
+    @sources.replace(other.sources)
     self
   end
 
@@ -80,7 +72,7 @@ class Wow::SourceList
   # Returns true if this source list includes +other+ which may be a
   # Wow::Source or a source URI.
   def include?(other)
-    if other.is_a? Gem::Source
+    if other.is_a? Wow::Source
       @sources.include? other
     else
       @sources.find { |x| x.source.to_s == other.to_s }
@@ -89,22 +81,10 @@ class Wow::SourceList
 
   # Remove given +source+ from list
   def delete(source)
-    if source.is_a? Gem::Source
+    if source.is_a? Wow::Source
       @sources.delete source
     else
       @sources.delete_if { |x| x.source.to_s == source.to_s }
-    end
-  end
-
-  # Iterate though all the sources to get the specs
-  # @throw [Wow::Error] If none of the sources contains the package with given name tuple.
-  def fetch_spec(name_tuple)
-    sources.each_with_index do |source, i|
-      begin
-        return source.fetch_spec(name_tuple)
-      rescue Wow::Error => e
-        raise e if i == sources.size
-      end
     end
   end
 
@@ -112,6 +92,7 @@ class Wow::SourceList
   # @param package_name [String] Name of the package to install
   # @param version_range [VersionRange] Version condition the package must match
   # @param prerelease [Boolean] Allow prerelease
+  # @return [Array<Package>]
   def list_packages(package_name, version_range = nil, prerelease: false)
     found = []
     sources.each do |source|
@@ -126,6 +107,7 @@ class Wow::SourceList
   # @param prerelease [Boolean] Allow prerelease
   # @param first_match [Boolean] If true only the first package found will be return,
   #   if false the package with the highest version will be returned
+  # @return [Package]
   def find_package(package_name, version_range = nil, prerelease: false, first_match: true)
     found = []
     sources.each do |source|
