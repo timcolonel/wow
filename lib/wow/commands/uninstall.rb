@@ -1,7 +1,6 @@
 require 'wow/package/specification'
 require 'wow/package_resolver'
 require 'wow/command'
-require 'wow/command_option'
 
 # Install command
 class Wow::Command::Uninstall < Wow::Command

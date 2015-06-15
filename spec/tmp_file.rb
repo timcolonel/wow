@@ -26,7 +26,7 @@ module Tmp
       FileUtils.mkdir_p(@fullpath)
     end
 
-    def sub_folder(name=nil)
+    def sub_folder(name = nil)
       Tmp::Folder.new(name, self)
     end
 
@@ -34,11 +34,19 @@ module Tmp
       File.join(@fullpath, path)
     end
 
-    def file(filename=nil)
+    def file(filename = nil)
       if filename.nil?
         filename = "#{SecureRandom.uuid}.tmp"
       end
       path(filename)
+    end
+
+    def new_file(filename = nil)
+      filename = file(filename)
+      File.open(filename, 'w') do |f|
+        f.write "#{filename}: #{Random.rand}"
+      end
+      filename
     end
 
     def random(prefix: nil, extension: 'tmp')
