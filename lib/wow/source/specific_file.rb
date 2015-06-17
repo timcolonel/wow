@@ -12,7 +12,7 @@ class Wow::Source::SpecificFile < Wow::Source
   end
 
   # @see Wow::Source#load_spec
-  def list_packages(*args) # :nodoc:
+  def list_packages(*) # :nodoc:
     [@package.spec.name_tuple]
   end
 

@@ -1,6 +1,6 @@
 require 'yaml'
 
-class Wow::Package::Platform
+class Wow::Package::Target
   attr_accessor :platform
   attr_accessor :architecture
 
@@ -14,15 +14,15 @@ class Wow::Package::Platform
   # platform.is?(other) => Boolean
   # Return true is the given platform is a parent or equals to this
   # i.e Self is a subset of the given platform.
-  # @param platform [Wow::Package::Platform] Other platform object to test
+  # @param platform [Wow::Package::Target] Other platform object to test
   # @return [Boolean]
   # e.g.
   #   win32.is?(windows)    => true
   #   windows.is?(win32)    => false
   #   windows.is?(windows)  => true
   def is?(platform)
-    fail ArgumentError unless platform.is_a? Wow::Package::Platform
-    Wow::Package::Platform.based_on?(platform, self)
+    return false unless platform.is_a? Wow::Package::Target
+    Wow::Package::Target.based_on?(platform, self)
   end
 
   # This this the opposite of is?. Return true if the given platform is a child or equals to this.
@@ -35,14 +35,18 @@ class Wow::Package::Platform
   #   windows.include?(windows) => true
   #
   def include?(platform)
-    fail ArgumentError unless platform.is_a? Wow::Package::Platform
-    Wow::Package::Platform.based_on?(self, platform)
+    fail ArgumentError unless platform.is_a? Wow::Package::Target
+    Wow::Package::Target.based_on?(self, platform)
   end
 
   def to_s
     str = @platform.to_s
     str << "-#{@architecture}" if @architecture != :any
     str
+  end
+
+  def as_json
+    { platform: @platform.to_s, architecture: @architecture.to_s }
   end
 
   def to_hash
@@ -52,7 +56,7 @@ class Wow::Package::Platform
   def ==(other)
     if other.is_a? Symbol
       @architecture == :any && @platform == other
-    elsif other.is_a? Wow::Package::Platform
+    elsif other.is_a? Wow::Package::Target
       self.to_a == other.to_a
     else
       false
@@ -90,8 +94,8 @@ class Wow::Package::Platform
     end
 
     # Test to see if the child is based on the parent in the platform hierarchy
-    # @param parent [Symbol|Wow::Package::Platform] Parent to test against
-    # @param child [Symbol|Wow::Package::Platform] Child to test against
+    # @param parent [Symbol|Wow::Package::Target] Parent to test against
+    # @param child [Symbol|Wow::Package::Target] Child to test against
     # If parent or child are symbol the architecture will be default to `:any`
     # @return [Boolean]
     #
@@ -104,33 +108,33 @@ class Wow::Package::Platform
     # ```
     #
     def based_on?(parent, child)
-      parent = Wow::Package::Platform.new(parent) if parent.is_a? Symbol
-      child = Wow::Package::Platform.new(child) if child.is_a? Symbol
+      parent = Wow::Package::Target.new(parent) if parent.is_a? Symbol
+      child = Wow::Package::Target.new(child) if child.is_a? Symbol
       platform_based_on?(parent, child) and architecture_base_on?(parent, child)
     end
 
     def platform_based_on?(parent, child)
-      parent = parent.platform if parent.is_a? Wow::Package::Platform
-      child = child.platform if child.is_a? Wow::Package::Platform
+      parent = parent.platform if parent.is_a? Wow::Package::Target
+      child = child.platform if child.is_a? Wow::Package::Target
 
-      parent_tree = Wow::Package::Platform.platforms.find(parent)
+      parent_tree = Wow::Package::Target.platforms.find(parent)
       return false if parent_tree.nil?
       child_tree = parent_tree.find(child)
       !child_tree.nil?
     end
 
     def architecture_base_on?(parent, child)
-      parent = parent.architecture if parent.is_a? Wow::Package::Platform
-      child = child.architecture if child.is_a? Wow::Package::Platform
+      parent = parent.architecture if parent.is_a? Wow::Package::Target
+      child = child.architecture if child.is_a? Wow::Package::Target
 
-      parent_tree = Wow::Package::Platform.architectures.find(parent)
+      parent_tree = Wow::Package::Target.architectures.find(parent)
       return false if parent_tree.nil?
       child_tree = parent_tree.find(child)
       !child_tree.nil?
     end
 
     def from_hash(hash)
-      Wow::Package::Platform.new(hash[:platform].to_sym, hash[:architecture].to_sym)
+      Wow::Package::Target.new(hash[:platform].to_sym, hash[:architecture].to_sym)
     end
   end
 

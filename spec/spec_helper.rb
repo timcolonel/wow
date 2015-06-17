@@ -7,6 +7,7 @@ require 'rspec'
 require 'active_support'
 require 'yaml'
 require 'wow'
+require 'wow/package'
 require 'tmp_file'
 require 'renderer'
 
@@ -60,7 +61,7 @@ module Macros
       # Cleanup
       Wow::Config.send(:remove_const, :ASSET_FOLDER)
       Wow::Config.const_set(:ASSET_FOLDER, asset_folder)
-      Wow::Package::Platform.load
+      Wow::Package::Target.load
       @asset_folder = nil
     end
   end

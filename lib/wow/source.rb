@@ -25,7 +25,7 @@ class Wow::Source
   end
 
   # List all the packages matching the query
-  def list_packages(_package_name, _version_range = nil, prerelease: false)
+  def list_packages(_package_name, _version_range = nil, _prerelease: false)
     fail NotImplementedError
   end
 

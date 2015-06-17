@@ -13,7 +13,7 @@ authors = ['Your Name <you@example.com>']
 tags = ['Some', 'Tag']
 
 #Short description
-short_description = '[Short Description]'
+summary = '[Short Description]'
 
 # Detailed description of the package(Can be a filename that will be loaded)
 description = '[Description]'

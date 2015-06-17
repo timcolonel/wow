@@ -34,6 +34,10 @@ class Wow::Package::Dependency
 
   alias_method :eql?, :==
 
+  def as_json
+    {name: @name, version_range: @version_range.to_s}
+  end
+
   def to_hash
     {name: @name, version_range: @version_range.to_s}
   end

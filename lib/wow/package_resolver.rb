@@ -1,3 +1,11 @@
+require 'wow'
+
+# Use the available sources to find or list packages.
+# It can be used in 2 mode:
+# * install: It will not look for the package in the sources if it's already installed
+#   but return the installed package directly
+# * update: Event if the package is already installed it will look
+#   for a newer version in all the sources
 class Wow::PackageResolver
   METHODS = [:install, :update]
 
@@ -19,7 +27,8 @@ class Wow::PackageResolver
   # If in update mode it will get the package with the highest version.
   # If source version is the same as the installed package it will return the installed package.
   def get_package(name, version_range = nil, prerelease: nil)
-    installed_package = self.class.find_installed_package(name, version_range, prerelease: prerelease)
+    installed_package = self.class.find_installed_package(name, version_range,
+                                                          prerelease: prerelease)
     if installing? && installed_package
       installed_package
     else
@@ -32,10 +41,14 @@ class Wow::PackageResolver
     end
   end
 
+  # Is the resolver in install mode
+  # @return [Boolean]
   def installing?
     @method == :install
   end
 
+  # Is the resolver in update mode
+  # @return [Boolean]
   def updating?
     @method == :update
   end

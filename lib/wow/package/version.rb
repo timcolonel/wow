@@ -83,7 +83,17 @@ class Wow::Package::Version
         patch: match[:patch],
         stage: get_stage(match[:stage]),
         identifier: match[:identifier])
+  end
 
+  def self.from_json(value)
+    return nil if value.nil?
+    if value.is_a? Hash
+      Wow::Package::Version.new(**value)
+    elsif value.is_a? Wow::Package::Version
+      value
+    else
+      parse(value)
+    end
   end
 
   def self.get_stage(str)
@@ -98,6 +108,9 @@ class Wow::Package::Version
     end
   end
 
+  def as_json
+    to_s
+  end
   # Return the version to string
   # @param short [Boolean] If true the stage will use the initial instead of the full name
   # @param hide_release [Boolean] If true the stage will not be included if it is release

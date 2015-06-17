@@ -20,35 +20,29 @@ class Wow::Package::VersionRange
     end
   end
 
-  register_pattern :more_equal, /\A>= (.*)\Z/x do |match|
-    value = Wow::Package::Version.parse(match[1], true)
-    Wow::Package::VersionRange.new(lower_bound: value, include: { lower_bound: true })
+  register_pattern :more_equal, /\A>= (.*)\Z/x do |version|
+    Wow::Package::VersionRange.new(lower_bound: version, include: {lower_bound: true})
   end
 
-  register_pattern :more, /\A> (.*)\Z/x do |match|
-    value = Wow::Package::Version.parse(match[1], true)
-    Wow::Package::VersionRange.new(lower_bound: value, include: { lower_bound: false })
+  register_pattern :more, /\A> (.*)\Z/x do |version|
+    Wow::Package::VersionRange.new(lower_bound: version, include: {lower_bound: false})
   end
 
-  register_pattern :less_equal, /\A<= (.*)\Z/x do |match|
-    value = Wow::Package::Version.parse(match[1], true)
-    Wow::Package::VersionRange.new(upper_bound: value, include: { upper_bound: true })
+  register_pattern :less_equal, /\A<= (.*)\Z/x do |version|
+    Wow::Package::VersionRange.new(upper_bound: version, include: {upper_bound: true})
   end
 
-  register_pattern :less, /\A< (.*)\Z/x do |match|
-    value = Wow::Package::Version.parse(match[1], true)
-    Wow::Package::VersionRange.new(upper_bound: value, include: { upper_bound: false })
+  register_pattern :less, /\A< (.*)\Z/x do |version|
+    Wow::Package::VersionRange.new(upper_bound: version, include: {upper_bound: false})
   end
 
-  register_pattern :tilt, /\A~> (.*)\Z/x do |match|
-    version = Wow::Package::Version.parse(match[1], true)
+  register_pattern :tilt, /\A~> (.*)\Z/x do |version|
     Wow::Package::VersionRange.new(lower_bound: version, upper_bound: version.get_upper_bound)
   end
 
   # Need to be last as it's the more general value(The equal operator is optional)
-  register_pattern :equal, /\A=? (.*)\Z/x do |match|
-    value = Wow::Package::Version.parse(match[1], true)
-    Wow::Package::VersionRange.new(value)
+  register_pattern :equal, /\A=? (.*)\Z/x do |version|
+    Wow::Package::VersionRange.new(version)
   end
 
   # Create a new VersionRange
@@ -71,8 +65,7 @@ class Wow::Package::VersionRange
       @lower_bound = lower_bound || Wow::Package::Version.zero
       @upper_bound = upper_bound
     elsif value.is_a? Wow::Package::Version
-      @lower_bound = value
-      @upper_bound = value
+      @lower_bound = @upper_bound = value
     else
       @lower_bound = Wow::Package::Version.zero
       parse(value)
@@ -80,7 +73,7 @@ class Wow::Package::VersionRange
   end
 
   def default_include
-    { lower_bound: true, upper_bound: false }
+    {lower_bound: true, upper_bound: false}
   end
 
   def include_lower_bound?
@@ -109,7 +102,8 @@ class Wow::Package::VersionRange
   def self.parse_part(part)
     @patterns.each do |_name, regex, block|
       next unless regex =~ part.squeeze(' ').strip
-      return block.call(Regexp.last_match)
+      value = Wow::Package::Version.parse(Regexp.last_match[1], true)
+      return block.call(value)
     end
   end
 
@@ -129,7 +123,6 @@ class Wow::Package::VersionRange
     end
     self
   end
-
 
   def merge(other)
     clone.merge!(other)
@@ -181,5 +174,4 @@ class Wow::Package::VersionRange
     return false if @upper_bound.nil?
     @lower_bound > @upper_bound
   end
-
 end

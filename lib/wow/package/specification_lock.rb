@@ -1,24 +1,22 @@
 require 'wow/package/name_tuple'
-require 'wow/package/platform'
+require 'wow/package/target'
 require 'toml'
 
 # Specification lock.
 class Wow::Package::SpecificationLock
+  include Wow::Package::SpecAttributes
 
-  attr_accessor :target, :files, :executables, :dependencies,
-                :name, :version, :authors, :tags, :homepage, :description, :short_description
+  attr_accessor :files, :executables, :target
 
   def initialize(platform, architecture = nil)
-    @target = if platform.nil? || !platform.is_a?(Wow::Package::Platform)
-                Wow::Package::Platform.new(platform, architecture)
+    initialize_attributes
+    @target = if platform.nil? || !platform.is_a?(Wow::Package::Target)
+                Wow::Package::Target.new(platform, architecture)
               else
                 platform
               end
-    @files = Set.new
-    @executables = Set.new
-    @tags = Set.new
-    @authors = Set.new
-    @dependencies = Wow::Package::DependencySet.new
+    @files = []
+    @executables = []
   end
 
   # @param [Wow::Package::Specification]
@@ -27,7 +25,7 @@ class Wow::Package::SpecificationLock
     @version ||= specification.version
     @homepage ||= specification.homepage
     @description ||= specification.description
-    @short_description ||= specification.short_description
+    @summary ||= specification.summary
 
     @tags += specification.tags
     @authors += specification.authors
@@ -38,18 +36,16 @@ class Wow::Package::SpecificationLock
     @dependencies += specification.dependencies
   end
 
+  def as_json
+    out = {}
+    to_hash.each { |k, v| out[k] = v.as_json }
+    out
+  end
+
   def to_hash
-    {name: @name.to_s,
-     target: @target.to_hash,
-     version: @version.to_s,
-     authors: @authors.to_a,
-     tags: @tags.to_a,
-     homepage: @homepage.to_s,
-     description: @description,
-     short_description: @short_description,
-     files: @files.to_a,
-     executables: @executables.to_a,
-     dependencies: @dependencies.to_hash}
+    attributes_hash.merge(target: @target,
+                          files: @files,
+                          executables: @executables)
   end
 
   def filename
@@ -65,27 +61,26 @@ class Wow::Package::SpecificationLock
 
   def save
     File.open filename, 'w' do |f|
-      f.write(TOML.dump(to_hash))
+      f.write(as_json.to_json)
     end
   end
 
+  # Load the specification lock from a file.
+  # @param filename [String]
   def self.load(filename)
-    Wow::Package::SpecificationLock.load_toml(File.read(filename))
+    self.load_json(File.read(filename))
   end
 
-  def self.load_toml(toml)
-    Wow::Package::SpecificationLock.from_hash(TOML.parse(toml).deep_symbolize_keys)
+  # Parse the given json content
+  # @param json [String]
+  def self.load_json(json)
+    from_json(JSON.parse(json, symbolize_names: true))
   end
 
-  def self.from_hash(hash)
-    spec_lock = Wow::Package::SpecificationLock.new(Wow::Package::Platform.from_hash(hash[:target]))
-    spec_lock.name = hash[:name]
-    spec_lock.version = Wow::Package::Version.parse(hash[:version])
-    spec_lock.authors = hash[:authors]
-    spec_lock.tags = hash[:tags]
-    spec_lock.homepage = hash[:homepage]
-    spec_lock.description = hash[:description]
-    spec_lock.short_description = hash[:short_description]
+  # Extract from "JSON" structure(Hash, Array, String)
+  def self.from_json(hash)
+    spec_lock = new(Wow::Package::Target.from_hash(hash[:target]))
+    spec_lock.initialize_attributes(hash)
     spec_lock.files = hash[:files]
     spec_lock.executables = hash[:executables]
     spec_lock

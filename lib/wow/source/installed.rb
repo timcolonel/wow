@@ -1,8 +1,9 @@
 require 'wow/install_dir'
 require 'wow/source'
 
+# Source for am installation directory.
+# packages are stored in the +source+/lib
 class Wow::Source::Installed < Wow::Source::Local
-
   def initialize(source)
     super(source)
     @dir = Wow::InstallDir.new(source)
@@ -20,7 +21,7 @@ class Wow::Source::Installed < Wow::Source::Local
           tuple = pkg.spec.name_tuple
           packages[tuple] = pkg
         rescue SystemCallError
-          # ignore
+          puts "Error while reading #{folder}"
         end
       end
     end

@@ -3,21 +3,15 @@ require 'wow/package/file_pattern'
 require 'wow/package/specification_lock'
 
 # Package Specification
+# This class is the mapping of the user specification defined in the oml file
 class Wow::Package::Specification
   include ActiveModel::Validations
+  include Wow::Package::SpecAttributes
 
   # User config
-  attr_accessor :name
-  attr_reader :version
-  attr_accessor :homepage
-  attr_accessor :authors
-  attr_reader :short_description
-  attr_reader :description
   attr_accessor :executables
-  attr_accessor :tags
   attr_reader :files_included
   attr_reader :files_excluded
-  attr_reader :dependencies
 
   # Internal Config
   attr_accessor :platform_configs
@@ -64,17 +58,10 @@ class Wow::Package::Specification
 
   # Initialize a new specification
   def initialize(hash = {})
-    @name = hash[:name]
-    self.version = hash[:version]
-    @homepage = hash[:homepage]
-    @authors = hash.fetch(:authors, [])
-    @tags = hash.fetch(:tags, [])
-    self.short_description = hash[:short_description]
-    self.description = hash[:description]
+    initialize_attributes(hash)
     self.files_included = hash[:files]
     self.files_excluded = hash[:files_excluded]
     @executables = hash.fetch(:executables, [])
-    self.dependencies = hash[:dependencies]
     @platform_configs = {}
     load_platforms(hash[:platform])
   end
@@ -97,16 +84,16 @@ class Wow::Package::Specification
     exclude_arch = []
     # Check if arch specific specs are defined
     data.each do |arch_name, content|
-      next unless Wow::Package::Platform.architectures.exist?(arch_name)
+      next unless Wow::Package::Target.architectures.exist?(arch_name)
 
-      platform = Wow::Package::Platform.new(platform_name, arch_name)
+      platform = Wow::Package::Target.new(platform_name, arch_name)
       exclude_arch << arch_name
       platform_config = Wow::Package::Specification.new(content)
       @platform_configs[platform] = platform_config
     end
     return if exclude_arch.size == data.size
 
-    platform = Wow::Package::Platform.new(platform_name)
+    platform = Wow::Package::Target.new(platform_name)
     platform_config = Wow::Package::Specification.new(data.except(exclude_arch))
     @platform_configs[platform] = platform_config
   end
@@ -130,32 +117,7 @@ class Wow::Package::Specification
   end
 
   def platform(name, &block)
-    platform_configs << {plaform: Wow::Package::Platform.new(name), block: block}
-  end
-
-  def version=(version)
-    @version = if version.is_a? String
-                 Wow::Package::Version.parse(version)
-               else
-                 version
-               end
-  end
-
-  def short_description=(content)
-    content ||= ''
-    @short_description = content
-  end
-
-  # Set the description of the package.
-  # @param content [String] Can either be the description itself or a filename.
-  def description=(content)
-    if content.nil?
-      @description = ''
-    elsif File.exists?(content)
-      @description = IO.read(content)
-    else
-      @description = content
-    end
+    platform_configs << {plaform: Wow::Package::Target.new(name), block: block}
   end
 
   # Set the list of files included
@@ -184,26 +146,9 @@ class Wow::Package::Specification
     end
   end
 
-  # Set the dependencies
-  # It can be set in the following ways:
-  # * with an array of Wow::Package::Dependency
-  # * with a Hash with key: package, value: version
-  #   e.g. `{'package1' => '>= 1.1', 'package2' => '~> 1.1'}`
-  # * with a Array of Array
-  #   e.g. `[['package1', '>= 1.1'], ['package2', '~> 1.1']]`
-  # @param array [Array|Hash]
-  def dependencies=(array)
-    if array.nil?
-      @dependencies = Wow::Package::DependencySet.new
-    elsif array.is_a? Wow::Package::DependencySet
-      @dependencies = array
-    else
-      @dependencies = Wow::Package::DependencySet.new(array)
-    end
-  end
 
   # List all the defined platforms
-  # @return [Array<Wow::Package::Platform>]
+  # @return [Array<Wow::Package::Target>]
   def platforms
     @platform_configs.keys
   end
@@ -237,9 +182,9 @@ class Wow::Package::Specification
   # @return [Wow::Package::Config]
   def get_platform_config(platform, architecture = :any)
     config = clone
-    config.target = Wow::Package::Platform.new(platform, architecture)
+    config.target = Wow::Package::Target.new(platform, architecture)
     @platform_configs.each do |target, specification|
-      config.merge_with(specification) if config.target.is? target
+      config.merge!(specification) if config.target.is? target
     end
     config
   end
@@ -255,11 +200,16 @@ class Wow::Package::Specification
     spec_lock
   end
 
-  def merge_with(specification)
-    @files_included += specification.files_included
-    @files_excluded += specification.files_excluded
-    @executables += specification.executables
-    @tags += specification.tags
+
+  def merge!(other)
+    @files_included += other.files_included
+    @files_excluded += other.files_excluded
+    @executables += other.executables
+    @tags += other.tags
+  end
+
+  def merge(other)
+    self.clone.merge!(other)
   end
 
   # Raise am error if the config is invalid

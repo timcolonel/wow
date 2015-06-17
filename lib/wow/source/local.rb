@@ -3,61 +3,6 @@ require 'wow/package/version_range'
 
 # Source for a directory containing .wow package.
 class Wow::Source::Local < Wow::Source
-  def <=>(other)
-    case other
-    when Wow::Source::Installed,
-      Wow::Source::Lock then
-      -1
-    when Wow::Source::Local then
-      0
-    when Wow::Source then
-      1
-    else
-      nil
-    end
-  end
-
-  # List the packages matching the filter
-  def load_packages(filter = :complete)
-    names = []
-
-    @specs = glob_packages
-    @specs.each do |tup, pkg|
-      case filter
-      when :released
-        names << pkg.spec.name_tuple unless pkg.spec.version.prerelease?
-      when :prerelease
-        names << pkg.spec.name_tuple if pkg.spec.version.prerelease?
-      when :latest_release
-        unless pkg.spec.version.prerelease?
-          tup = pkg.spec.name_tuple
-
-          cur = names.find { |x| x.name == tup.name }
-          if !cur
-            names << tup
-          elsif cur.version < tup.version
-            names.delete cur
-            names << tup
-          end
-        end
-      when :latest
-        tup = pkg.spec.name_tuple
-
-        cur = names.find { |x| x.name == tup.name }
-        if !cur
-          names << tup
-        elsif cur.version < tup.version
-          names.delete cur
-          names << tup
-        end
-      else
-        names << pkg.spec.name_tuple
-      end
-    end
-
-    names
-  end
-
   # @see Wow::Source#find_package
   def list_packages(package_name, version_range = nil, prerelease: false)
     found = []

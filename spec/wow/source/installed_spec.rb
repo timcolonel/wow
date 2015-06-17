@@ -14,19 +14,10 @@ RSpec.describe Wow::Source::Installed do
     @pkg_b = tmp_package 'b', '1.0.0', extract_to: @install_dir.lib
   end
 
-  describe '#load_packages' do
+  describe '#glob_packages' do
     it 'load specs of release' do
-      expect(subject.load_packages(:released).sort).to eq([@pkg_a.spec.name_tuple, @pkg_a2.spec.name_tuple, @pkg_b.spec.name_tuple].sort)
-    end
-
-    it 'load specs of prerelease' do
-      expect(subject.load_packages(:prerelease)).to eq([@pkg_ap.spec.name_tuple])
-    end
-    it 'get only the latest release version' do
-      expect(subject.load_packages(:latest_release).sort).to eq([@pkg_a2.spec.name_tuple, @pkg_b.spec.name_tuple].sort)
-    end
-    it 'get only the latest version' do
-      expect(subject.load_packages(:latest).sort).to eq([@pkg_ap.spec.name_tuple, @pkg_b.spec.name_tuple].sort)
+      expect(subject.glob_packages.keys.sort)
+        .to eq([@pkg_a, @pkg_a2, @pkg_ap, @pkg_b].map(&:name_tuple).sort)
     end
   end
 end

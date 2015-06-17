@@ -10,9 +10,10 @@ class Wow::Command::Init < Wow::Command
     src = Wow::Config.template_path('packages.toml')
     dst = File.join(Dir.pwd, Wow::Package::Specification.filename)
     if File.exist? dst
-      unless shell.yes?("#{Wow::Package::Specification.filename} already exists in this folder are you sure you want to override it? [yn]")
-        return
+      keep = shell.keep?(dst) do
+        File.read(src)
       end
+      return if keep
     end
     FileUtils.cp(src, dst)
     puts "Created config successfully in #{Wow::Package::Specification.filename}"

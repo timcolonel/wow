@@ -12,26 +12,6 @@ RSpec.describe Wow::Source::Local do
     @pkg_b = tmp_package 'b', '1.0.0', destination: @folder.to_s
   end
 
-  describe '#load_packages' do
-    it 'load specs of release' do
-      expect(subject.load_packages(:released).sort).to eq([@pkg_a.spec.name_tuple,
-                                                           @pkg_a2.spec.name_tuple,
-                                                           @pkg_b.spec.name_tuple].sort)
-    end
-
-    it 'load specs of prerelease' do
-      expect(subject.load_packages(:prerelease)).to eq([@pkg_ap.spec.name_tuple])
-    end
-    it 'get only the latest release version' do
-      expect(subject.load_packages(:latest_release).sort).to eq([@pkg_a2.spec.name_tuple,
-                                                                 @pkg_b.spec.name_tuple].sort)
-    end
-    it 'get only the latest version' do
-      expect(subject.load_packages(:latest).sort).to eq([@pkg_ap.spec.name_tuple,
-                                                         @pkg_b.spec.name_tuple].sort)
-    end
-  end
-
   describe '#list_packages' do
     it 'get only package with the given name and not prerelease' do
       expect(subject.list_packages('a').map(&:name_tuple).sort)

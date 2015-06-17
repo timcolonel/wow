@@ -20,7 +20,7 @@ class Wow::Command::Register < Wow::Command
       response = client.post 'api/v1/packages',
                              name: config.name,
                              homepage: config.homepage,
-                             short_description: config.short_description,
+                             summary: config.summary,
                              description: config.description,
                              tags: config.tags,
                              authors: config.authors

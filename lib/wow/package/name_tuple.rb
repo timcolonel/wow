@@ -27,7 +27,7 @@ class Wow::Package::NameTuple
                       else
                         nil
                       end
-               Wow::Package::Platform.new(platform, arch)
+               Wow::Package::Target.new(platform, arch)
              else
                nil
              end
@@ -60,7 +60,7 @@ class Wow::Package::NameTuple
       end
     end
 
-    "#{array.join('-')}.lock.toml"
+    "#{array.join('-')}.lock.json"
   end
 
   def <=>(other)

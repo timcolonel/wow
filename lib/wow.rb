@@ -6,7 +6,6 @@ require 'core_ext'
 require 'clin'
 require 'struct/tree'
 
-
 Clin.use_readline = false
 
 # Wow Module contains all the wow classes and modules
