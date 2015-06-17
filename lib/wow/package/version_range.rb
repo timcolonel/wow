@@ -1,7 +1,10 @@
+require 'wow'
 require 'wow/package/version'
+require 'wow/package/version_range/patterns'
 
 # Version Range
 class Wow::Package::VersionRange
+  include Wow::Package::VersionRange::Patterns
   # Range lower bound
   attr_accessor :lower_bound
 
@@ -10,40 +13,6 @@ class Wow::Package::VersionRange
 
   # Include hash Default: {lower_bound: true, upper_bound: false}
   attr_accessor :include
-
-  class << self
-    attr_accessor :patterns
-
-    def register_pattern(name, regex, &block)
-      @patterns ||= []
-      @patterns << [name, regex, block]
-    end
-  end
-
-  register_pattern :more_equal, /\A>= (.*)\Z/x do |version|
-    Wow::Package::VersionRange.new(lower_bound: version, include: {lower_bound: true})
-  end
-
-  register_pattern :more, /\A> (.*)\Z/x do |version|
-    Wow::Package::VersionRange.new(lower_bound: version, include: {lower_bound: false})
-  end
-
-  register_pattern :less_equal, /\A<= (.*)\Z/x do |version|
-    Wow::Package::VersionRange.new(upper_bound: version, include: {upper_bound: true})
-  end
-
-  register_pattern :less, /\A< (.*)\Z/x do |version|
-    Wow::Package::VersionRange.new(upper_bound: version, include: {upper_bound: false})
-  end
-
-  register_pattern :tilt, /\A~> (.*)\Z/x do |version|
-    Wow::Package::VersionRange.new(lower_bound: version, upper_bound: version.get_upper_bound)
-  end
-
-  # Need to be last as it's the more general value(The equal operator is optional)
-  register_pattern :equal, /\A=? (.*)\Z/x do |version|
-    Wow::Package::VersionRange.new(version)
-  end
 
   # Create a new VersionRange
   # @param value [Version|String]

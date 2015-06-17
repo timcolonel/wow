@@ -132,7 +132,6 @@ class Wow::Package::Version
     str
   end
 
-
   # Build a unique number from the version.
   # The number follows the version comparison
   # i.e (version1 <=> version2) == (version1.unique <=> version2.unique)
@@ -156,7 +155,10 @@ class Wow::Package::Version
     unique <=> other.unique
   end
 
-  def get_upper_bound
+  # Return the next pessimistic upgrade
+  # 1.2.3 => 1.3.0
+  # 1.2   => 2.0.0
+  def pessimistic_upgrade
     upper_bound = clone
     if @patch.nil?
       upper_bound.major = @major + 1

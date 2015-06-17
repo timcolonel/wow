@@ -62,7 +62,7 @@ RSpec.describe Wow::Package::VersionRange do
 
     it 'pessimistic use the a custom upper bound' do
       expect(Wow::Package::VersionRange.new('~> 1.2.3').lower_bound).to eq(lower_bound)
-      expect(Wow::Package::VersionRange.new('~> 1.2.3').upper_bound).to eq(lower_bound.get_upper_bound)
+      expect(Wow::Package::VersionRange.new('~> 1.2.3').upper_bound).to eq(lower_bound.pessimistic_upgrade)
     end
 
     it 'work with multiple conditions' do

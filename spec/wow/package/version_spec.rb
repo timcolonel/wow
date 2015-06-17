@@ -134,7 +134,7 @@ RSpec.describe Wow::Package::Version, type: :model do
   end
 
   describe '#get_upper_bound' do
-    it { expect(Wow::Package::Version.parse('1.2', true).get_upper_bound.to_s).to eq('2.0.0') }
-    it { expect(Wow::Package::Version.parse('1.2.3').get_upper_bound.to_s).to eq('1.3.0') }
+    it { expect(Wow::Package::Version.parse('1.2', true).pessimistic_upgrade.to_s).to eq('2.0.0') }
+    it { expect(Wow::Package::Version.parse('1.2.3').pessimistic_upgrade.to_s).to eq('1.3.0') }
   end
 end
