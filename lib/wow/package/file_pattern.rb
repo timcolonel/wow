@@ -1,3 +1,5 @@
+require 'wow'
+require 'wow/package'
 # @author Timothee Guerin
 # Class for pattern matching of files
 # Contains a pattern e.g. lib/**/*

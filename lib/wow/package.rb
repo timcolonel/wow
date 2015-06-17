@@ -12,15 +12,14 @@ class Wow::Package
     @path = path
 
     if archive?
-      name_tuple = Wow::Package::NameTuple.from_folder_name(File.basename(path))
-      lock_file = File.join(path, name_tuple.lock_filename)
-      @spec = Wow::Package::SpecificationLock.load(lock_file)
-    else
-      @is_archive = true
       Wow::Archive.open @path do |archive|
         content = archive.read_file(Wow::Package::SpecificationLock.filename_in_archive(@path))
         @spec = Wow::Package::SpecificationLock.load_json(content)
       end
+    else
+      name_tuple = Wow::Package::NameTuple.from_folder_name(File.basename(path))
+      lock_file = File.join(path, name_tuple.lock_filename)
+      @spec = Wow::Package::SpecificationLock.load(lock_file)
     end
   end
 
