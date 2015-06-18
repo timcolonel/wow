@@ -26,15 +26,28 @@ module Wow::Package::SpecAttributes
   # Dependencies
   attr_reader :dependencies
 
+  # Dependencies
+  attr_reader :executables
+
+  # Dependencies
+  attr_reader :applications
+
   # List of attributes defined in this module
   def _attrs
-    [:name, :version, :homepage, :authors, :tags, :summary, :description, :dependencies]
+    [:name, :version, :homepage, :authors, :tags, :summary, :description,
+     :dependencies, :executables, :applications]
+  end
+
+  def initialize_attributes
+    _attrs.each do |attr|
+      send("#{attr}=".to_sym, nil)
+    end
   end
 
   # Copy the attribute from a hash. This will give nil to all the attributes not in the hash
   # This OVERWRITE the current attribute value
   # @param hash [Hash]
-  def replace_attributes(hash = {})
+  def replace_attributes(hash)
     _attrs.each do |attr|
       send("#{attr}=".to_sym, hash[attr])
     end
@@ -52,16 +65,17 @@ module Wow::Package::SpecAttributes
   end
 
   # Copy the attribute from another object including this module
-  # Merge will only copy the value from other if self value is not nil
+  # It will merge only if other attribute is not nil
   # If the attribute is an array or a set
   # @param other [Object]
   def merge_attributes(other)
     _attrs.each do |attr|
       current = send(attr)
-      if current.nil?
-        send("#{attr}=".to_sym, other.send(attr))
-      elsif current.respond_to?('each') # If an array then concat the arrays
-        send("#{attr}=".to_sym, current + other.send(attr))
+      value = other.send(attr)
+      if current.respond_to?('each') # If an array then concat the arrays
+        send("#{attr}=".to_sym, current + value)
+      elsif !(value.nil? || value.blank?)
+        send("#{attr}=".to_sym, value)
       end
     end
     self
@@ -92,7 +106,7 @@ module Wow::Package::SpecAttributes
   # Set the package summary.
   # @param content [String]
   def summary=(content)
-    @summary = content || ''
+    @summary = content
   end
 
   # Set the description of the package.
@@ -137,5 +151,13 @@ module Wow::Package::SpecAttributes
     else
       @dependencies = Wow::Package::DependencySet.new(array)
     end
+  end
+
+  def executables=(ary)
+    @executables = ary || []
+  end
+
+  def applications=(ary)
+    @applications = ary || []
   end
 end

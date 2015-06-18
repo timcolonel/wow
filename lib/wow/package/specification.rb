@@ -9,7 +9,6 @@ class Wow::Package::Specification
   include Wow::Package::SpecAttributes
 
   # User config
-  attr_accessor :executables
   attr_reader :files_included
   attr_reader :files_excluded
 
@@ -43,7 +42,7 @@ class Wow::Package::Specification
   def self.from_toml(file)
     hash = TOML.load_file(file).deep_symbolize_keys
     spec = Wow::Package::Specification.new(hash)
-    spec.files_included << Wow::Package::FilePattern.new(file)
+    spec.files_included.unshift Wow::Package::FilePattern.new(file)
     spec
   end
 
@@ -52,7 +51,6 @@ class Wow::Package::Specification
     replace_attributes(hash)
     self.files_included = hash[:files]
     self.files_excluded = hash[:files_excluded]
-    @executables = hash.fetch(:executables, [])
     @platform_configs = {}
     load_platforms(hash[:platform])
   end
@@ -101,12 +99,6 @@ class Wow::Package::Specification
     @files_excluded += [*files].map { |x| Wow::Package::FilePattern.new(x) }
   end
 
-  # Add a new executable
-  # @param executables [String|Array] File or list of files
-  def executable(executables)
-    @executables += executables
-  end
-
   def platform(name, &block)
     platform_configs << {plaform: Wow::Package::Target.new(name), block: block}
   end
@@ -141,13 +133,6 @@ class Wow::Package::Specification
   # @return [Array<Wow::Package::Target>]
   def platforms
     @platform_configs.keys
-  end
-
-  def +(other)
-    fail ArgumentError unless other.is_a? Wow::Package::Specification
-    self.files += other.files
-    self.executables += other.executables
-    self
   end
 
   def list_files_matching_patterns(file_patterns = [])
@@ -192,7 +177,6 @@ class Wow::Package::Specification
   def merge!(other)
     @files_included += other.files_included
     @files_excluded += other.files_excluded
-    @executables += other.executables
     @tags += other.tags
   end
 

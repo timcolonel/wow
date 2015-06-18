@@ -61,6 +61,7 @@ RSpec.describe Wow::Package::SpecificationLock do
        target: {platform: 'any', architecture: 'any'},
        files: [],
        executables: [],
+       applications: [],
        dependencies: [{name: 'otherpkg', version_range: '>= 1.0.0'}]}
     end
     it { expect(subject.as_json).to eq(json) }

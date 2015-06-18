@@ -1,0 +1,38 @@
+{
+  "target": {
+    "platform": "osx",
+    "architecture": "x86"
+  },
+  "name": "multiple_platform",
+  "version": "4.5.6",
+  "homepage": "http://multiple-platform.example.com",
+  "authors": [
+    "John Smith john.smith@smithing.com"
+  ],
+  "tags": [
+    "complex",
+    "cross platform"
+  ],
+  "summary": "Multiple platform test spec",
+  "description": "Multiple platform test spec Longer description",
+  "files": [
+    "multiple_platform-osx-x86.lock.json",
+    "multiple_target.toml",
+    "general.rb",
+    "unix.rb",
+    "osx.rb",
+    "osx-x86.rb"
+  ],
+  "executables": [],
+  "applications": [],
+  "dependencies": [
+    {
+      "name": "a",
+      "version_range": ">= 1.2.3"
+    },
+    {
+      "name": "a_osx",
+      "version_range": ">= 2.3.7"
+    }
+  ]
+}

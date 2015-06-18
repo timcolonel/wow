@@ -1,0 +1,32 @@
+{
+  "target": {
+    "platform": "unix",
+    "architecture": "any"
+  },
+  "name": "multiple_platform",
+  "version": "4.5.6",
+  "homepage": "http://multiple-platform.example.com",
+  "authors": [
+    "John Smith john.smith@smithing.com"
+  ],
+  "tags": [
+    "complex",
+    "cross platform"
+  ],
+  "summary": "Multiple platform test spec",
+  "description": "Multiple platform test spec Longer description",
+  "files": [
+    "multiple_platform-unix.lock.json",
+    "multiple_target.toml",
+    "general.rb",
+    "unix.rb"
+  ],
+  "executables": [],
+  "applications": [],
+  "dependencies": [
+    {
+      "name": "a",
+      "version_range": ">= 1.2.3"
+    }
+  ]
+}

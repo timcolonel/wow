@@ -108,68 +108,43 @@ RSpec.describe Wow::Package::Specification do
   end
 
   describe '#lock' do
-    let(:hash) do
-      {name: Faker::App.name,
-       files: ['any.rb'],
-       dependencies: {a: '>= 1.2.3'},
-       platform: {windows: {files: ['windows.rb'], dependencies: {b: '>= 3.2.1'}},
-                  unix: {files: ['unix.rb']},
-                  osx: {files: ['osx.rb'], x86: {files: ['osx-x86.rb']}}}}
-    end
-
-    let(:dep_a) { {name: 'a', version_range: '>= 1.2.3'} }
-    let(:dep_b) { {name: 'b', version_range: '>= 3.2.1'} }
-
-    subject { Wow::Package::Specification.new(hash) }
-    let(:generated) { subject.lock(*target) }
-
     before do
       allow_any_instance_of(Wow::Package::Specification).to receive(:files) do |spec|
         Hash[spec.files_included.map(&:wildcard).map { |x| [x, x] }]
       end
     end
 
-    it { expect(subject.files.values).to include('any.rb') }
-
-
-    context 'when getting with general platform' do
-      let(:target) { :windows }
-
-      it { expect(generated.name).to eq(subject.name) }
-      it { expect(generated.files).to include('windows.rb') }
-      it { expect(generated.files).not_to include('unix.rb') }
-      it { expect(generated.files).not_to include('osx.rb') }
-      it { expect(generated.dependencies.as_json).to eq([dep_a, dep_b]) }
+    # Sort a json object so array don't need to
+    def sort_json(json)
+      out = {}
+      json.each do |k, v|
+        if v.is_a? Hash
+          v = sort_json(v)
+        elsif v.respond_to?(:sort)
+          v = v.sort_by(&:to_s)
+        end
+        out[k] = v
+      end
+      out
     end
 
-    context 'when getting with general platform' do
-      let(:target) { :unix }
-
-      it { expect(generated.name).to eq(subject.name) }
-      it { expect(generated.files).to include('unix.rb') }
-      it { expect(generated.files).not_to include('osx.rb') }
-      it { expect(generated.files).not_to include('windows.rb') }
-      it { expect(generated.dependencies.as_json).to eq([dep_a]) }
-    end
-
-    context 'when getting nested platform' do
-      let(:target) { :osx }
-
-      it { expect(generated.name).to eq(subject.name) }
-      it { expect(generated.files).to include('unix.rb') }
-      it { expect(generated.files).to include('osx.rb') }
-      it { expect(generated.files).not_to include('osx-x86.rb') }
-      it { expect(generated.dependencies.as_json).to eq([dep_a]) }
-    end
-
-    context 'when getting nested platform with architecture' do
-      let(:target) { [:osx, :x86] }
-
-      it { expect(generated.name).to eq(subject.name) }
-      it { expect(generated.files).to include('unix.rb') }
-      it { expect(generated.files).to include('osx.rb') }
-      it { expect(generated.files).to include('osx-x86.rb') }
-      it { expect(generated.dependencies.as_json).to eq([dep_a]) }
+    it 'run the test cases' do
+      Dir.chdir(File.join(File.dirname(__FILE__), 'cases/specification')) do
+        Dir['*.toml'].each do |spec_file|
+          base = File.basename(spec_file, '.toml')
+          spec = Wow::Package::Specification.from_toml(spec_file)
+          Dir["#{base}*.json"].each do |json_file|
+            json_base = File.basename(json_file, '.json')
+            match = json_base.match(/\A#{Regexp.escape(base)}-([a-z0-9]+)(?:-([a-z0-9]+))?\Z/)
+            platform = match[1]
+            architecture = match[2]
+            message = "Error in creating the lock file for #{platform} #{architecture}"
+            out = spec.lock(platform, architecture).as_json
+            should = JSON.parse(File.read(json_file), symbolize_names: true)
+            expect(sort_json(out)).to eq(sort_json(should)), message
+          end
+        end
+      end
     end
   end
 end

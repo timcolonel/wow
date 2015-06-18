@@ -6,17 +6,16 @@ require 'toml'
 class Wow::Package::SpecificationLock
   include Wow::Package::SpecAttributes
 
-  attr_accessor :files, :executables, :target
+  attr_accessor :files, :target
 
   def initialize(platform, architecture = nil)
-    replace_attributes
+    initialize_attributes
     @target = if platform.nil? || !platform.is_a?(Wow::Package::Target)
                 Wow::Package::Target.new(platform, architecture)
               else
                 platform
               end
-    @files = []
-    @executables = []
+    @files = Set.new
   end
 
   # @param [Wow::Package::Specification]
@@ -24,7 +23,6 @@ class Wow::Package::SpecificationLock
     merge_attributes(specification)
     @files << filename
     @files += specification.files.values
-    @executables += specification.executables
   end
 
   def as_json
@@ -35,8 +33,7 @@ class Wow::Package::SpecificationLock
 
   def to_hash
     attributes_hash.merge(target: @target,
-                          files: @files,
-                          executables: @executables)
+                          files: @files)
   end
 
   def filename
@@ -73,12 +70,11 @@ class Wow::Package::SpecificationLock
     spec_lock = new(Wow::Package::Target.from_hash(hash[:target]))
     spec_lock.replace_attributes(hash)
     spec_lock.files = hash[:files]
-    spec_lock.executables = hash[:executables]
     spec_lock
   end
 
   def name_tuple
-    Wow::Package::NameTuple.new(@name, @version, @target)
+    Wow::Package::NameTuple.new(self.name, self.version, @target)
   end
 
   def ==(other)
