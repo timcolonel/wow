@@ -9,7 +9,7 @@ class Wow::Package::SpecificationLock
   attr_accessor :files, :executables, :target
 
   def initialize(platform, architecture = nil)
-    initialize_attributes
+    replace_attributes
     @target = if platform.nil? || !platform.is_a?(Wow::Package::Target)
                 Wow::Package::Target.new(platform, architecture)
               else
@@ -21,19 +21,10 @@ class Wow::Package::SpecificationLock
 
   # @param [Wow::Package::Specification]
   def insert_specification(specification)
-    @name ||= specification.name
-    @version ||= specification.version
-    @homepage ||= specification.homepage
-    @description ||= specification.description
-    @summary ||= specification.summary
-
-    @tags += specification.tags
-    @authors += specification.authors
-
+    merge_attributes(specification)
     @files << filename
     @files += specification.files.values
     @executables += specification.executables
-    @dependencies += specification.dependencies
   end
 
   def as_json
@@ -68,7 +59,7 @@ class Wow::Package::SpecificationLock
   # Load the specification lock from a file.
   # @param filename [String]
   def self.load(filename)
-    self.load_json(File.read(filename))
+    load_json(File.read(filename))
   end
 
   # Parse the given json content
@@ -80,7 +71,7 @@ class Wow::Package::SpecificationLock
   # Extract from "JSON" structure(Hash, Array, String)
   def self.from_json(hash)
     spec_lock = new(Wow::Package::Target.from_hash(hash[:target]))
-    spec_lock.initialize_attributes(hash)
+    spec_lock.replace_attributes(hash)
     spec_lock.files = hash[:files]
     spec_lock.executables = hash[:executables]
     spec_lock

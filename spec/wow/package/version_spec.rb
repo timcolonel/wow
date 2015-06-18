@@ -133,8 +133,19 @@ RSpec.describe Wow::Package::Version, type: :model do
     it { expect(Wow::Package::Version.parse('1.2.4') < Wow::Package::Version.parse('1.2.3')).to be false }
   end
 
-  describe '#get_upper_bound' do
+  describe '#pessimistic_upgrade' do
     it { expect(Wow::Package::Version.parse('1.2', true).pessimistic_upgrade.to_s).to eq('2.0.0') }
     it { expect(Wow::Package::Version.parse('1.2.3').pessimistic_upgrade.to_s).to eq('1.3.0') }
+  end
+
+  describe '#coefficient' do
+    it do
+      coef = Wow::Package::Version.coefficient
+      expect(coef).to eq({major: 1_000_000_000_000_000,
+                          minor: 1_000_000_000_000,
+                          patch: 1_000_000_000,
+                          stage: 1_000_000,
+                          identifier: 100_000})
+    end
   end
 end

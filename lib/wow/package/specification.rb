@@ -21,15 +21,6 @@ class Wow::Package::Specification
                       with: /\A[a-z0-9_-]+\z/,
                       message: 'Error in config file. Should only contain lowercase, numbers and _-'
 
-  validate do
-    @files_included.each do |pattern|
-      if Pathname.new(pattern.pattern).absolute?
-        errors.add :file_patterns,
-                   "Path `#{pattern.pattern}`should be relative to the root but is an absolute path!"
-      end
-    end
-  end
-
   def self.filename
     'wow.toml'
   end
@@ -37,14 +28,14 @@ class Wow::Package::Specification
   # Will load the config from the current working directory
   # @return loaded config
   def self.load
-    Wow::Package::Specification.from_toml(Wow::Package::Specification.filename)
+    from_toml(Wow::Package::Specification.filename)
   end
 
   # Will load the config from the current working directory and check it's valid
   # @return loaded config
   # @throw Wow::Error if the config is invalid @see Wow::Specification.validate!
   def self.load_valid!
-    config = Wow::Package::Specification.from_toml(Wow::Package::Specification.filename)
+    config = load
     config.validate!
     config
   end
@@ -58,7 +49,7 @@ class Wow::Package::Specification
 
   # Initialize a new specification
   def initialize(hash = {})
-    initialize_attributes(hash)
+    replace_attributes(hash)
     self.files_included = hash[:files]
     self.files_excluded = hash[:files_excluded]
     @executables = hash.fetch(:executables, [])
@@ -146,7 +137,6 @@ class Wow::Package::Specification
     end
   end
 
-
   # List all the defined platforms
   # @return [Array<Wow::Package::Target>]
   def platforms
@@ -159,7 +149,6 @@ class Wow::Package::Specification
     self.executables += other.executables
     self
   end
-
 
   def list_files_matching_patterns(file_patterns = [])
     patterns = [*file_patterns]
@@ -200,7 +189,6 @@ class Wow::Package::Specification
     spec_lock
   end
 
-
   def merge!(other)
     @files_included += other.files_included
     @files_excluded += other.files_excluded
@@ -209,7 +197,7 @@ class Wow::Package::Specification
   end
 
   def merge(other)
-    self.clone.merge!(other)
+    clone.merge!(other)
   end
 
   # Raise am error if the config is invalid

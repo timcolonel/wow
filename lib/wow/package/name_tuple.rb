@@ -41,7 +41,7 @@ class Wow::Package::NameTuple
   def folder_name
     @arch = nil
     array = [@name, @version]
-    if @target and @target.platform != :any
+    if @target && @target.platform != :any
       array << @target.platform
       if @target.architecture && @target.architecture != :any
         array << @target.architecture
@@ -68,16 +68,8 @@ class Wow::Package::NameTuple
   end
 
   def ==(other)
-    case other
-    when self.class
-      @name == other.name &&
-        @version == other.version &&
-        @target == other.target
-    when Array
-      to_a == other
-    else
-      false
-    end
+    return to_a == other if other.is_a? array
+    @name == other.name && @version == other.version && @target == other.target
   end
 
   alias_method :eql?, :==

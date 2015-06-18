@@ -31,20 +31,40 @@ module Wow::Package::SpecAttributes
     [:name, :version, :homepage, :authors, :tags, :summary, :description, :dependencies]
   end
 
-  # Copy the attribute from a hash
+  # Copy the attribute from a hash. This will give nil to all the attributes not in the hash
+  # This OVERWRITE the current attribute value
   # @param hash [Hash]
-  def initialize_attributes(hash = {})
+  def replace_attributes(hash = {})
     _attrs.each do |attr|
       send("#{attr}=".to_sym, hash[attr])
     end
+    self
+  end
+
+  # Copy only the attributes in the has
+  # @param hash [Hash]
+  def assign_attributes(hash = {})
+    _attrs.each do |attr|
+      next unless hash.key?(attr)
+      send("#{attr}=".to_sym, hash[attr])
+    end
+    self
   end
 
   # Copy the attribute from another object including this module
+  # Merge will only copy the value from other if self value is not nil
+  # If the attribute is an array or a set
   # @param other [Object]
-  def copy_attributes(other)
+  def merge_attributes(other)
     _attrs.each do |attr|
-      send("#{attr}=".to_sym, other.send(attr))
+      current = send(attr)
+      if current.nil?
+        send("#{attr}=".to_sym, other.send(attr))
+      elsif current.respond_to?('each') # If an array then concat the arrays
+        send("#{attr}=".to_sym, current + other.send(attr))
+      end
     end
+    self
   end
 
   # Return a hash of the attributes
@@ -66,7 +86,7 @@ module Wow::Package::SpecAttributes
   # Set the version
   # @param value [Version|String|Hash]
   def version=(value)
-    @version =  Wow::Package::Version.from_json(value)
+    @version = Wow::Package::Version.from_json(value)
   end
 
   # Set the package summary.

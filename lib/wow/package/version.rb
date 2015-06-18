@@ -13,7 +13,7 @@ class Wow::Package::Version
     \Z
   /ix
 
-  attr_reader :major, :minor, :patch, :stage, :identifier
+  attr_reader :major, :minor, :patch, :identifier
 
   def initialize(major:, minor:, patch: nil, stage: :release, identifier: nil)
     self.major = major
@@ -38,6 +38,14 @@ class Wow::Package::Version
     @stage = stage.to_sym
   end
 
+  # Return the stage value
+  # @param short [Boolean] If true it will return the short stage name
+  # @return [Symbol]
+  # @see stage_initial
+  def stage(short = false)
+    short ? Wow::Package::Version.stage_initial[@stage.to_sym] : @stage
+  end
+
   def patch=(patch)
     @patch = patch.nil? ? nil : patch.to_i
   end
@@ -47,26 +55,26 @@ class Wow::Package::Version
   end
 
   def self.stages
-    { alpha: 0, beta: 1, release_candidate: 2, release: 3 }
+    {alpha: 0, beta: 1, release_candidate: 2, release: 3}
   end
 
   def self.stage_initial
-    { alpha: 'a', beta: 'b', release_candidate: 'rc', release: 'r' }
+    {alpha: 'a', beta: 'b', release_candidate: 'rc', release: 'r'}
   end
 
   def self.coefficient_multiplier
-    { major: 1000, minor: 1000, patch: 1000, stage: 10, identifier: 100_000 }
+    {major: 1000, minor: 1000, patch: 1000, stage: 10, identifier: 100_000}
   end
 
   def self.coefficient
-    result = { identifier: coefficient_multiplier[:identifier] }
-    result[:stage] = coefficient_multiplier[:stage] * result[:identifier]
-    result[:patch] = coefficient_multiplier[:patch] * result[:stage]
-    result[:minor] = coefficient_multiplier[:minor] * result[:patch]
-    result[:major] = coefficient_multiplier[:major] * result[:minor]
+    prev = 1
+    result = {}
+    [:identifier, :stage, :patch, :minor, :major].each do |seg|
+      prev *= coefficient_multiplier[seg]
+      result[seg] = prev
+    end
     result
   end
-
 
   # Parse a version string.
   # @param str [String] version in the string format to parse
@@ -111,6 +119,7 @@ class Wow::Package::Version
   def as_json
     to_s
   end
+
   # Return the version to string
   # @param short [Boolean] If true the stage will use the initial instead of the full name
   # @param hide_release [Boolean] If true the stage will not be included if it is release
@@ -124,12 +133,10 @@ class Wow::Package::Version
   # # => '1.2.3-release'
   # ```
   def to_s(short: true, hide_release: true)
-    str = [major, minor, patch].join('.')
-    unless hide_release && stage.to_sym == :release
-      str << ".#{short ? Wow::Package::Version.stage_initial[stage.to_sym] : stage}"
-    end
-    str << ".#{identifier}" unless identifier.nil?
-    str
+    ary = [major, minor, patch]
+    ary << stage(short) unless hide_release && @stage.to_sym == :release
+    ary << identifier unless identifier.nil?
+    ary.join('.')
   end
 
   # Build a unique number from the version.

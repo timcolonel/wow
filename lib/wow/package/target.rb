@@ -1,5 +1,8 @@
 require 'yaml'
 
+# A target is a combination of the following
+# * platform: Target os (windows, linux, any, unix, osx, etc)
+# * architecture: Target processor architecture any, x86, x64
 class Wow::Package::Target
   attr_accessor :platform
   attr_accessor :architecture
@@ -46,23 +49,22 @@ class Wow::Package::Target
   end
 
   def as_json
-    { platform: @platform.to_s, architecture: @architecture.to_s }
+    {platform: @platform.to_s, architecture: @architecture.to_s}
   end
 
   def to_hash
-    { platform: @platform.to_s, architecture: @architecture.to_s }
+    {platform: @platform.to_s, architecture: @architecture.to_s}
   end
 
   def ==(other)
     if other.is_a? Symbol
       @architecture == :any && @platform == other
     elsif other.is_a? Wow::Package::Target
-      self.to_a == other.to_a
+      to_a == other.to_a
     else
       false
     end
   end
-
 
   def to_a
     [@platform, @architecture]
@@ -100,17 +102,17 @@ class Wow::Package::Target
     # @return [Boolean]
     #
     # ```
-    # Wow::Package::Platform.based_on? :all, :windows # => true
-    # Wow::Package::Platform.based_on? :unix, :osx # => true
-    # Wow::Package::Platform.based_on? Platform.new(:unix), Platform.new(:osx, :x64) # => true
-    # Wow::Package::Platform.based_on? Platform.new(:unix, :x64), Platform.new(:osx, :x64) # => true
-    # Wow::Package::Platform.based_on? Platform.new(:unix, :x64), Platform.new(:osx, :x32) # => false
+    # Wow::Package::Platform.based_on? :all, :windows #=> true
+    # Wow::Package::Platform.based_on? :unix, :osx #=> true
+    # Wow::Package::Platform.based_on? Platform.new(:unix), Platform.new(:osx, :x64) #=> true
+    # Wow::Package::Platform.based_on? Platform.new(:unix, :x64), Platform.new(:osx, :x64) #=> true
+    # Wow::Package::Platform.based_on? Platform.new(:unix, :x64), Platform.new(:osx, :x32) #=> false
     # ```
     #
     def based_on?(parent, child)
       parent = Wow::Package::Target.new(parent) if parent.is_a? Symbol
       child = Wow::Package::Target.new(child) if child.is_a? Symbol
-      platform_based_on?(parent, child) and architecture_base_on?(parent, child)
+      platform_based_on?(parent, child) && architecture_base_on?(parent, child)
     end
 
     def platform_based_on?(parent, child)
@@ -137,6 +139,4 @@ class Wow::Package::Target
       Wow::Package::Target.new(hash[:platform].to_sym, hash[:architecture].to_sym)
     end
   end
-
 end
-
