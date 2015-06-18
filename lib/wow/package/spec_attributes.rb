@@ -38,6 +38,14 @@ module Wow::Package::SpecAttributes
      :dependencies, :executables, :applications]
   end
 
+  # Iterate through each attribute
+  # The callback take 2 arguments: the attribute name and the attribute value
+  def each_attribute(&block)
+    _attrs.each do |attr|
+      block.call(attr, send(attr))
+    end
+  end
+
   def initialize_attributes
     _attrs.each do |attr|
       send("#{attr}=".to_sym, nil)
