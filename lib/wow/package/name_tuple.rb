@@ -68,7 +68,7 @@ class Wow::Package::NameTuple
   end
 
   def ==(other)
-    return to_a == other if other.is_a? array
+    return to_a == other if other.is_a? Array
     @name == other.name && @version == other.version && @target == other.target
   end
 

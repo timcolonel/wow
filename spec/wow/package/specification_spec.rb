@@ -66,11 +66,6 @@ RSpec.describe Wow::Package::Specification do
       before { subject.version = nil }
       it { expect(subject).not_to be_valid }
     end
-
-    context 'when file contains absolute path' do
-      before { subject.file '/absolute/path' }
-      it { expect(subject).not_to be_valid }
-    end
   end
 
   describe '#create_archive' do
@@ -116,48 +111,65 @@ RSpec.describe Wow::Package::Specification do
     let(:hash) do
       {name: Faker::App.name,
        files: ['any.rb'],
-       platform: {unix: {files: ['unix.rb']},
+       dependencies: {a: '>= 1.2.3'},
+       platform: {windows: {files: ['windows.rb'], dependencies: {b: '>= 3.2.1'}},
+                  unix: {files: ['unix.rb']},
                   osx: {files: ['osx.rb'], x86: {files: ['osx-x86.rb']}}}}
     end
 
-    subject do
-      specification = Wow::Package::Specification.new(hash)
-      specification
-    end
+    let(:dep_a) { {name: 'a', version_range: '>= 1.2.3'} }
+    let(:dep_b) { {name: 'b', version_range: '>= 3.2.1'} }
+
+    subject { Wow::Package::Specification.new(hash) }
+    let(:generated) { subject.lock(*target) }
+
     before do
       allow_any_instance_of(Wow::Package::Specification).to receive(:files) do |spec|
         Hash[spec.files_included.map(&:wildcard).map { |x| [x, x] }]
       end
     end
+
     it { expect(subject.files.values).to include('any.rb') }
 
-    context 'when getting with general platform' do
-      before do
-        @generated = subject.lock(:unix)
-      end
 
-      it { expect(@generated.files).to include('unix.rb') }
-      it { expect(@generated.files).not_to include('osx.rb') }
+    context 'when getting with general platform' do
+      let(:target) { :windows }
+
+      it { expect(generated.name).to eq(subject.name) }
+      it { expect(generated.files).to include('windows.rb') }
+      it { expect(generated.files).not_to include('unix.rb') }
+      it { expect(generated.files).not_to include('osx.rb') }
+      it { expect(generated.dependencies.as_json).to eq([dep_a, dep_b]) }
+    end
+
+    context 'when getting with general platform' do
+      let(:target) { :unix }
+
+      it { expect(generated.name).to eq(subject.name) }
+      it { expect(generated.files).to include('unix.rb') }
+      it { expect(generated.files).not_to include('osx.rb') }
+      it { expect(generated.files).not_to include('windows.rb') }
+      it { expect(generated.dependencies.as_json).to eq([dep_a]) }
     end
 
     context 'when getting nested platform' do
-      before do
-        @generated = subject.lock(:osx)
-      end
+      let(:target) { :osx }
 
-      it { expect(@generated.files).to include('unix.rb') }
-      it { expect(@generated.files).to include('osx.rb') }
-      it { expect(@generated.files).not_to include('osx-x86.rb') }
+      it { expect(generated.name).to eq(subject.name) }
+      it { expect(generated.files).to include('unix.rb') }
+      it { expect(generated.files).to include('osx.rb') }
+      it { expect(generated.files).not_to include('osx-x86.rb') }
+      it { expect(generated.dependencies.as_json).to eq([dep_a]) }
     end
 
     context 'when getting nested platform with architecture' do
-      before do
-        @generated = subject.lock(:osx, :x86)
-      end
+      let(:target) { [:osx, :x86] }
 
-      it { expect(@generated.files).to include('unix.rb') }
-      it { expect(@generated.files).to include('osx.rb') }
-      it { expect(@generated.files).to include('osx-x86.rb') }
+      it { expect(generated.name).to eq(subject.name) }
+      it { expect(generated.files).to include('unix.rb') }
+      it { expect(generated.files).to include('osx.rb') }
+      it { expect(generated.files).to include('osx-x86.rb') }
+      it { expect(generated.dependencies.as_json).to eq([dep_a]) }
     end
   end
 end
