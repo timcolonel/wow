@@ -24,6 +24,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'require_all'
   s.add_dependency 'rest-client'
   s.add_dependency 'clin', '>= 0.4.0'
+  s.add_dependency 'os'
 
   s.add_development_dependency 'codeclimate-test-reporter'
   s.add_development_dependency 'faker'

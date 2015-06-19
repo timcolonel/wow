@@ -10,8 +10,12 @@ class Wow::Package::Target
   def initialize(platform = nil, architecture = nil)
     platform ||= :any
     architecture ||= :any
-    @platform = platform.to_sym
-    @architecture = architecture.to_sym
+    if platform.is_a?(String) && platform.include?('-')
+      @platform, @architecture = platform.split('-').map(&:to_sym)
+    else
+      @platform = platform.to_sym
+      @architecture = architecture.to_sym
+    end
   end
 
   # platform.is?(other) => Boolean

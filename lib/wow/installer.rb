@@ -14,11 +14,13 @@ class Wow::Installer
   def initialize(package, directory)
     @package = package
     @directory = directory.is_a?(Wow::InstallDir) ? directory : Wow::InstallDir.new(directory)
+    @exe = Wow::ExecutableManager.new(@directory)
   end
 
   def install
     puts "Installing #{@package.spec.name} #{@package.spec.version}..."
     extract_to_folder
+    @exe.create_executables(@package)
     puts "Installed #{@package.spec.name} #{@package.spec.version}"
   end
 
@@ -33,6 +35,6 @@ class Wow::Installer
   # Path to the package folder
   # e.g. $WOW_DIR/packages/lib/a-1.9.0/
   def lib_folder
-    File.join(@directory.lib, @package.spec.name_tuple.folder_name)
+    File.join(@directory.lib, @package.name_tuple.folder_name)
   end
 end

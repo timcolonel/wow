@@ -4,6 +4,7 @@ require 'active_model'
 require 'require_all'
 require 'core_ext'
 require 'clin'
+require 'os'
 require 'struct/tree'
 
 Clin.use_readline = false

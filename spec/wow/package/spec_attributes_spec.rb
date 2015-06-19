@@ -2,6 +2,7 @@ require 'spec_helper'
 
 RSpec.describe Wow::Package::SpecAttributes do
   let (:cls) { Class.new { include Wow::Package::SpecAttributes } }
+
   subject { cls.new }
   describe '#initialize_attributes' do
     it 'call each setter with nil' do
@@ -14,6 +15,7 @@ RSpec.describe Wow::Package::SpecAttributes do
 
   describe '#replace_attributes' do
     let(:hash) { {name: 'new val', tags: %w(tag1 tag2)} }
+
     it 'call each setter with the value in the hash' do
       subject._attrs.each do |attr|
         expect(subject).to receive("#{attr}=").with(hash[attr])
@@ -31,9 +33,11 @@ RSpec.describe Wow::Package::SpecAttributes do
   describe '#assign_attributes' do
     let(:hash) { {name: 'new val', tags: %w(tag1 tag2)} }
     let(:summary) { Faker::Lorem.sentence }
+
     before do
       subject.summary = summary
     end
+
     it 'call each setter with the value in the hash' do
       subject._attrs.each do |attr|
         if hash.key? attr
@@ -56,6 +60,7 @@ RSpec.describe Wow::Package::SpecAttributes do
   describe '#merge_attribute' do
     let(:other) { cls.new }
     let(:summary) { Faker::Lorem.sentence }
+
     before do
       other.name = 'new val'
       other.tags = %w(tag2 tag3)

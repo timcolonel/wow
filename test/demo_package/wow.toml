@@ -31,10 +31,10 @@ files = ['bin/*', 'lib/**/*']
 files_excluded = ['lib/util.rb']
 
 # List of executables(Relative to the root of the package) The file will be linked in the WOW bin directory which should be visible by the system path.
-executables = ['[Executables]']
+executables = ['bin/demo.bat']
 
 # List of application to install with the package. An application is a GUI program.
-application = ['[Apllication]']
+application = []
 
 # Platform specific config
 # Here you can repeat any of the specified config above and it will merge but only for the platform specified

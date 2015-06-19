@@ -47,15 +47,12 @@ application = []
 [dependencies]
 a = '>= 1.2.3'
 
-
 # Platform specific config
 # Here you can repeat any of the specified config above and it will merge but only for the platform specified
 # For example if you had  files = ['src/'] in the main config and add files = ['windows/'] under the [platform.windows] both src and windows will be deployed on install.
 [platform.windows]
 files = ['windows.rb']
-
-[platform.windows.dependencies]
-a_win = '>= 1.3.0'
+dependencies = {a_win = '>= 1.3.0'}
 
 [platform.unix]
 files = ['unix.rb']
